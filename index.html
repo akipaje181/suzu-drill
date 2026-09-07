@@ -22,25 +22,14 @@
   body{margin:0}
   [hidden]{display:none !important}
   img{max-width:100%}
-  .linkbtn{background:none; border:0; padding:6px 10px; font:inherit; font-size:12px; color:var(--ink-faint); text-decoration:underline; cursor:pointer}
   :root{
-    --paper:#ffffff;
-    --ground:#f2eee4;
-    --ink:#23211d;
-    --ink-soft:#6f695d;
-    --ink-faint:#9c9587;
-    --rule:#ded7c6;
-    --rule-soft:#ece6d8;
-    --shu:#d4453a;
-    --shu-ink:#c0392f;
-    --shu-wash:#fbeeec;
-    --ok-wash:#f0f4ec;
-    --ok-ink:#3f7a52;
-    --bar:#2e2b25;
-    --bar-ink:#f3efe4;
-    --field:#fdfcf8;
-    --field-line:#c8c0ad;
-    --grid:#e4ddcc;
+    --paper:#ffffff; --ground:#f2eee4;
+    --ink:#23211d; --ink-soft:#6f695d; --ink-faint:#9c9587;
+    --rule:#ded7c6; --rule-soft:#ece6d8;
+    --shu:#d4453a; --shu-ink:#c0392f; --shu-wash:#fbeeec;
+    --ok-wash:#f0f4ec; --ok-ink:#3f7a52;
+    --bar:#2e2b25; --bar-ink:#f3efe4;
+    --field:#fdfcf8; --field-line:#c8c0ad; --grid:#e4ddcc;
     --f-round:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Hiragino Sans','Yu Gothic',sans-serif;
     --f-kaku:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif;
   }
@@ -69,13 +58,21 @@
   button, input{font:inherit; color:inherit; touch-action:manipulation}
   button{cursor:pointer}
   :focus-visible{outline:3px solid var(--shu); outline-offset:2px}
-
   .wrap{max-width:760px; margin:0 auto; padding:0 14px}
+  .linkbtn{background:none; border:0; padding:6px 10px; font:inherit; font-size:13px; color:var(--ink-soft); text-decoration:underline; cursor:pointer}
+  .linkbtn.shu{color:var(--shu-ink)}
+  h2.sec{font-family:var(--f-round); font-size:18px; font-weight:700; margin:22px 0 10px}
+  h2.sec small{font-family:var(--f-kaku); font-size:12px; font-weight:500; color:var(--ink-soft); margin-left:8px}
+  .muted{color:var(--ink-soft); font-size:13px}
 
   /* ---------- header ---------- */
-  .top{background:var(--bar); color:var(--bar-ink); padding:12px 0 10px}
+  .top{background:var(--bar); color:var(--bar-ink); padding:12px 0 10px; position:sticky; top:0; z-index:20}
   .top .wrap{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
   .top h1{font-family:var(--f-round); font-size:18px; font-weight:700; margin:0; letter-spacing:.04em}
+  .back{
+    font-family:var(--f-round); font-size:15px; font-weight:700; color:var(--bar-ink);
+    background:transparent; border:1.5px solid currentColor; border-radius:999px; padding:5px 14px 5px 10px; min-height:38px; opacity:.85;
+  }
   .tabs{display:flex; gap:6px; margin-left:auto}
   .tab{
     font-family:var(--f-round); font-size:15px; font-weight:500;
@@ -83,6 +80,24 @@
     border:1.5px solid currentColor; border-radius:999px; padding:6px 14px; min-height:38px;
   }
   .tab[aria-pressed="true"]{opacity:1; background:var(--shu); border-color:var(--shu); color:#fff}
+  .tabs.inpage .tab{color:var(--ink); opacity:.75}
+  .tabs.inpage .tab[aria-pressed="true"]{color:#fff; opacity:1}
+
+  /* ---------- home ---------- */
+  .hello{font-family:var(--f-round); font-size:15px; color:var(--ink-soft); margin:18px 0 12px}
+  .hello b{color:var(--ink); font-size:17px}
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit, minmax(215px, 1fr)); gap:12px}
+  .tile{
+    display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+    min-height:128px; padding:16px 16px 14px; border-radius:16px; text-align:left;
+    background:var(--paper); border:1.5px solid var(--rule); color:var(--ink);
+  }
+  .tile svg{width:34px; height:34px; color:var(--shu-ink)}
+  .tile b{font-family:var(--f-round); font-size:20px; font-weight:700; line-height:1.3}
+  .tile span{font-size:13px; color:var(--ink-soft); line-height:1.5}
+  .tile.primary{background:var(--shu); border-color:var(--shu); color:#fff}
+  .tile.primary svg, .tile.primary span{color:rgba(255,255,255,.88)}
+  .tile .badge{display:inline-block; margin-top:auto; font-size:12px; color:var(--shu-ink); font-weight:700}
 
   /* ---------- sheet picker ---------- */
   .pick{background:var(--paper); border-bottom:1px solid var(--rule)}
@@ -99,58 +114,33 @@
   .chip.full{border-color:var(--ok-ink)}
   .chip[aria-pressed="true"]{background:var(--shu); border-color:var(--shu); color:#fff}
   .chip[aria-pressed="true"] small{color:rgba(255,255,255,.85)}
-  .weak{
-    margin-top:9px; font-size:13px; color:var(--ink-soft);
-    display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
-  }
-  .weak b{color:var(--shu-ink); font-family:var(--f-round)}
 
   /* ---------- problems ---------- */
-  .sheet-hd{
-    display:flex; align-items:baseline; gap:10px; margin:18px 0 10px;
-    font-family:var(--f-round);
-  }
+  .sheet-hd{display:flex; align-items:baseline; gap:10px; margin:18px 0 10px; font-family:var(--f-round)}
   .sheet-hd h2{font-size:19px; font-weight:700; margin:0}
   .sheet-hd span{font-size:13px; color:var(--ink-soft); font-family:var(--f-kaku)}
-
-  .q{
-    background:var(--paper); border:1px solid var(--rule); border-radius:12px;
-    padding:14px 15px 15px; margin-bottom:12px; position:relative;
-  }
+  .q{background:var(--paper); border:1px solid var(--rule); border-radius:12px; padding:14px 15px 15px; margin-bottom:12px; position:relative}
   .q-hd{display:flex; align-items:flex-start; gap:9px}
   .q-n{
-    flex:none; width:30px; height:30px; border-radius:50%;
-    border:2px solid var(--shu); color:var(--shu-ink);
-    font-family:var(--f-round); font-weight:700; font-size:15px;
-    display:flex; align-items:center; justify-content:center; line-height:1;
+    flex:none; width:30px; height:30px; border-radius:50%; border:2px solid var(--shu); color:var(--shu-ink);
+    font-family:var(--f-round); font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:center; line-height:1;
   }
-  .q-t{font-family:var(--f-round); font-size:16.5px; line-height:1.85; line-break:strict; flex:1}
-
+  .q-t{font-family:var(--f-round); font-size:16.5px; line-height:1.85; line-break:strict; flex:1; margin:0}
+  .q-type{position:absolute; top:-9px; left:14px; font-size:11px; color:var(--ink-soft); background:var(--paper); padding:0 6px; border-radius:6px}
   .row{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:13px 0 0 39px}
   .row .lbl{font-family:var(--f-round); font-size:15px; color:var(--ink-soft); flex:none}
-  .num{
-    width:96px; height:52px; text-align:center;
-    font-family:var(--f-round); font-size:22px; font-weight:700;
-    background:var(--field); border:2px solid var(--field-line); border-radius:10px;
-  }
+  .num{width:96px; height:52px; text-align:center; font-family:var(--f-round); font-size:22px; font-weight:700; background:var(--field); border:2px solid var(--field-line); border-radius:10px}
   .num::placeholder{color:var(--ink-faint); font-weight:400; font-size:16px}
   .unit{font-family:var(--f-round); font-size:17px; font-weight:500}
   .opts{display:flex; gap:8px; flex-wrap:wrap}
-  .opt{
-    font-family:var(--f-round); font-size:16px; font-weight:500; min-height:52px;
-    padding:8px 16px; border-radius:10px;
-    border:2px solid var(--field-line); background:var(--field);
-  }
+  .opt{font-family:var(--f-round); font-size:16px; font-weight:500; min-height:52px; padding:8px 16px; border-radius:10px; border:2px solid var(--field-line); background:var(--field)}
   .opt[aria-pressed="true"]{background:var(--shu); border-color:var(--shu); color:#fff}
 
   /* ---------- handwriting pad ---------- */
   .pad{margin:12px 0 0; border:1.5px dashed var(--field-line); border-radius:10px; overflow:hidden; background:var(--field)}
   .pad-bar{display:flex; align-items:center; gap:6px; padding:6px 8px; border-bottom:1px dashed var(--rule)}
   .pad-lbl{font-family:var(--f-round); font-size:12.5px; color:var(--ink-faint); margin-right:auto; padding-left:2px}
-  .tool{
-    min-height:38px; padding:4px 13px; border-radius:8px; font-size:14px; font-family:var(--f-round);
-    border:1.5px solid var(--field-line); background:var(--paper); color:var(--ink);
-  }
+  .tool{min-height:38px; padding:4px 13px; border-radius:8px; font-size:14px; font-family:var(--f-round); border:1.5px solid var(--field-line); background:var(--paper); color:var(--ink)}
   .tool[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
   .tool.clear{color:var(--shu-ink)}
   .pad-cv{
@@ -158,159 +148,299 @@
     background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
     background-size:30px 30px; background-position:-1px -1px;
   }
-  .q.graded .pad{opacity:.9}
 
   /* ---------- marking ---------- */
   .q.ok{border-color:var(--ok-ink)}
   .q.ng{border-color:var(--shu); background:var(--shu-wash)}
-  .mark{
-    position:absolute; top:10px; right:12px;
-    font-size:34px; line-height:1; font-weight:700;
-  }
+  .mark{position:absolute; top:10px; right:12px; font-size:34px; line-height:1; font-weight:700}
   .mark.o{width:32px; height:32px; border:4px solid var(--ok-ink); border-radius:50%; top:12px}
   .mark.x{color:var(--shu-ink)}
   .q.graded .num, .q.graded .opt{pointer-events:none}
   .q.ng .num, .q.ng .opt{border-color:var(--shu); opacity:.75}
-
-  .fix{
-    margin:12px 0 0 39px; padding:11px 13px; border-radius:9px;
-    background:var(--paper); border:1px dashed var(--shu);
-    font-family:var(--f-round); font-size:15px; line-height:1.8;
-  }
+  .fix{margin:12px 0 0 39px; padding:11px 13px; border-radius:9px; background:var(--paper); border:1px dashed var(--shu); font-family:var(--f-round); font-size:15px; line-height:1.8}
   .fix .k{color:var(--ink-soft); font-size:13px; font-family:var(--f-kaku); margin-right:6px}
   .fix .a{color:var(--shu-ink); font-weight:700; font-size:17px}
   .fix .st{display:block; margin-top:4px; color:var(--ink-soft); font-size:14px}
   .fix .st em{font-style:normal; color:var(--ink); font-weight:500}
+  .fix .go{display:block; margin-top:6px}
 
   /* ---------- result + action bar ---------- */
-  .score{
-    background:var(--paper); border:1px solid var(--rule); border-radius:12px;
-    padding:14px 16px; margin-bottom:12px;
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-  }
+  .score{background:var(--paper); border:1px solid var(--rule); border-radius:12px; padding:14px 16px; margin-bottom:12px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
   .score .big{font-family:var(--f-round); font-size:30px; font-weight:700; line-height:1}
   .score .big i{font-style:normal; font-size:17px; color:var(--ink-soft)}
   .score .msg{font-family:var(--f-round); font-size:16px; flex:1; min-width:140px}
   .score.all .big{color:var(--ok-ink)}
-
-  .bar{
-    position:fixed; left:0; right:0; bottom:0; z-index:30;
-    background:var(--paper); border-top:1px solid var(--rule);
-    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
-  }
+  .bar{position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--paper); border-top:1px solid var(--rule); padding:10px 14px calc(10px + env(safe-area-inset-bottom))}
   .bar .wrap{display:flex; gap:10px; padding:0}
-  .btn{
-    flex:1; min-height:56px; border-radius:12px; border:2px solid var(--shu);
-    background:var(--shu); color:#fff;
-    font-family:var(--f-round); font-size:19px; font-weight:700;
-  }
+  .btn{flex:1; min-height:56px; border-radius:12px; border:2px solid var(--shu); background:var(--shu); color:#fff; font-family:var(--f-round); font-size:19px; font-weight:700}
   .btn.ghost{background:transparent; color:var(--shu-ink)}
+  .btn.sm{flex:none; min-height:48px; font-size:16px; padding:0 18px}
   .btn[disabled]{opacity:.4}
-
   .note{font-size:12px; color:var(--ink-faint); text-align:center; margin:18px 0 6px}
 
+  /* ---------- weak mode ---------- */
+  .panel{background:var(--paper); border:1px solid var(--rule); border-radius:12px; padding:16px 18px; margin:16px 0 12px}
+  .panel h3{font-family:var(--f-round); font-size:17px; margin:0 0 8px}
+  .klist{display:flex; flex-direction:column; gap:6px; margin:6px 0 12px}
+  .krow{display:flex; align-items:center; gap:10px; font-family:var(--f-round); font-size:16px}
+  .krow .rate{margin-left:auto; font-family:var(--f-kaku); font-size:13px; color:var(--ink-soft); white-space:nowrap}
+  .krow .rate.weak{color:var(--shu-ink); font-weight:700}
+  .pill{display:inline-block; font-size:11px; font-weight:700; color:var(--shu-ink); border:1.5px solid var(--shu); border-radius:999px; padding:0 8px; line-height:18px}
+
+  /* ---------- lessons ---------- */
+  .llist{display:flex; flex-direction:column; gap:8px; margin-top:12px}
+  .lrow{display:flex; align-items:center; gap:12px; padding:13px 16px; background:var(--paper); border:1px solid var(--rule); border-radius:12px; text-align:left; font-family:var(--f-round); font-size:17px; font-weight:700; color:var(--ink)}
+  .lrow .n{flex:none; width:28px; height:28px; border-radius:50%; background:var(--shu-wash); color:var(--shu-ink); font-size:13px; display:flex; align-items:center; justify-content:center}
+  .lrow .st{margin-left:auto; font-family:var(--f-kaku); font-size:12px; font-weight:500; color:var(--ink-soft); white-space:nowrap}
+  .lrow .st.weak{color:var(--shu-ink); font-weight:700}
+  .lesson h2{font-family:var(--f-round); font-size:21px; margin:18px 0 6px; text-wrap:balance}
+  .lesson .eyebrow{display:inline-block; font-family:var(--f-round); font-size:12px; font-weight:700; color:var(--shu-ink); border:1.5px solid var(--shu); border-radius:3px; padding:1px 8px; letter-spacing:.06em; margin-top:16px}
+  .lesson .why{font-family:var(--f-round); font-size:16.5px; line-height:1.9; line-break:strict; margin:6px 0 0}
+  .lesson .ex{margin:14px 0 0; background:var(--shu-wash); border:1px solid rgba(212,69,58,.35); border-radius:10px; padding:12px 16px; font-family:var(--f-round); font-size:16px; line-height:2}
+  .lesson .ex .h{font-size:12px; color:var(--shu-ink); font-weight:700; letter-spacing:.06em; margin-bottom:2px; font-family:var(--f-kaku)}
+  .lesson .ex em{font-style:normal; color:var(--shu-ink); font-weight:700}
+  .lesson .ng{margin:12px 0 0; font-family:var(--f-round); font-size:15px; color:var(--ink-soft); line-height:1.8}
+  .lesson .ng b{color:var(--shu-ink)}
+  .lesson .try{margin-top:22px}
+  .lesson .actions{display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 0}
+
+  /* ---------- records ---------- */
+  .stats{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:14px}
+  .stat{background:var(--paper); border:1px solid var(--rule); border-radius:12px; padding:12px 14px}
+  .stat b{display:block; font-family:var(--f-round); font-size:26px; line-height:1.2}
+  .stat b i{font-style:normal; font-size:14px; color:var(--ink-soft); font-weight:500}
+  .stat span{font-size:12px; color:var(--ink-soft)}
+  .trow{display:grid; grid-template-columns:1fr auto; gap:3px 12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--rule-soft); width:100%; background:none; border-left:0; border-right:0; border-top:0; text-align:left; color:var(--ink)}
+  .trow .nm{font-family:var(--f-round); font-size:16px; font-weight:700}
+  .trow .nm .pill{margin-left:8px; vertical-align:2px}
+  .trow .rt{font-size:13px; color:var(--ink-soft); white-space:nowrap; font-variant-numeric:tabular-nums}
+  .bar-bg{grid-column:1 / -1; height:8px; background:var(--rule-soft); border-radius:4px; overflow:hidden}
+  .bar-fg{height:100%; background:var(--ok-ink); border-radius:4px}
+  .bar-fg.weak{background:var(--shu)}
+  .day{margin-top:14px}
+  .day h4{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin:0 0 4px; font-weight:700}
+  .lg{display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--rule-soft); font-size:14px}
+  .lg .tm{color:var(--ink-faint); font-variant-numeric:tabular-nums; width:44px}
+  .lg .wh{font-family:var(--f-round); font-weight:700}
+  .lg .sc{margin-left:auto; font-family:var(--f-round); font-weight:700; font-variant-numeric:tabular-nums}
+  .lg .sc.all{color:var(--ok-ink)}
+  .lg .wr{font-size:12px; color:var(--shu-ink)}
+  .grid5{display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; margin:6px 0 10px}
+  .cell{border:1.5px solid var(--rule); border-radius:10px; padding:6px 4px; text-align:center; font-family:var(--f-round); font-size:13px; background:var(--field)}
+  .cell b{display:block; font-size:15px}
+  .cell.full{border-color:var(--ok-ink); color:var(--ok-ink)}
+  .cell.none{color:var(--ink-faint)}
+  .rec-actions{display:flex; gap:12px; justify-content:center; margin:22px 0 10px; flex-wrap:wrap}
+
+  /* ---------- print view ---------- */
+  .pctl .opt-row{display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; margin:12px 0}
+  .pctl label{display:inline-flex; align-items:center; gap:8px; font-family:var(--f-round); font-size:15px}
+  .pctl input[type=checkbox]{width:22px; height:22px; accent-color:var(--shu)}
+  .pctl .src{display:flex; gap:8px; flex-wrap:wrap}
+  .pdfs{margin:16px 0 20px}
+  .pdfs .rowp{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:8px 0; border-bottom:1px solid var(--rule-soft)}
+  .pdfs .rowp b{font-family:var(--f-round); width:56px}
+  .pdfs a{font-family:var(--f-round); font-size:14px; color:var(--shu-ink); border:1.5px solid var(--shu); border-radius:999px; padding:4px 12px; text-decoration:none; min-height:36px; display:inline-flex; align-items:center}
+  #printArea{margin:14px auto 0; width:210mm; max-width:100%}
+  .psheet{
+    position:relative; width:210mm; min-height:297mm; padding:13mm 15mm 12mm; margin:0 0 8mm;
+    background:#fff; color:#23211d; box-shadow:0 1px 2px rgba(35,33,29,.1), 0 10px 26px rgba(35,33,29,.13);
+    font-size:10pt; font-family:var(--f-kaku); line-height:1.7;
+  }
+  .psheet .head{display:flex; align-items:flex-end; gap:10mm; border-bottom:1.6pt solid #23211d; padding-bottom:2.2mm}
+  .psheet .ttl{font-family:var(--f-round); font-weight:700; font-size:14pt; letter-spacing:.06em; margin:0; color:#23211d}
+  .psheet .no{margin-left:auto; font-family:var(--f-round); font-weight:700; font-size:11pt; color:#c0392f; border:1.4pt solid #d4453a; border-radius:2px; padding:.6mm 2.6mm; letter-spacing:.08em; white-space:nowrap}
+  .psheet .meta{display:flex; align-items:baseline; gap:7mm; margin-top:3mm; font-size:9pt; color:#6f695d}
+  .psheet .fill{border-bottom:.8pt solid #cfc8b8; display:inline-block}
+  .psheet .d{width:9mm} .psheet .nm{flex:1; min-width:40mm}
+  .psheet .sc{border:.9pt solid #cfc8b8; padding:1mm 3mm; white-space:nowrap}
+  .psheet .probs{display:flex; flex-direction:column; gap:3.5mm; margin-top:4mm}
+  .psheet .p{display:grid; grid-template-columns:1fr 62mm; grid-template-rows:auto auto; column-gap:5mm; row-gap:2mm}
+  .psheet .pt{grid-column:1; grid-row:1; display:flex; gap:2.6mm; align-items:flex-start; font-family:var(--f-round); font-size:10.5pt; line-height:1.74; line-break:strict; text-align:justify}
+  .psheet .pn{font-weight:700; font-size:11pt; color:#c0392f; flex:none; line-height:1.6}
+  .psheet .lines{grid-column:1; grid-row:2; padding-left:6.6mm; display:flex; flex-direction:column; justify-content:space-between; gap:2.5mm}
+  .psheet .ln{display:flex; align-items:flex-end; gap:2mm; min-height:10mm}
+  .psheet .ln .lbl{font-family:var(--f-round); font-size:10pt; color:#6f695d; flex:none; white-space:nowrap}
+  .psheet .ln .rule{flex:1; border-bottom:1pt solid #cfc8b8; min-height:9.5mm}
+  .psheet .ln.ans .lbl{color:#23211d}
+  .psheet .ln.ans .rule{border-bottom-width:1.4pt; border-bottom-color:#9c9587}
+  .psheet .hs{grid-column:2; grid-row:1 / 3; border:1pt dashed #cfc8b8; position:relative; min-height:36mm; padding:3.4mm 2mm 2mm}
+  .psheet .hs span{position:absolute; top:.8mm; left:1.6mm; font-family:var(--f-round); font-size:8pt; color:#9c9587}
+  .psheet .ak{margin-top:6mm; border:.9pt solid #e7e1d3}
+  .psheet .ak h4{font-family:var(--f-round); font-weight:700; font-size:10pt; margin:0; background:#fbeeec; color:#c0392f; padding:1.4mm 3mm; border-bottom:.9pt solid #eed6d2}
+  .psheet .ak table{width:100%; border-collapse:collapse; font-size:9.5pt; font-variant-numeric:tabular-nums}
+  .psheet .ak td{padding:1.8mm 3mm; vertical-align:top; border-top:.6pt solid #e7e1d3}
+  .psheet .ak tr:first-child td{border-top:0}
+  .psheet .ak .cn{width:5mm; color:#c0392f; font-weight:700; font-family:var(--f-round)}
+  .psheet .ak .cs{color:#6f695d}
+  .psheet .ak .ca{font-family:var(--f-round); font-weight:700; text-align:right; white-space:nowrap}
+
+  @page{size:A4; margin:13mm 15mm 12mm}
+  @media print{
+    body{background:#fff; padding:0}
+    body.print-mode .top, body.print-mode .bar, body.print-mode .pctl, body.print-mode .pdfs, body.print-mode .note{display:none !important}
+    body.print-mode #main > *:not(#v-print){display:none !important}
+    body.print-mode #v-print > .wrap{display:none !important}
+    #printArea{zoom:1 !important; width:auto; margin:0}
+    .psheet{width:auto; min-height:0; padding:0; margin:0; box-shadow:none; break-after:page; page-break-after:always}
+    .psheet:last-child{break-after:auto; page-break-after:auto}
+    .psheet .p{break-inside:avoid; page-break-inside:avoid}
+  }
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
 <body>
 
 <div class="top"><div class="wrap">
-  <h1>すずドリル</h1>
-  <div class="tabs" id="tabs"></div>
+  <button type="button" class="back" id="back" hidden>‹ ホーム</button>
+  <h1 id="ttl">すずドリル</h1>
+  <div class="tabs" id="tabs" hidden></div>
 </div></div>
 
-<div class="pick"><div class="wrap">
-  <div class="pick-row" id="chips"></div>
-  <div class="weak" id="weak"></div>
-</div></div>
+<main id="main">
 
-<div class="wrap">
-  <div class="sheet-hd"><h2 id="sheetTitle">No.1</h2><span id="sheetSub">こたえを 入れて、まるつけを おしてね</span></div>
-  <div id="result"></div>
-  <div id="qs"></div>
-  <p class="note" id="note"></p>
-  <p class="note"><button type="button" class="linkbtn" id="btnExport">きろくを 書き出す</button></p>
-</div>
+  <section id="v-home">
+    <div class="wrap">
+      <p class="hello" id="hello"></p>
+      <div class="tiles" id="tiles"></div>
+      <p class="note">2年生 文しょうだい　1-⑤・1-⑥・1-⑦　ぜんぶで 150問</p>
+    </div>
+  </section>
 
-<div class="bar"><div class="wrap">
+  <section id="v-solve" hidden>
+    <div class="pick"><div class="wrap">
+      <div class="pick-row" id="chips"></div>
+    </div></div>
+    <div class="wrap">
+      <div class="sheet-hd"><h2 id="sheetTitle">No.1</h2><span>こたえを 入れて、まるつけを おしてね</span></div>
+      <div id="result"></div>
+      <div id="qs"></div>
+      <p class="note" id="note"></p>
+    </div>
+  </section>
+
+  <section id="v-weak" hidden>
+    <div class="wrap">
+      <div id="wintro"></div>
+      <div id="wresult"></div>
+      <div id="wqs"></div>
+    </div>
+  </section>
+
+  <section id="v-lessons" hidden>
+    <div class="wrap">
+      <div id="llist"></div>
+      <div id="ldetail" class="lesson" hidden></div>
+    </div>
+  </section>
+
+  <section id="v-records" hidden>
+    <div class="wrap" id="recs"></div>
+  </section>
+
+  <section id="v-print" hidden>
+    <div class="wrap">
+      <div class="pctl" id="pctl"></div>
+      <div class="pdfs" id="pdfs"></div>
+    </div>
+    <div id="printArea"></div>
+  </section>
+
+</main>
+
+<div class="bar" id="bar" hidden><div class="wrap">
   <button class="btn ghost" id="btnAgain" hidden>もういちど</button>
   <button class="btn" id="btnMain">まるつけ</button>
 </div></div>
 
 <script>
 (function () {
-  var DATA = {"tests":[{"id":"1-5","label":"1-⑤","types":["かご＋ばら","それぞれ〜ずつ","どちらが多い","あいだの数","長さのひき算"],"note":"6月5日の 小テスト 1-⑤ と 同じ 5つの型です。","sheets":[{"n":1,"qs":[{"t":"みかんを 2かごと 3こ 買いました。1かごには 6こ 入って いました。家に かえってから、家ぞく 5人が 一人 1こずつ 食べました。みかんは なんこ のこって いますか。","s":["6+6+3=15","15-5=10"],"ans":{"k":"n","v":10,"u":"こ"}},{"t":"たまごが 53こ ありました。あさと ひるに それぞれ 7こずつ つかいました。たまごは あと なんこ のこって いますか。","s":["53-7=46","46-7=39"],"ans":{"k":"n","v":39,"u":"こ"}},{"t":"水そうに、メダカと 金魚が あわせて 120ぴき います。その うち、メダカは 40ぴきです。メダカと 金魚では、どちらが どれだけ 多く いますか。","s":["120-40=80","80-40=40"],"ans":{"k":"pick","opts":["メダカ","金魚"],"pick":"金魚","v":40,"u":"ぴき"}},{"t":"35人の 2年生が いちれつに ならんで います。その あいだに 1人ずつ 1年生が 入ると、子どもは みんなで なん人に なりますか。","s":["35-1=34","35+34=69"],"ans":{"k":"n","v":69,"u":"人"}},{"t":"15cm8mmの かみテープが あります。この かみテープから、5cm5mmの 長さを 切りとりました。のこりの かみテープの 長さは どれだけですか。","s":["15cm8mm-5cm5mm"],"ans":{"k":"len","cm":10,"mm":3}}]},{"n":2,"qs":[{"t":"りんごを 2はこと 4こ 買いました。1はこには 7こ 入って いました。家に かえってから、家ぞく 6人が 一人 1こずつ 食べました。りんごは なんこ のこって いますか。","s":["7+7+4=18","18-6=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"色紙が 45まい ありました。1日目と 2日目に それぞれ 8まいずつ つかいました。色紙は あと なんまい のこって いますか。","s":["45-8=37","37-8=29"],"ans":{"k":"n","v":29,"u":"まい"}},{"t":"花だんに、赤い 花と 白い 花が あわせて 130本 さいて います。その うち、赤い 花は 50本です。赤い 花と 白い 花では、どちらが どれだけ 多いですか。","s":["130-50=80","80-50=30"],"ans":{"k":"pick","opts":["赤い 花","白い 花"],"pick":"白い 花","v":30,"u":"本"}},{"t":"28人の 子どもが いちれつに ならんで います。その あいだに 1人ずつ 先生が 入ると、みんなで なん人に なりますか。","s":["28-1=27","28+27=55"],"ans":{"k":"n","v":55,"u":"人"}},{"t":"18cm7mmの リボンが あります。この リボンから、6cm4mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["18cm7mm-6cm4mm"],"ans":{"k":"len","cm":12,"mm":3}}]},{"n":3,"qs":[{"t":"あめを 3ふくろと 2こ 買いました。1ふくろには 5こ 入って いました。おやつの 時間に 4人が 一人 1こずつ 食べました。あめは なんこ のこって いますか。","s":["5+5+5=15","15+2=17","17-4=13"],"ans":{"k":"n","v":13,"u":"こ"}},{"t":"おり紙が 62まい ありました。あさと ゆうがたに それぞれ 9まいずつ つかいました。おり紙は あと なんまい のこって いますか。","s":["62-9=53","53-9=44"],"ans":{"k":"n","v":44,"u":"まい"}},{"t":"こうえんに、男の子と 女の子が あわせて 90人 います。その うち、男の子は 60人です。男の子と 女の子では、どちらが どれだけ 多いですか。","s":["90-60=30","60-30=30"],"ans":{"k":"pick","opts":["男の子","女の子"],"pick":"男の子","v":30,"u":"人"}},{"t":"木が 42本 いちれつに ならんで 立って います。その あいだに 1本ずつ 花を うえると、木と 花は あわせて なん本に なりますか。","s":["42-1=41","42+41=83"],"ans":{"k":"n","v":83,"u":"本"}},{"t":"24cm9mmの ひもが あります。この ひもから、8cm3mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["24cm9mm-8cm3mm"],"ans":{"k":"len","cm":16,"mm":6}}]},{"n":4,"qs":[{"t":"たまごを 2パックと 5こ もらいました。1パックには 8こ 入って いました。家ぞく 3人が 一人 1こずつ 食べました。たまごは なんこ のこって いますか。","s":["8+8+5=21","21-3=18"],"ans":{"k":"n","v":18,"u":"こ"}},{"t":"トマトが 38こ ありました。あさと ひるに それぞれ 6こずつ つかいました。トマトは あと なんこ のこって いますか。","s":["38-6=32","32-6=26"],"ans":{"k":"n","v":26,"u":"こ"}},{"t":"はこに、あめと チョコが あわせて 110こ 入って います。その うち、あめは 70こです。あめと チョコでは、どちらが どれだけ 多いですか。","s":["110-70=40","70-40=30"],"ans":{"k":"pick","opts":["あめ","チョコ"],"pick":"あめ","v":30,"u":"こ"}},{"t":"20人の 1年生が いちれつに ならんで います。その あいだに 1人ずつ 2年生が 入ると、子どもは みんなで なん人に なりますか。","s":["20-1=19","20+19=39"],"ans":{"k":"n","v":39,"u":"人"}},{"t":"13cm6mmの かみテープが あります。この かみテープから、4cm2mmの 長さを 切りとりました。のこりの かみテープの 長さは どれだけですか。","s":["13cm6mm-4cm2mm"],"ans":{"k":"len","cm":9,"mm":4}}]},{"n":5,"qs":[{"t":"トマトを 2かごと 3こ 買いました。1かごには 9こ 入って いました。サラダに 家ぞく 5人が 一人 1こずつ 食べました。トマトは なんこ のこって いますか。","s":["9+9+3=21","21-5=16"],"ans":{"k":"n","v":16,"u":"こ"}},{"t":"シールが 71まい ありました。1日目と 2日目に それぞれ 8まいずつ つかいました。シールは あと なんまい のこって いますか。","s":["71-8=63","63-8=55"],"ans":{"k":"n","v":55,"u":"まい"}},{"t":"本だなに、絵本と ずかんが あわせて 150さつ あります。その うち、ずかんは 40さつです。絵本と ずかんでは、どちらが どれだけ 多いですか。","s":["150-40=110","110-40=70"],"ans":{"k":"pick","opts":["絵本","ずかん"],"pick":"絵本","v":70,"u":"さつ"}},{"t":"はたが 31本 いちれつに 立って います。その あいだに 1本ずつ 赤い はたを 立てると、はたは ぜんぶで なん本に なりますか。","s":["31-1=30","31+30=61"],"ans":{"k":"n","v":61,"u":"本"}},{"t":"27cm8mmの リボンが あります。この リボンから、9cm6mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["27cm8mm-9cm6mm"],"ans":{"k":"len","cm":18,"mm":2}}]},{"n":6,"qs":[{"t":"クッキーを 3はこと 4こ 作りました。1はこには 6こ 入って います。おきゃくさん 6人が 一人 1こずつ 食べました。クッキーは なんこ のこって いますか。","s":["6+6+6=18","18+4=22","22-6=16"],"ans":{"k":"n","v":16,"u":"こ"}},{"t":"ジュースが 54本 ありました。あさと ひるに それぞれ 7本ずつ くばりました。ジュースは あと なん本 のこって いますか。","s":["54-7=47","47-7=40"],"ans":{"k":"n","v":40,"u":"本"}},{"t":"水そうに、エビと 貝が あわせて 80ぴき います。その うち、エビは 30ぴきです。エビと 貝では、どちらが どれだけ 多いですか。","s":["80-30=50","50-30=20"],"ans":{"k":"pick","opts":["エビ","貝"],"pick":"貝","v":20,"u":"ぴき"}},{"t":"26人の 子どもが いちれつに ならんで います。その あいだに 1人ずつ おとなが 入ると、みんなで なん人に なりますか。","s":["26-1=25","26+25=51"],"ans":{"k":"n","v":51,"u":"人"}},{"t":"16cm5mmの 毛糸が あります。この 毛糸から、7cm1mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["16cm5mm-7cm1mm"],"ans":{"k":"len","cm":9,"mm":4}}]},{"n":7,"qs":[{"t":"いちごを 2パックと 6こ 買いました。1パックには 5こ 入って いました。家ぞく 4人が 一人 1こずつ 食べました。いちごは なんこ のこって いますか。","s":["5+5+6=16","16-4=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"えんぴつが 43本 ありました。1年生と 2年生に それぞれ 9本ずつ くばりました。えんぴつは あと なん本 のこって いますか。","s":["43-9=34","34-9=25"],"ans":{"k":"n","v":25,"u":"本"}},{"t":"星の シールと ハートの シールが あわせて 120まい あります。その うち、星の シールは 80まいです。星と ハートでは、どちらが どれだけ 多いですか。","s":["120-80=40","80-40=40"],"ans":{"k":"pick","opts":["星","ハート"],"pick":"星","v":40,"u":"まい"}},{"t":"45人の 2年生が いちれつに ならんで います。その あいだに 1人ずつ 1年生が 入ると、子どもは みんなで なん人に なりますか。","s":["45-1=44","45+44=89"],"ans":{"k":"n","v":89,"u":"人"}},{"t":"32cm7mmの はり金が あります。この はり金から、5cm3mmの 長さを 切りとりました。のこりの はり金の 長さは どれだけですか。","s":["32cm7mm-5cm3mm"],"ans":{"k":"len","cm":27,"mm":4}}]},{"n":8,"qs":[{"t":"ドーナツを 2はこと 2こ 買いました。1はこには 7こ 入って いました。家ぞく 5人が 一人 1こずつ 食べました。ドーナツは なんこ のこって いますか。","s":["7+7+2=16","16-5=11"],"ans":{"k":"n","v":11,"u":"こ"}},{"t":"あめが 66こ ありました。あさと ひるに それぞれ 8こずつ 食べました。あめは あと なんこ のこって いますか。","s":["66-8=58","58-8=50"],"ans":{"k":"n","v":50,"u":"こ"}},{"t":"ちゅう車場に、車と じてん車が あわせて 100だい あります。その うち、車は 45だいです。車と じてん車では、どちらが どれだけ 多いですか。","s":["100-45=55","55-45=10"],"ans":{"k":"pick","opts":["車","じてん車"],"pick":"じてん車","v":10,"u":"だい"}},{"t":"いすが 18きゃく いちれつに ならんで います。その あいだに 1きゃくずつ いすを ふやすと、いすは ぜんぶで なんきゃくに なりますか。","s":["18-1=17","18+17=35"],"ans":{"k":"n","v":35,"u":"きゃく"}},{"t":"21cm9mmの テープが あります。この テープから、8cm7mmの 長さを 切りとりました。のこりの テープの 長さは どれだけですか。","s":["21cm9mm-8cm7mm"],"ans":{"k":"len","cm":13,"mm":2}}]},{"n":9,"qs":[{"t":"プリンを 3はこと 5こ 買いました。1はこには 4こ 入って いました。家ぞく 3人が 一人 1こずつ 食べました。プリンは なんこ のこって いますか。","s":["4+4+4=12","12+5=17","17-3=14"],"ans":{"k":"n","v":14,"u":"こ"}},{"t":"花が 52本 さいて いました。きのうと 今日に それぞれ 6本ずつ 切りました。花は あと なん本 のこって いますか。","s":["52-6=46","46-6=40"],"ans":{"k":"n","v":40,"u":"本"}},{"t":"赤い おはじきと 青い おはじきが あわせて 140こ あります。その うち、青い おはじきは 90こです。赤と 青では、どちらが どれだけ 多いですか。","s":["140-90=50","90-50=40"],"ans":{"k":"pick","opts":["赤","青"],"pick":"青","v":40,"u":"こ"}},{"t":"33人の 子どもが いちれつに ならんで います。その あいだに 1人ずつ お母さんが 入ると、みんなで なん人に なりますか。","s":["33-1=32","33+32=65"],"ans":{"k":"n","v":65,"u":"人"}},{"t":"19cm6mmの ひもが あります。この ひもから、6cm4mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["19cm6mm-6cm4mm"],"ans":{"k":"len","cm":13,"mm":2}}]},{"n":10,"qs":[{"t":"みかんを 2かごと 3こ 買いました。1かごには 8こ 入って いました。家に かえってから、家ぞく 6人が 一人 1こずつ 食べました。みかんは なんこ のこって いますか。","s":["8+8+3=19","19-6=13"],"ans":{"k":"n","v":13,"u":"こ"}},{"t":"カードが 47まい ありました。あさと ひるに それぞれ 9まいずつ つかいました。カードは あと なんまい のこって いますか。","s":["47-9=38","38-9=29"],"ans":{"k":"n","v":29,"u":"まい"}},{"t":"学校の 1年生と 2年生が あわせて 160人 います。その うち、1年生は 70人です。1年生と 2年生では、どちらが どれだけ 多いですか。","s":["160-70=90","90-70=20"],"ans":{"k":"pick","opts":["1年生","2年生"],"pick":"2年生","v":20,"u":"人"}},{"t":"24人の 2年生が いちれつに ならんで います。その あいだに 1人ずつ 1年生が 入ると、子どもは みんなで なん人に なりますか。","s":["24-1=23","24+23=47"],"ans":{"k":"n","v":47,"u":"人"}},{"t":"25cm8mmの リボンが あります。この リボンから、7cm5mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["25cm8mm-7cm5mm"],"ans":{"k":"len","cm":18,"mm":3}}]}]},{"id":"1-6","label":"1-⑥","types":["わの あいだの数","長さ（0mm）","一人2こずつ","それぞれ〜ずつ","どちらが多い"],"note":"6月12日の 小テスト 1-⑥ と 同じ 5つの型です。","sheets":[{"n":1,"qs":[{"t":"36人の 2年生が わに なって すわって いました。その後、2年生と 2年生の あいだに 3年生が 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 36","36+36=72"],"ans":{"k":"n","v":72,"u":"人"}},{"t":"57cm9mmの 毛糸が あります。この 毛糸から、6cm9mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["57cm9mm-6cm9mm"],"ans":{"k":"len","cm":51,"mm":0}},{"t":"さくらんぼを 3かごと 2こ 買いました。1かごには 5こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。さくらんぼは なんこ のこって いますか。","s":["5+5+5+2=17","2+2+2+2=8","17-8=9"],"ans":{"k":"n","v":9,"u":"こ"}},{"t":"あめが 47こ ありました。はるさんと なつさんが、それぞれ 6こずつ 食べました。あめは あと なんこ のこって いますか。","s":["47-6=41","41-6=35"],"ans":{"k":"n","v":35,"u":"こ"}},{"t":"赤えんぴつと 青えんぴつが あわせて 88本 あります。その うち、赤えんぴつは 22本です。赤えんぴつと 青えんぴつでは、どちらが どれだけ 多く ありますか。","s":["88-22=66","66-22=44"],"ans":{"k":"pick","opts":["赤えんぴつ","青えんぴつ"],"pick":"青えんぴつ","v":44,"u":"本"}}]},{"n":2,"qs":[{"t":"24人の 子どもが わに なって 手を つないで います。その あいだに おとなが 1人ずつ 入ると、みんなで なん人に なりますか。","s":["あいだも 24","24+24=48"],"ans":{"k":"n","v":48,"u":"人"}},{"t":"43cm5mmの リボンが あります。この リボンから、8cm5mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["43cm5mm-8cm5mm"],"ans":{"k":"len","cm":35,"mm":0}},{"t":"いちごを 2はこと 4こ 買いました。1はこには 7こ 入って いました。家に かえってから 家ぞく 3人が 一人 2こずつ 食べました。いちごは なんこ のこって いますか。","s":["7+7+4=18","2+2+2=6","18-6=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"カードが 52まい ありました。ゆいさんと そらさんが、それぞれ 7まいずつ つかいました。カードは あと なんまい のこって いますか。","s":["52-7=45","45-7=38"],"ans":{"k":"n","v":38,"u":"まい"}},{"t":"白い ごいしと 黒い ごいしが あわせて 76こ あります。その うち、白い ごいしは 18こです。白い ごいしと 黒い ごいしでは、どちらが どれだけ 多く ありますか。","s":["76-18=58","58-18=40"],"ans":{"k":"pick","opts":["白い ごいし","黒い ごいし"],"pick":"黒い ごいし","v":40,"u":"こ"}}]},{"n":3,"qs":[{"t":"まるい テーブルの まわりに 45人が すわって います。その あいだに 1人ずつ すわると、みんなで なん人に なりますか。","s":["あいだも 45","45+45=90"],"ans":{"k":"n","v":90,"u":"人"}},{"t":"62cm7mmの ひもが あります。この ひもから、9cm7mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["62cm7mm-9cm7mm"],"ans":{"k":"len","cm":53,"mm":0}},{"t":"ぶどうを 3ふくろと 3こ 買いました。1ふくろには 6こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。ぶどうは なんこ のこって いますか。","s":["6+6+6+3=21","2+2+2+2=8","21-8=13"],"ans":{"k":"n","v":13,"u":"こ"}},{"t":"シールが 63まい ありました。けんさんと はなさんが、それぞれ 8まいずつ つかいました。シールは あと なんまい のこって いますか。","s":["63-8=55","55-8=47"],"ans":{"k":"n","v":47,"u":"まい"}},{"t":"大人と 子どもが あわせて 94人 います。その うち、大人は 35人です。大人と 子どもでは、どちらが どれだけ 多く いますか。","s":["94-35=59","59-35=24"],"ans":{"k":"pick","opts":["大人","子ども"],"pick":"子ども","v":24,"u":"人"}}]},{"n":4,"qs":[{"t":"18人の 2年生が わに なって すわって いました。その あいだに 1年生が 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 18","18+18=36"],"ans":{"k":"n","v":36,"u":"人"}},{"t":"38cm6mmの かみテープが あります。この かみテープから、4cm6mmの 長さを 切りとりました。のこりの かみテープの 長さは どれだけですか。","s":["38cm6mm-4cm6mm"],"ans":{"k":"len","cm":34,"mm":0}},{"t":"あめを 2ふくろと 5こ 買いました。1ふくろには 8こ 入って いました。家に かえってから 家ぞく 3人が 一人 3こずつ 食べました。あめは なんこ のこって いますか。","s":["8+8+5=21","3+3+3=9","21-9=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"えんぴつが 41本 ありました。りくさんと さくらさんが、それぞれ 9本ずつ つかいました。えんぴつは あと なん本 のこって いますか。","s":["41-9=32","32-9=23"],"ans":{"k":"n","v":23,"u":"本"}},{"t":"パンと おにぎりが あわせて 82こ あります。その うち、パンは 26こです。パンと おにぎりでは、どちらが どれだけ 多く ありますか。","s":["82-26=56","56-26=30"],"ans":{"k":"pick","opts":["パン","おにぎり"],"pick":"おにぎり","v":30,"u":"こ"}}]},{"n":5,"qs":[{"t":"まるい 池の まわりに 木が 32本 うえて あります。木と 木の あいだに 花を 1本ずつ うえると、木と 花は あわせて なん本に なりますか。","s":["あいだも 32","32+32=64"],"ans":{"k":"n","v":64,"u":"本"}},{"t":"75cm8mmの 毛糸が あります。この 毛糸から、7cm8mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["75cm8mm-7cm8mm"],"ans":{"k":"len","cm":68,"mm":0}},{"t":"みかんを 3かごと 4こ 買いました。1かごには 5こ 入って いました。家に かえってから 家ぞく 5人が 一人 2こずつ 食べました。みかんは なんこ のこって いますか。","s":["5+5+5+4=19","2+2+2+2+2=10","19-10=9"],"ans":{"k":"n","v":9,"u":"こ"}},{"t":"クッキーが 56こ ありました。あおいさんと ゆうとさんが、それぞれ 7こずつ 食べました。クッキーは あと なんこ のこって いますか。","s":["56-7=49","49-7=42"],"ans":{"k":"n","v":42,"u":"こ"}},{"t":"赤い ぼうしと 白い ぼうしが あわせて 65こ あります。その うち、赤い ぼうしは 21こです。赤い ぼうしと 白い ぼうしでは、どちらが どれだけ 多く ありますか。","s":["65-21=44","44-21=23"],"ans":{"k":"pick","opts":["赤い ぼうし","白い ぼうし"],"pick":"白い ぼうし","v":23,"u":"こ"}}]},{"n":6,"qs":[{"t":"27人の 子どもが わに なって います。その あいだに 先生が 1人ずつ 入ると、みんなで なん人に なりますか。","s":["あいだも 27","27+27=54"],"ans":{"k":"n","v":54,"u":"人"}},{"t":"54cm3mmの テープが あります。この テープから、6cm3mmの 長さを 切りとりました。のこりの テープの 長さは どれだけですか。","s":["54cm3mm-6cm3mm"],"ans":{"k":"len","cm":48,"mm":0}},{"t":"クッキーを 2はこと 2こ 買いました。1はこには 9こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。クッキーは なんこ のこって いますか。","s":["9+9+2=20","2+2+2+2=8","20-8=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"色紙が 74まい ありました。みなとさんと ひなさんが、それぞれ 8まいずつ つかいました。色紙は あと なんまい のこって いますか。","s":["74-8=66","66-8=58"],"ans":{"k":"n","v":58,"u":"まい"}},{"t":"男の子と 女の子が あわせて 71人 います。その うち、男の子は 28人です。男の子と 女の子では、どちらが どれだけ 多く いますか。","s":["71-28=43","43-28=15"],"ans":{"k":"pick","opts":["男の子","女の子"],"pick":"女の子","v":15,"u":"人"}}]},{"n":7,"qs":[{"t":"まるい 花だんの まわりに チューリップが 41本 さいて います。その あいだに 1本ずつ うえると、花は ぜんぶで なん本に なりますか。","s":["あいだも 41","41+41=82"],"ans":{"k":"n","v":82,"u":"本"}},{"t":"81cm4mmの はり金が あります。この はり金から、5cm4mmの 長さを 切りとりました。のこりの はり金の 長さは どれだけですか。","s":["81cm4mm-5cm4mm"],"ans":{"k":"len","cm":76,"mm":0}},{"t":"たまごを 3パックと 6こ 買いました。1パックには 4こ 入って いました。家に かえってから 家ぞく 3人が 一人 2こずつ 食べました。たまごは なんこ のこって いますか。","s":["4+4+4+6=18","2+2+2=6","18-6=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"たまごが 45こ ありました。あきさんと なつさんが、それぞれ 6こずつ つかいました。たまごは あと なんこ のこって いますか。","s":["45-6=39","39-6=33"],"ans":{"k":"n","v":33,"u":"こ"}},{"t":"金魚と メダカが あわせて 90ひき います。その うち、金魚は 27ひきです。金魚と メダカでは、どちらが どれだけ 多く いますか。","s":["90-27=63","63-27=36"],"ans":{"k":"pick","opts":["金魚","メダカ"],"pick":"メダカ","v":36,"u":"ひき"}}]},{"n":8,"qs":[{"t":"15人の 子どもが わに なって すわって いました。その あいだに 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 15","15+15=30"],"ans":{"k":"n","v":30,"u":"人"}},{"t":"46cm9mmの リボンが あります。この リボンから、8cm9mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["46cm9mm-8cm9mm"],"ans":{"k":"len","cm":38,"mm":0}},{"t":"トマトを 2かごと 3こ 買いました。1かごには 7こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。トマトは なんこ のこって いますか。","s":["7+7+3=17","2+2+2+2=8","17-8=9"],"ans":{"k":"n","v":9,"u":"こ"}},{"t":"おり紙が 68まい ありました。そらさんと うみさんが、それぞれ 9まいずつ つかいました。おり紙は あと なんまい のこって いますか。","s":["68-9=59","59-9=50"],"ans":{"k":"n","v":50,"u":"まい"}},{"t":"まんがと 絵本が あわせて 84さつ あります。その うち、まんがは 32さつです。まんがと 絵本では、どちらが どれだけ 多く ありますか。","s":["84-32=52","52-32=20"],"ans":{"k":"pick","opts":["まんが","絵本"],"pick":"絵本","v":20,"u":"さつ"}}]},{"n":9,"qs":[{"t":"38人の 2年生が わに なって すわって いました。その あいだに 3年生が 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 38","38+38=76"],"ans":{"k":"n","v":76,"u":"人"}},{"t":"67cm2mmの ひもが あります。この ひもから、9cm2mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["67cm2mm-9cm2mm"],"ans":{"k":"len","cm":58,"mm":0}},{"t":"ドーナツを 3はこと 1こ 買いました。1はこには 6こ 入って いました。家に かえってから 家ぞく 3人が 一人 3こずつ 食べました。ドーナツは なんこ のこって いますか。","s":["6+6+6+1=19","3+3+3=9","19-9=10"],"ans":{"k":"n","v":10,"u":"こ"}},{"t":"トマトが 51こ ありました。はるさんと ふゆさんが、それぞれ 7こずつ つかいました。トマトは あと なんこ のこって いますか。","s":["51-7=44","44-7=37"],"ans":{"k":"n","v":37,"u":"こ"}},{"t":"青い おはじきと 赤い おはじきが あわせて 73こ あります。その うち、青い おはじきは 24こです。青い おはじきと 赤い おはじきでは、どちらが どれだけ 多く ありますか。","s":["73-24=49","49-24=25"],"ans":{"k":"pick","opts":["青い おはじき","赤い おはじき"],"pick":"赤い おはじき","v":25,"u":"こ"}}]},{"n":10,"qs":[{"t":"まるい 池の まわりに いすが 29きゃく ならんで います。その あいだに いすを 1きゃくずつ ふやすと、いすは ぜんぶで なんきゃくに なりますか。","s":["あいだも 29","29+29=58"],"ans":{"k":"n","v":58,"u":"きゃく"}},{"t":"53cm6mmの 毛糸が あります。この 毛糸から、7cm6mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["53cm6mm-7cm6mm"],"ans":{"k":"len","cm":46,"mm":0}},{"t":"プリンを 2はこと 4こ 買いました。1はこには 8こ 入って いました。家に かえってから 家ぞく 5人が 一人 2こずつ 食べました。プリンは なんこ のこって いますか。","s":["8+8+4=20","2+2+2+2+2=10","20-10=10"],"ans":{"k":"n","v":10,"u":"こ"}},{"t":"ジュースが 62本 ありました。ゆいさんと かえでさんが、それぞれ 8本ずつ くばりました。ジュースは あと なん本 のこって いますか。","s":["62-8=54","54-8=46"],"ans":{"k":"n","v":46,"u":"本"}},{"t":"タクシーと バスが あわせて 96だい あります。その うち、タクシーは 39だいです。タクシーと バスでは、どちらが どれだけ 多く ありますか。","s":["96-39=57","57-39=18"],"ans":{"k":"pick","opts":["タクシー","バス"],"pick":"バス","v":18,"u":"だい"}}]}]},{"id":"1-7","label":"1-⑦","types":["どちらが多い","長さのたし算","年れい","あいだの数","まえ＋うしろ＋自分"],"note":"6月11日の 小テスト 1-⑦ と 同じ 5つの型です。","sheets":[{"n":1,"qs":[{"t":"カボチャと スイカが あわせて 77こ あります。その うち、カボチャは 28こです。カボチャと スイカでは、どちらが どれだけ 多く ありますか。","s":["77-28=49","49-28=21"],"ans":{"k":"pick","opts":["カボチャ","スイカ"],"pick":"スイカ","v":21,"u":"こ"}},{"t":"23cm4mmの テープと 7cm8mmの テープが あります。2本の テープを あわせると、長さは どれだけに なりますか。","s":["23cm4mm+7cm8mm","12mm=1cm2mm"],"ans":{"k":"len","cm":31,"mm":2}},{"t":"きょ年、わたしは 7さいでした。姉は、わたしより 7さい とし上です。姉は、今 なんさいですか。","s":["7+1=8","8+7=15"],"ans":{"k":"n","v":15,"u":"さい"}},{"t":"27人の 女の子が いちれつに ならんで います。その あいだに 男の子が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["27-1=26","27+26=53"],"ans":{"k":"n","v":53,"u":"人"}},{"t":"あやさんは、バスていに ならんで います。あやさんの まえには 6人、うしろには 5人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["6+5+1=12"],"ans":{"k":"n","v":12,"u":"人"}}]},{"n":2,"qs":[{"t":"りんごと なしが あわせて 63こ あります。その うち、りんごは 19こです。りんごと なしでは、どちらが どれだけ 多く ありますか。","s":["63-19=44","44-19=25"],"ans":{"k":"pick","opts":["りんご","なし"],"pick":"なし","v":25,"u":"こ"}},{"t":"15cm6mmの リボンと 9cm7mmの リボンが あります。2本の リボンを あわせると、長さは どれだけに なりますか。","s":["15cm6mm+9cm7mm","13mm=1cm3mm"],"ans":{"k":"len","cm":25,"mm":3}},{"t":"きょ年、わたしは 8さいでした。兄は、わたしより 6さい とし上です。兄は、今 なんさいですか。","s":["8+1=9","9+6=15"],"ans":{"k":"n","v":15,"u":"さい"}},{"t":"34人の 子どもが いちれつに ならんで います。その あいだに おとなが 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["34-1=33","34+33=67"],"ans":{"k":"n","v":67,"u":"人"}},{"t":"ゆいさんは、きゅうしょくの れつに ならんで います。ゆいさんの まえには 8人、うしろには 4人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["8+4+1=13"],"ans":{"k":"n","v":13,"u":"人"}}]},{"n":3,"qs":[{"t":"犬と ねこが あわせて 91ひき います。その うち、犬は 34ひきです。犬と ねこでは、どちらが どれだけ 多く いますか。","s":["91-34=57","57-34=23"],"ans":{"k":"pick","opts":["犬","ねこ"],"pick":"ねこ","v":23,"u":"ひき"}},{"t":"34cm5mmの ひもと 8cm9mmの ひもが あります。2本の ひもを あわせると、長さは どれだけに なりますか。","s":["34cm5mm+8cm9mm","14mm=1cm4mm"],"ans":{"k":"len","cm":43,"mm":4}},{"t":"きょ年、わたしは 6さいでした。姉は、わたしより 9さい とし上です。姉は、今 なんさいですか。","s":["6+1=7","7+9=16"],"ans":{"k":"n","v":16,"u":"さい"}},{"t":"19人の 2年生が いちれつに ならんで います。その あいだに 1年生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["19-1=18","19+18=37"],"ans":{"k":"n","v":37,"u":"人"}},{"t":"けんさんは、すべりだいの れつに ならんで います。けんさんの まえには 3人、うしろには 9人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["3+9+1=13"],"ans":{"k":"n","v":13,"u":"人"}}]},{"n":4,"qs":[{"t":"赤い 花と 黄色い 花が あわせて 68本 あります。その うち、赤い 花は 25本です。赤い 花と 黄色い 花では、どちらが どれだけ 多く ありますか。","s":["68-25=43","43-25=18"],"ans":{"k":"pick","opts":["赤い 花","黄色い 花"],"pick":"黄色い 花","v":18,"u":"本"}},{"t":"12cm8mmの かみテープと 6cm5mmの かみテープが あります。2本の かみテープを あわせると、長さは どれだけに なりますか。","s":["12cm8mm+6cm5mm","13mm=1cm3mm"],"ans":{"k":"len","cm":19,"mm":3}},{"t":"きょ年、わたしは 9さいでした。兄は、わたしより 5さい とし上です。兄は、今 なんさいですか。","s":["9+1=10","10+5=15"],"ans":{"k":"n","v":15,"u":"さい"}},{"t":"46人の 子どもが いちれつに ならんで います。その あいだに 先生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["46-1=45","46+45=91"],"ans":{"k":"n","v":91,"u":"人"}},{"t":"そらさんは、バスていに ならんで います。そらさんの まえには 7人、うしろには 7人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["7+7+1=15"],"ans":{"k":"n","v":15,"u":"人"}}]},{"n":5,"qs":[{"t":"ケーキと パンが あわせて 74こ あります。その うち、ケーキは 29こです。ケーキと パンでは、どちらが どれだけ 多く ありますか。","s":["74-29=45","45-29=16"],"ans":{"k":"pick","opts":["ケーキ","パン"],"pick":"パン","v":16,"u":"こ"}},{"t":"27cm7mmの 毛糸と 5cm6mmの 毛糸が あります。2本の 毛糸を あわせると、長さは どれだけに なりますか。","s":["27cm7mm+5cm6mm","13mm=1cm3mm"],"ans":{"k":"len","cm":33,"mm":3}},{"t":"きょ年、わたしは 7さいでした。いとこは、わたしより 8さい とし上です。いとこは、今 なんさいですか。","s":["7+1=8","8+8=16"],"ans":{"k":"n","v":16,"u":"さい"}},{"t":"23本の 木が いちれつに ならんで います。その あいだに 花を 1本ずつ うえると、ぜんぶで なん本に なりますか。","s":["23-1=22","23+22=45"],"ans":{"k":"n","v":45,"u":"本"}},{"t":"はなさんは、すいどうの まえに ならんで います。はなさんの まえには 5人、うしろには 2人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["5+2+1=8"],"ans":{"k":"n","v":8,"u":"人"}}]},{"n":6,"qs":[{"t":"1年生と 2年生が あわせて 96人 います。その うち、1年生は 37人です。1年生と 2年生では、どちらが どれだけ 多く いますか。","s":["96-37=59","59-37=22"],"ans":{"k":"pick","opts":["1年生","2年生"],"pick":"2年生","v":22,"u":"人"}},{"t":"41cm9mmの はり金と 7cm4mmの はり金が あります。2本の はり金を あわせると、長さは どれだけに なりますか。","s":["41cm9mm+7cm4mm","13mm=1cm3mm"],"ans":{"k":"len","cm":49,"mm":3}},{"t":"きょ年、わたしは 5さいでした。姉は、わたしより 7さい とし上です。姉は、今 なんさいですか。","s":["5+1=6","6+7=13"],"ans":{"k":"n","v":13,"u":"さい"}},{"t":"38人の 2年生が いちれつに ならんで います。その あいだに 3年生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["38-1=37","38+37=75"],"ans":{"k":"n","v":75,"u":"人"}},{"t":"みなとさんは、きゅうしょくの れつに ならんで います。みなとさんの まえには 9人、うしろには 6人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["9+6+1=16"],"ans":{"k":"n","v":16,"u":"人"}}]},{"n":7,"qs":[{"t":"白い ぼうしと 赤い ぼうしが あわせて 82こ あります。その うち、白い ぼうしは 26こです。白い ぼうしと 赤い ぼうしでは、どちらが どれだけ 多く ありますか。","s":["82-26=56","56-26=30"],"ans":{"k":"pick","opts":["白い ぼうし","赤い ぼうし"],"pick":"赤い ぼうし","v":30,"u":"こ"}},{"t":"18cm6mmの テープと 9cm8mmの テープが あります。2本の テープを あわせると、長さは どれだけに なりますか。","s":["18cm6mm+9cm8mm","14mm=1cm4mm"],"ans":{"k":"len","cm":28,"mm":4}},{"t":"きょ年、わたしは 8さいでした。兄は、わたしより 9さい とし上です。兄は、今 なんさいですか。","s":["8+1=9","9+9=18"],"ans":{"k":"n","v":18,"u":"さい"}},{"t":"16本の はたが いちれつに ならんで います。その あいだに 赤い はたを 1本ずつ 立てると、ぜんぶで なん本に なりますか。","s":["16-1=15","16+15=31"],"ans":{"k":"n","v":31,"u":"本"}},{"t":"さくらさんは、バスていに ならんで います。さくらさんの まえには 4人、うしろには 8人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["4+8+1=13"],"ans":{"k":"n","v":13,"u":"人"}}]},{"n":8,"qs":[{"t":"かきと みかんが あわせて 59こ あります。その うち、かきは 17こです。かきと みかんでは、どちらが どれだけ 多く ありますか。","s":["59-17=42","42-17=25"],"ans":{"k":"pick","opts":["かき","みかん"],"pick":"みかん","v":25,"u":"こ"}},{"t":"36cm7mmの リボンと 8cm7mmの リボンが あります。2本の リボンを あわせると、長さは どれだけに なりますか。","s":["36cm7mm+8cm7mm","14mm=1cm4mm"],"ans":{"k":"len","cm":45,"mm":4}},{"t":"きょ年、わたしは 6さいでした。姉は、わたしより 6さい とし上です。姉は、今 なんさいですか。","s":["6+1=7","7+6=13"],"ans":{"k":"n","v":13,"u":"さい"}},{"t":"42人の 子どもが いちれつに ならんで います。その あいだに おとなが 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["42-1=41","42+41=83"],"ans":{"k":"n","v":83,"u":"人"}},{"t":"りくさんは、かいだんの れつに ならんで います。りくさんの まえには 6人、うしろには 3人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["6+3+1=10"],"ans":{"k":"n","v":10,"u":"人"}}]},{"n":9,"qs":[{"t":"オートバイと 自てん車が あわせて 70だい あります。その うち、オートバイは 23だいです。オートバイと 自てん車では、どちらが どれだけ 多く ありますか。","s":["70-23=47","47-23=24"],"ans":{"k":"pick","opts":["オートバイ","自てん車"],"pick":"自てん車","v":24,"u":"だい"}},{"t":"25cm9mmの ひもと 6cm3mmの ひもが あります。2本の ひもを あわせると、長さは どれだけに なりますか。","s":["25cm9mm+6cm3mm","12mm=1cm2mm"],"ans":{"k":"len","cm":32,"mm":2}},{"t":"きょ年、わたしは 9さいでした。兄は、わたしより 7さい とし上です。兄は、今 なんさいですか。","s":["9+1=10","10+7=17"],"ans":{"k":"n","v":17,"u":"さい"}},{"t":"25きゃくの いすが いちれつに ならんで います。その あいだに いすを 1きゃくずつ ならべると、ぜんぶで なんきゃくに なりますか。","s":["25-1=24","25+24=49"],"ans":{"k":"n","v":49,"u":"きゃく"}},{"t":"あおいさんは、すべりだいの れつに ならんで います。あおいさんの まえには 2人、うしろには 7人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["2+7+1=10"],"ans":{"k":"n","v":10,"u":"人"}}]},{"n":10,"qs":[{"t":"ずかんと まんがが あわせて 88さつ あります。その うち、ずかんは 31さつです。ずかんと まんがでは、どちらが どれだけ 多く ありますか。","s":["88-31=57","57-31=26"],"ans":{"k":"pick","opts":["ずかん","まんが"],"pick":"まんが","v":26,"u":"さつ"}},{"t":"44cm5mmの 毛糸と 9cm8mmの 毛糸が あります。2本の 毛糸を あわせると、長さは どれだけに なりますか。","s":["44cm5mm+9cm8mm","13mm=1cm3mm"],"ans":{"k":"len","cm":54,"mm":3}},{"t":"きょ年、わたしは 7さいでした。姉は、わたしより 5さい とし上です。姉は、今 なんさいですか。","s":["7+1=8","8+5=13"],"ans":{"k":"n","v":13,"u":"さい"}},{"t":"31人の 2年生が いちれつに ならんで います。その あいだに 1年生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["31-1=30","31+30=61"],"ans":{"k":"n","v":61,"u":"人"}},{"t":"ゆうとさんは、バスていに ならんで います。ゆうとさんの まえには 10人、うしろには 5人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["10+5+1=16"],"ans":{"k":"n","v":16,"u":"人"}}]}]}]};
+  var DATA = {"tests":[{"id":"1-5","label":"1-⑤","types":["かご＋ばら","それぞれ〜ずつ","どちらが多い","あいだの数","長さのひき算"],"note":"6月5日の 小テスト 1-⑤ と 同じ 5つの型です。","sheets":[{"n":1,"qs":[{"t":"みかんを 2かごと 3こ 買いました。1かごには 6こ 入って いました。家に かえってから、家ぞく 5人が 一人 1こずつ 食べました。みかんは なんこ のこって いますか。","s":["6+6+3=15","15-5=10"],"ans":{"k":"n","v":10,"u":"こ"}},{"t":"たまごが 53こ ありました。あさと ひるに それぞれ 7こずつ つかいました。たまごは あと なんこ のこって いますか。","s":["53-7=46","46-7=39"],"ans":{"k":"n","v":39,"u":"こ"}},{"t":"水そうに、メダカと 金魚が あわせて 120ぴき います。その うち、メダカは 40ぴきです。メダカと 金魚では、どちらが どれだけ 多く いますか。","s":["120-40=80","80-40=40"],"ans":{"k":"pick","opts":["メダカ","金魚"],"pick":"金魚","v":40,"u":"ぴき"}},{"t":"35人の 2年生が いちれつに ならんで います。その あいだに 1人ずつ 1年生が 入ると、子どもは みんなで なん人に なりますか。","s":["35-1=34","35+34=69"],"ans":{"k":"n","v":69,"u":"人"}},{"t":"15cm8mmの かみテープが あります。この かみテープから、5cm5mmの 長さを 切りとりました。のこりの かみテープの 長さは どれだけですか。","s":["15cm8mm-5cm5mm"],"ans":{"k":"len","cm":10,"mm":3}}]},{"n":2,"qs":[{"t":"りんごを 2はこと 4こ 買いました。1はこには 7こ 入って いました。家に かえってから、家ぞく 6人が 一人 1こずつ 食べました。りんごは なんこ のこって いますか。","s":["7+7+4=18","18-6=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"色紙が 45まい ありました。1日目と 2日目に それぞれ 8まいずつ つかいました。色紙は あと なんまい のこって いますか。","s":["45-8=37","37-8=29"],"ans":{"k":"n","v":29,"u":"まい"}},{"t":"花だんに、赤い 花と 白い 花が あわせて 130本 さいて います。その うち、赤い 花は 50本です。赤い 花と 白い 花では、どちらが どれだけ 多いですか。","s":["130-50=80","80-50=30"],"ans":{"k":"pick","opts":["赤い 花","白い 花"],"pick":"白い 花","v":30,"u":"本"}},{"t":"28人の 子どもが いちれつに ならんで います。その あいだに 1人ずつ 先生が 入ると、みんなで なん人に なりますか。","s":["28-1=27","28+27=55"],"ans":{"k":"n","v":55,"u":"人"}},{"t":"18cm7mmの リボンが あります。この リボンから、6cm4mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["18cm7mm-6cm4mm"],"ans":{"k":"len","cm":12,"mm":3}}]},{"n":3,"qs":[{"t":"あめを 3ふくろと 2こ 買いました。1ふくろには 5こ 入って いました。おやつの 時間に 4人が 一人 1こずつ 食べました。あめは なんこ のこって いますか。","s":["5+5+5=15","15+2=17","17-4=13"],"ans":{"k":"n","v":13,"u":"こ"}},{"t":"おり紙が 62まい ありました。あさと ゆうがたに それぞれ 9まいずつ つかいました。おり紙は あと なんまい のこって いますか。","s":["62-9=53","53-9=44"],"ans":{"k":"n","v":44,"u":"まい"}},{"t":"こうえんに、男の子と 女の子が あわせて 90人 います。その うち、男の子は 60人です。男の子と 女の子では、どちらが どれだけ 多いですか。","s":["90-60=30","60-30=30"],"ans":{"k":"pick","opts":["男の子","女の子"],"pick":"男の子","v":30,"u":"人"}},{"t":"木が 42本 いちれつに ならんで 立って います。その あいだに 1本ずつ 花を うえると、木と 花は あわせて なん本に なりますか。","s":["42-1=41","42+41=83"],"ans":{"k":"n","v":83,"u":"本"}},{"t":"24cm9mmの ひもが あります。この ひもから、8cm3mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["24cm9mm-8cm3mm"],"ans":{"k":"len","cm":16,"mm":6}}]},{"n":4,"qs":[{"t":"たまごを 2パックと 5こ もらいました。1パックには 8こ 入って いました。家ぞく 3人が 一人 1こずつ 食べました。たまごは なんこ のこって いますか。","s":["8+8+5=21","21-3=18"],"ans":{"k":"n","v":18,"u":"こ"}},{"t":"トマトが 38こ ありました。あさと ひるに それぞれ 6こずつ つかいました。トマトは あと なんこ のこって いますか。","s":["38-6=32","32-6=26"],"ans":{"k":"n","v":26,"u":"こ"}},{"t":"はこに、あめと チョコが あわせて 110こ 入って います。その うち、あめは 70こです。あめと チョコでは、どちらが どれだけ 多いですか。","s":["110-70=40","70-40=30"],"ans":{"k":"pick","opts":["あめ","チョコ"],"pick":"あめ","v":30,"u":"こ"}},{"t":"20人の 1年生が いちれつに ならんで います。その あいだに 1人ずつ 2年生が 入ると、子どもは みんなで なん人に なりますか。","s":["20-1=19","20+19=39"],"ans":{"k":"n","v":39,"u":"人"}},{"t":"13cm6mmの かみテープが あります。この かみテープから、4cm2mmの 長さを 切りとりました。のこりの かみテープの 長さは どれだけですか。","s":["13cm6mm-4cm2mm"],"ans":{"k":"len","cm":9,"mm":4}}]},{"n":5,"qs":[{"t":"トマトを 2かごと 3こ 買いました。1かごには 9こ 入って いました。サラダに 家ぞく 5人が 一人 1こずつ 食べました。トマトは なんこ のこって いますか。","s":["9+9+3=21","21-5=16"],"ans":{"k":"n","v":16,"u":"こ"}},{"t":"シールが 71まい ありました。1日目と 2日目に それぞれ 8まいずつ つかいました。シールは あと なんまい のこって いますか。","s":["71-8=63","63-8=55"],"ans":{"k":"n","v":55,"u":"まい"}},{"t":"本だなに、絵本と ずかんが あわせて 150さつ あります。その うち、ずかんは 40さつです。絵本と ずかんでは、どちらが どれだけ 多いですか。","s":["150-40=110","110-40=70"],"ans":{"k":"pick","opts":["絵本","ずかん"],"pick":"絵本","v":70,"u":"さつ"}},{"t":"はたが 31本 いちれつに 立って います。その あいだに 1本ずつ 赤い はたを 立てると、はたは ぜんぶで なん本に なりますか。","s":["31-1=30","31+30=61"],"ans":{"k":"n","v":61,"u":"本"}},{"t":"27cm8mmの リボンが あります。この リボンから、9cm6mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["27cm8mm-9cm6mm"],"ans":{"k":"len","cm":18,"mm":2}}]},{"n":6,"qs":[{"t":"クッキーを 3はこと 4こ 作りました。1はこには 6こ 入って います。おきゃくさん 6人が 一人 1こずつ 食べました。クッキーは なんこ のこって いますか。","s":["6+6+6=18","18+4=22","22-6=16"],"ans":{"k":"n","v":16,"u":"こ"}},{"t":"ジュースが 54本 ありました。あさと ひるに それぞれ 7本ずつ くばりました。ジュースは あと なん本 のこって いますか。","s":["54-7=47","47-7=40"],"ans":{"k":"n","v":40,"u":"本"}},{"t":"水そうに、エビと 貝が あわせて 80ぴき います。その うち、エビは 30ぴきです。エビと 貝では、どちらが どれだけ 多いですか。","s":["80-30=50","50-30=20"],"ans":{"k":"pick","opts":["エビ","貝"],"pick":"貝","v":20,"u":"ぴき"}},{"t":"26人の 子どもが いちれつに ならんで います。その あいだに 1人ずつ おとなが 入ると、みんなで なん人に なりますか。","s":["26-1=25","26+25=51"],"ans":{"k":"n","v":51,"u":"人"}},{"t":"16cm5mmの 毛糸が あります。この 毛糸から、7cm1mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["16cm5mm-7cm1mm"],"ans":{"k":"len","cm":9,"mm":4}}]},{"n":7,"qs":[{"t":"いちごを 2パックと 6こ 買いました。1パックには 5こ 入って いました。家ぞく 4人が 一人 1こずつ 食べました。いちごは なんこ のこって いますか。","s":["5+5+6=16","16-4=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"えんぴつが 43本 ありました。1年生と 2年生に それぞれ 9本ずつ くばりました。えんぴつは あと なん本 のこって いますか。","s":["43-9=34","34-9=25"],"ans":{"k":"n","v":25,"u":"本"}},{"t":"星の シールと ハートの シールが あわせて 120まい あります。その うち、星の シールは 80まいです。星と ハートでは、どちらが どれだけ 多いですか。","s":["120-80=40","80-40=40"],"ans":{"k":"pick","opts":["星","ハート"],"pick":"星","v":40,"u":"まい"}},{"t":"45人の 2年生が いちれつに ならんで います。その あいだに 1人ずつ 1年生が 入ると、子どもは みんなで なん人に なりますか。","s":["45-1=44","45+44=89"],"ans":{"k":"n","v":89,"u":"人"}},{"t":"32cm7mmの はり金が あります。この はり金から、5cm3mmの 長さを 切りとりました。のこりの はり金の 長さは どれだけですか。","s":["32cm7mm-5cm3mm"],"ans":{"k":"len","cm":27,"mm":4}}]},{"n":8,"qs":[{"t":"ドーナツを 2はこと 2こ 買いました。1はこには 7こ 入って いました。家ぞく 5人が 一人 1こずつ 食べました。ドーナツは なんこ のこって いますか。","s":["7+7+2=16","16-5=11"],"ans":{"k":"n","v":11,"u":"こ"}},{"t":"あめが 66こ ありました。あさと ひるに それぞれ 8こずつ 食べました。あめは あと なんこ のこって いますか。","s":["66-8=58","58-8=50"],"ans":{"k":"n","v":50,"u":"こ"}},{"t":"ちゅう車場に、車と じてん車が あわせて 100だい あります。その うち、車は 45だいです。車と じてん車では、どちらが どれだけ 多いですか。","s":["100-45=55","55-45=10"],"ans":{"k":"pick","opts":["車","じてん車"],"pick":"じてん車","v":10,"u":"だい"}},{"t":"いすが 18きゃく いちれつに ならんで います。その あいだに 1きゃくずつ いすを ふやすと、いすは ぜんぶで なんきゃくに なりますか。","s":["18-1=17","18+17=35"],"ans":{"k":"n","v":35,"u":"きゃく"}},{"t":"21cm9mmの テープが あります。この テープから、8cm7mmの 長さを 切りとりました。のこりの テープの 長さは どれだけですか。","s":["21cm9mm-8cm7mm"],"ans":{"k":"len","cm":13,"mm":2}}]},{"n":9,"qs":[{"t":"プリンを 3はこと 5こ 買いました。1はこには 4こ 入って いました。家ぞく 3人が 一人 1こずつ 食べました。プリンは なんこ のこって いますか。","s":["4+4+4=12","12+5=17","17-3=14"],"ans":{"k":"n","v":14,"u":"こ"}},{"t":"花が 52本 さいて いました。きのうと 今日に それぞれ 6本ずつ 切りました。花は あと なん本 のこって いますか。","s":["52-6=46","46-6=40"],"ans":{"k":"n","v":40,"u":"本"}},{"t":"赤い おはじきと 青い おはじきが あわせて 140こ あります。その うち、青い おはじきは 90こです。赤と 青では、どちらが どれだけ 多いですか。","s":["140-90=50","90-50=40"],"ans":{"k":"pick","opts":["赤","青"],"pick":"青","v":40,"u":"こ"}},{"t":"33人の 子どもが いちれつに ならんで います。その あいだに 1人ずつ お母さんが 入ると、みんなで なん人に なりますか。","s":["33-1=32","33+32=65"],"ans":{"k":"n","v":65,"u":"人"}},{"t":"19cm6mmの ひもが あります。この ひもから、6cm4mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["19cm6mm-6cm4mm"],"ans":{"k":"len","cm":13,"mm":2}}]},{"n":10,"qs":[{"t":"みかんを 2かごと 3こ 買いました。1かごには 8こ 入って いました。家に かえってから、家ぞく 6人が 一人 1こずつ 食べました。みかんは なんこ のこって いますか。","s":["8+8+3=19","19-6=13"],"ans":{"k":"n","v":13,"u":"こ"}},{"t":"カードが 47まい ありました。あさと ひるに それぞれ 9まいずつ つかいました。カードは あと なんまい のこって いますか。","s":["47-9=38","38-9=29"],"ans":{"k":"n","v":29,"u":"まい"}},{"t":"学校の 1年生と 2年生が あわせて 160人 います。その うち、1年生は 70人です。1年生と 2年生では、どちらが どれだけ 多いですか。","s":["160-70=90","90-70=20"],"ans":{"k":"pick","opts":["1年生","2年生"],"pick":"2年生","v":20,"u":"人"}},{"t":"24人の 2年生が いちれつに ならんで います。その あいだに 1人ずつ 1年生が 入ると、子どもは みんなで なん人に なりますか。","s":["24-1=23","24+23=47"],"ans":{"k":"n","v":47,"u":"人"}},{"t":"25cm8mmの リボンが あります。この リボンから、7cm5mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["25cm8mm-7cm5mm"],"ans":{"k":"len","cm":18,"mm":3}}]}],"typeKeys":["kago","sorezore","dochira","aida","nagasa_hiki"]},{"id":"1-6","label":"1-⑥","types":["わの あいだの数","長さ（0mm）","一人2こずつ","それぞれ〜ずつ","どちらが多い"],"note":"6月12日の 小テスト 1-⑥ と 同じ 5つの型です。","sheets":[{"n":1,"qs":[{"t":"36人の 2年生が わに なって すわって いました。その後、2年生と 2年生の あいだに 3年生が 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 36","36+36=72"],"ans":{"k":"n","v":72,"u":"人"}},{"t":"57cm9mmの 毛糸が あります。この 毛糸から、6cm9mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["57cm9mm-6cm9mm"],"ans":{"k":"len","cm":51,"mm":0}},{"t":"さくらんぼを 3かごと 2こ 買いました。1かごには 5こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。さくらんぼは なんこ のこって いますか。","s":["5+5+5+2=17","2+2+2+2=8","17-8=9"],"ans":{"k":"n","v":9,"u":"こ"}},{"t":"あめが 47こ ありました。はるさんと なつさんが、それぞれ 6こずつ 食べました。あめは あと なんこ のこって いますか。","s":["47-6=41","41-6=35"],"ans":{"k":"n","v":35,"u":"こ"}},{"t":"赤えんぴつと 青えんぴつが あわせて 88本 あります。その うち、赤えんぴつは 22本です。赤えんぴつと 青えんぴつでは、どちらが どれだけ 多く ありますか。","s":["88-22=66","66-22=44"],"ans":{"k":"pick","opts":["赤えんぴつ","青えんぴつ"],"pick":"青えんぴつ","v":44,"u":"本"}}]},{"n":2,"qs":[{"t":"24人の 子どもが わに なって 手を つないで います。その あいだに おとなが 1人ずつ 入ると、みんなで なん人に なりますか。","s":["あいだも 24","24+24=48"],"ans":{"k":"n","v":48,"u":"人"}},{"t":"43cm5mmの リボンが あります。この リボンから、8cm5mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["43cm5mm-8cm5mm"],"ans":{"k":"len","cm":35,"mm":0}},{"t":"いちごを 2はこと 4こ 買いました。1はこには 7こ 入って いました。家に かえってから 家ぞく 3人が 一人 2こずつ 食べました。いちごは なんこ のこって いますか。","s":["7+7+4=18","2+2+2=6","18-6=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"カードが 52まい ありました。ゆいさんと そらさんが、それぞれ 7まいずつ つかいました。カードは あと なんまい のこって いますか。","s":["52-7=45","45-7=38"],"ans":{"k":"n","v":38,"u":"まい"}},{"t":"白い ごいしと 黒い ごいしが あわせて 76こ あります。その うち、白い ごいしは 18こです。白い ごいしと 黒い ごいしでは、どちらが どれだけ 多く ありますか。","s":["76-18=58","58-18=40"],"ans":{"k":"pick","opts":["白い ごいし","黒い ごいし"],"pick":"黒い ごいし","v":40,"u":"こ"}}]},{"n":3,"qs":[{"t":"まるい テーブルの まわりに 45人が すわって います。その あいだに 1人ずつ すわると、みんなで なん人に なりますか。","s":["あいだも 45","45+45=90"],"ans":{"k":"n","v":90,"u":"人"}},{"t":"62cm7mmの ひもが あります。この ひもから、9cm7mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["62cm7mm-9cm7mm"],"ans":{"k":"len","cm":53,"mm":0}},{"t":"ぶどうを 3ふくろと 3こ 買いました。1ふくろには 6こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。ぶどうは なんこ のこって いますか。","s":["6+6+6+3=21","2+2+2+2=8","21-8=13"],"ans":{"k":"n","v":13,"u":"こ"}},{"t":"シールが 63まい ありました。けんさんと はなさんが、それぞれ 8まいずつ つかいました。シールは あと なんまい のこって いますか。","s":["63-8=55","55-8=47"],"ans":{"k":"n","v":47,"u":"まい"}},{"t":"大人と 子どもが あわせて 94人 います。その うち、大人は 35人です。大人と 子どもでは、どちらが どれだけ 多く いますか。","s":["94-35=59","59-35=24"],"ans":{"k":"pick","opts":["大人","子ども"],"pick":"子ども","v":24,"u":"人"}}]},{"n":4,"qs":[{"t":"18人の 2年生が わに なって すわって いました。その あいだに 1年生が 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 18","18+18=36"],"ans":{"k":"n","v":36,"u":"人"}},{"t":"38cm6mmの かみテープが あります。この かみテープから、4cm6mmの 長さを 切りとりました。のこりの かみテープの 長さは どれだけですか。","s":["38cm6mm-4cm6mm"],"ans":{"k":"len","cm":34,"mm":0}},{"t":"あめを 2ふくろと 5こ 買いました。1ふくろには 8こ 入って いました。家に かえってから 家ぞく 3人が 一人 3こずつ 食べました。あめは なんこ のこって いますか。","s":["8+8+5=21","3+3+3=9","21-9=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"えんぴつが 41本 ありました。りくさんと さくらさんが、それぞれ 9本ずつ つかいました。えんぴつは あと なん本 のこって いますか。","s":["41-9=32","32-9=23"],"ans":{"k":"n","v":23,"u":"本"}},{"t":"パンと おにぎりが あわせて 82こ あります。その うち、パンは 26こです。パンと おにぎりでは、どちらが どれだけ 多く ありますか。","s":["82-26=56","56-26=30"],"ans":{"k":"pick","opts":["パン","おにぎり"],"pick":"おにぎり","v":30,"u":"こ"}}]},{"n":5,"qs":[{"t":"まるい 池の まわりに 木が 32本 うえて あります。木と 木の あいだに 花を 1本ずつ うえると、木と 花は あわせて なん本に なりますか。","s":["あいだも 32","32+32=64"],"ans":{"k":"n","v":64,"u":"本"}},{"t":"75cm8mmの 毛糸が あります。この 毛糸から、7cm8mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["75cm8mm-7cm8mm"],"ans":{"k":"len","cm":68,"mm":0}},{"t":"みかんを 3かごと 4こ 買いました。1かごには 5こ 入って いました。家に かえってから 家ぞく 5人が 一人 2こずつ 食べました。みかんは なんこ のこって いますか。","s":["5+5+5+4=19","2+2+2+2+2=10","19-10=9"],"ans":{"k":"n","v":9,"u":"こ"}},{"t":"クッキーが 56こ ありました。あおいさんと ゆうとさんが、それぞれ 7こずつ 食べました。クッキーは あと なんこ のこって いますか。","s":["56-7=49","49-7=42"],"ans":{"k":"n","v":42,"u":"こ"}},{"t":"赤い ぼうしと 白い ぼうしが あわせて 65こ あります。その うち、赤い ぼうしは 21こです。赤い ぼうしと 白い ぼうしでは、どちらが どれだけ 多く ありますか。","s":["65-21=44","44-21=23"],"ans":{"k":"pick","opts":["赤い ぼうし","白い ぼうし"],"pick":"白い ぼうし","v":23,"u":"こ"}}]},{"n":6,"qs":[{"t":"27人の 子どもが わに なって います。その あいだに 先生が 1人ずつ 入ると、みんなで なん人に なりますか。","s":["あいだも 27","27+27=54"],"ans":{"k":"n","v":54,"u":"人"}},{"t":"54cm3mmの テープが あります。この テープから、6cm3mmの 長さを 切りとりました。のこりの テープの 長さは どれだけですか。","s":["54cm3mm-6cm3mm"],"ans":{"k":"len","cm":48,"mm":0}},{"t":"クッキーを 2はこと 2こ 買いました。1はこには 9こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。クッキーは なんこ のこって いますか。","s":["9+9+2=20","2+2+2+2=8","20-8=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"色紙が 74まい ありました。みなとさんと ひなさんが、それぞれ 8まいずつ つかいました。色紙は あと なんまい のこって いますか。","s":["74-8=66","66-8=58"],"ans":{"k":"n","v":58,"u":"まい"}},{"t":"男の子と 女の子が あわせて 71人 います。その うち、男の子は 28人です。男の子と 女の子では、どちらが どれだけ 多く いますか。","s":["71-28=43","43-28=15"],"ans":{"k":"pick","opts":["男の子","女の子"],"pick":"女の子","v":15,"u":"人"}}]},{"n":7,"qs":[{"t":"まるい 花だんの まわりに チューリップが 41本 さいて います。その あいだに 1本ずつ うえると、花は ぜんぶで なん本に なりますか。","s":["あいだも 41","41+41=82"],"ans":{"k":"n","v":82,"u":"本"}},{"t":"81cm4mmの はり金が あります。この はり金から、5cm4mmの 長さを 切りとりました。のこりの はり金の 長さは どれだけですか。","s":["81cm4mm-5cm4mm"],"ans":{"k":"len","cm":76,"mm":0}},{"t":"たまごを 3パックと 6こ 買いました。1パックには 4こ 入って いました。家に かえってから 家ぞく 3人が 一人 2こずつ 食べました。たまごは なんこ のこって いますか。","s":["4+4+4+6=18","2+2+2=6","18-6=12"],"ans":{"k":"n","v":12,"u":"こ"}},{"t":"たまごが 45こ ありました。あきさんと なつさんが、それぞれ 6こずつ つかいました。たまごは あと なんこ のこって いますか。","s":["45-6=39","39-6=33"],"ans":{"k":"n","v":33,"u":"こ"}},{"t":"金魚と メダカが あわせて 90ひき います。その うち、金魚は 27ひきです。金魚と メダカでは、どちらが どれだけ 多く いますか。","s":["90-27=63","63-27=36"],"ans":{"k":"pick","opts":["金魚","メダカ"],"pick":"メダカ","v":36,"u":"ひき"}}]},{"n":8,"qs":[{"t":"15人の 子どもが わに なって すわって いました。その あいだに 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 15","15+15=30"],"ans":{"k":"n","v":30,"u":"人"}},{"t":"46cm9mmの リボンが あります。この リボンから、8cm9mmの 長さを 切りとりました。のこりの リボンの 長さは どれだけですか。","s":["46cm9mm-8cm9mm"],"ans":{"k":"len","cm":38,"mm":0}},{"t":"トマトを 2かごと 3こ 買いました。1かごには 7こ 入って いました。家に かえってから 家ぞく 4人が 一人 2こずつ 食べました。トマトは なんこ のこって いますか。","s":["7+7+3=17","2+2+2+2=8","17-8=9"],"ans":{"k":"n","v":9,"u":"こ"}},{"t":"おり紙が 68まい ありました。そらさんと うみさんが、それぞれ 9まいずつ つかいました。おり紙は あと なんまい のこって いますか。","s":["68-9=59","59-9=50"],"ans":{"k":"n","v":50,"u":"まい"}},{"t":"まんがと 絵本が あわせて 84さつ あります。その うち、まんがは 32さつです。まんがと 絵本では、どちらが どれだけ 多く ありますか。","s":["84-32=52","52-32=20"],"ans":{"k":"pick","opts":["まんが","絵本"],"pick":"絵本","v":20,"u":"さつ"}}]},{"n":9,"qs":[{"t":"38人の 2年生が わに なって すわって いました。その あいだに 3年生が 1人ずつ すわりました。みんなで なん人に なりましたか。","s":["あいだも 38","38+38=76"],"ans":{"k":"n","v":76,"u":"人"}},{"t":"67cm2mmの ひもが あります。この ひもから、9cm2mmの 長さを 切りとりました。のこりの ひもの 長さは どれだけですか。","s":["67cm2mm-9cm2mm"],"ans":{"k":"len","cm":58,"mm":0}},{"t":"ドーナツを 3はこと 1こ 買いました。1はこには 6こ 入って いました。家に かえってから 家ぞく 3人が 一人 3こずつ 食べました。ドーナツは なんこ のこって いますか。","s":["6+6+6+1=19","3+3+3=9","19-9=10"],"ans":{"k":"n","v":10,"u":"こ"}},{"t":"トマトが 51こ ありました。はるさんと ふゆさんが、それぞれ 7こずつ つかいました。トマトは あと なんこ のこって いますか。","s":["51-7=44","44-7=37"],"ans":{"k":"n","v":37,"u":"こ"}},{"t":"青い おはじきと 赤い おはじきが あわせて 73こ あります。その うち、青い おはじきは 24こです。青い おはじきと 赤い おはじきでは、どちらが どれだけ 多く ありますか。","s":["73-24=49","49-24=25"],"ans":{"k":"pick","opts":["青い おはじき","赤い おはじき"],"pick":"赤い おはじき","v":25,"u":"こ"}}]},{"n":10,"qs":[{"t":"まるい 池の まわりに いすが 29きゃく ならんで います。その あいだに いすを 1きゃくずつ ふやすと、いすは ぜんぶで なんきゃくに なりますか。","s":["あいだも 29","29+29=58"],"ans":{"k":"n","v":58,"u":"きゃく"}},{"t":"53cm6mmの 毛糸が あります。この 毛糸から、7cm6mmの 長さを 切りとりました。のこりの 毛糸の 長さは どれだけですか。","s":["53cm6mm-7cm6mm"],"ans":{"k":"len","cm":46,"mm":0}},{"t":"プリンを 2はこと 4こ 買いました。1はこには 8こ 入って いました。家に かえってから 家ぞく 5人が 一人 2こずつ 食べました。プリンは なんこ のこって いますか。","s":["8+8+4=20","2+2+2+2+2=10","20-10=10"],"ans":{"k":"n","v":10,"u":"こ"}},{"t":"ジュースが 62本 ありました。ゆいさんと かえでさんが、それぞれ 8本ずつ くばりました。ジュースは あと なん本 のこって いますか。","s":["62-8=54","54-8=46"],"ans":{"k":"n","v":46,"u":"本"}},{"t":"タクシーと バスが あわせて 96だい あります。その うち、タクシーは 39だいです。タクシーと バスでは、どちらが どれだけ 多く ありますか。","s":["96-39=57","57-39=18"],"ans":{"k":"pick","opts":["タクシー","バス"],"pick":"バス","v":18,"u":"だい"}}]}],"typeKeys":["wa","nagasa_hiki","kago","sorezore","dochira"]},{"id":"1-7","label":"1-⑦","types":["どちらが多い","長さのたし算","年れい","あいだの数","まえ＋うしろ＋自分"],"note":"6月11日の 小テスト 1-⑦ と 同じ 5つの型です。","sheets":[{"n":1,"qs":[{"t":"カボチャと スイカが あわせて 77こ あります。その うち、カボチャは 28こです。カボチャと スイカでは、どちらが どれだけ 多く ありますか。","s":["77-28=49","49-28=21"],"ans":{"k":"pick","opts":["カボチャ","スイカ"],"pick":"スイカ","v":21,"u":"こ"}},{"t":"23cm4mmの テープと 7cm8mmの テープが あります。2本の テープを あわせると、長さは どれだけに なりますか。","s":["23cm4mm+7cm8mm","12mm=1cm2mm"],"ans":{"k":"len","cm":31,"mm":2}},{"t":"きょ年、わたしは 7さいでした。姉は、わたしより 7さい とし上です。姉は、今 なんさいですか。","s":["7+1=8","8+7=15"],"ans":{"k":"n","v":15,"u":"さい"}},{"t":"27人の 女の子が いちれつに ならんで います。その あいだに 男の子が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["27-1=26","27+26=53"],"ans":{"k":"n","v":53,"u":"人"}},{"t":"あやさんは、バスていに ならんで います。あやさんの まえには 6人、うしろには 5人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["6+5+1=12"],"ans":{"k":"n","v":12,"u":"人"}}]},{"n":2,"qs":[{"t":"りんごと なしが あわせて 63こ あります。その うち、りんごは 19こです。りんごと なしでは、どちらが どれだけ 多く ありますか。","s":["63-19=44","44-19=25"],"ans":{"k":"pick","opts":["りんご","なし"],"pick":"なし","v":25,"u":"こ"}},{"t":"15cm6mmの リボンと 9cm7mmの リボンが あります。2本の リボンを あわせると、長さは どれだけに なりますか。","s":["15cm6mm+9cm7mm","13mm=1cm3mm"],"ans":{"k":"len","cm":25,"mm":3}},{"t":"きょ年、わたしは 8さいでした。兄は、わたしより 6さい とし上です。兄は、今 なんさいですか。","s":["8+1=9","9+6=15"],"ans":{"k":"n","v":15,"u":"さい"}},{"t":"34人の 子どもが いちれつに ならんで います。その あいだに おとなが 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["34-1=33","34+33=67"],"ans":{"k":"n","v":67,"u":"人"}},{"t":"ゆいさんは、きゅうしょくの れつに ならんで います。ゆいさんの まえには 8人、うしろには 4人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["8+4+1=13"],"ans":{"k":"n","v":13,"u":"人"}}]},{"n":3,"qs":[{"t":"犬と ねこが あわせて 91ひき います。その うち、犬は 34ひきです。犬と ねこでは、どちらが どれだけ 多く いますか。","s":["91-34=57","57-34=23"],"ans":{"k":"pick","opts":["犬","ねこ"],"pick":"ねこ","v":23,"u":"ひき"}},{"t":"34cm5mmの ひもと 8cm9mmの ひもが あります。2本の ひもを あわせると、長さは どれだけに なりますか。","s":["34cm5mm+8cm9mm","14mm=1cm4mm"],"ans":{"k":"len","cm":43,"mm":4}},{"t":"きょ年、わたしは 6さいでした。姉は、わたしより 9さい とし上です。姉は、今 なんさいですか。","s":["6+1=7","7+9=16"],"ans":{"k":"n","v":16,"u":"さい"}},{"t":"19人の 2年生が いちれつに ならんで います。その あいだに 1年生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["19-1=18","19+18=37"],"ans":{"k":"n","v":37,"u":"人"}},{"t":"けんさんは、すべりだいの れつに ならんで います。けんさんの まえには 3人、うしろには 9人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["3+9+1=13"],"ans":{"k":"n","v":13,"u":"人"}}]},{"n":4,"qs":[{"t":"赤い 花と 黄色い 花が あわせて 68本 あります。その うち、赤い 花は 25本です。赤い 花と 黄色い 花では、どちらが どれだけ 多く ありますか。","s":["68-25=43","43-25=18"],"ans":{"k":"pick","opts":["赤い 花","黄色い 花"],"pick":"黄色い 花","v":18,"u":"本"}},{"t":"12cm8mmの かみテープと 6cm5mmの かみテープが あります。2本の かみテープを あわせると、長さは どれだけに なりますか。","s":["12cm8mm+6cm5mm","13mm=1cm3mm"],"ans":{"k":"len","cm":19,"mm":3}},{"t":"きょ年、わたしは 9さいでした。兄は、わたしより 5さい とし上です。兄は、今 なんさいですか。","s":["9+1=10","10+5=15"],"ans":{"k":"n","v":15,"u":"さい"}},{"t":"46人の 子どもが いちれつに ならんで います。その あいだに 先生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["46-1=45","46+45=91"],"ans":{"k":"n","v":91,"u":"人"}},{"t":"そらさんは、バスていに ならんで います。そらさんの まえには 7人、うしろには 7人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["7+7+1=15"],"ans":{"k":"n","v":15,"u":"人"}}]},{"n":5,"qs":[{"t":"ケーキと パンが あわせて 74こ あります。その うち、ケーキは 29こです。ケーキと パンでは、どちらが どれだけ 多く ありますか。","s":["74-29=45","45-29=16"],"ans":{"k":"pick","opts":["ケーキ","パン"],"pick":"パン","v":16,"u":"こ"}},{"t":"27cm7mmの 毛糸と 5cm6mmの 毛糸が あります。2本の 毛糸を あわせると、長さは どれだけに なりますか。","s":["27cm7mm+5cm6mm","13mm=1cm3mm"],"ans":{"k":"len","cm":33,"mm":3}},{"t":"きょ年、わたしは 7さいでした。いとこは、わたしより 8さい とし上です。いとこは、今 なんさいですか。","s":["7+1=8","8+8=16"],"ans":{"k":"n","v":16,"u":"さい"}},{"t":"23本の 木が いちれつに ならんで います。その あいだに 花を 1本ずつ うえると、ぜんぶで なん本に なりますか。","s":["23-1=22","23+22=45"],"ans":{"k":"n","v":45,"u":"本"}},{"t":"はなさんは、すいどうの まえに ならんで います。はなさんの まえには 5人、うしろには 2人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["5+2+1=8"],"ans":{"k":"n","v":8,"u":"人"}}]},{"n":6,"qs":[{"t":"1年生と 2年生が あわせて 96人 います。その うち、1年生は 37人です。1年生と 2年生では、どちらが どれだけ 多く いますか。","s":["96-37=59","59-37=22"],"ans":{"k":"pick","opts":["1年生","2年生"],"pick":"2年生","v":22,"u":"人"}},{"t":"41cm9mmの はり金と 7cm4mmの はり金が あります。2本の はり金を あわせると、長さは どれだけに なりますか。","s":["41cm9mm+7cm4mm","13mm=1cm3mm"],"ans":{"k":"len","cm":49,"mm":3}},{"t":"きょ年、わたしは 5さいでした。姉は、わたしより 7さい とし上です。姉は、今 なんさいですか。","s":["5+1=6","6+7=13"],"ans":{"k":"n","v":13,"u":"さい"}},{"t":"38人の 2年生が いちれつに ならんで います。その あいだに 3年生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["38-1=37","38+37=75"],"ans":{"k":"n","v":75,"u":"人"}},{"t":"みなとさんは、きゅうしょくの れつに ならんで います。みなとさんの まえには 9人、うしろには 6人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["9+6+1=16"],"ans":{"k":"n","v":16,"u":"人"}}]},{"n":7,"qs":[{"t":"白い ぼうしと 赤い ぼうしが あわせて 82こ あります。その うち、白い ぼうしは 26こです。白い ぼうしと 赤い ぼうしでは、どちらが どれだけ 多く ありますか。","s":["82-26=56","56-26=30"],"ans":{"k":"pick","opts":["白い ぼうし","赤い ぼうし"],"pick":"赤い ぼうし","v":30,"u":"こ"}},{"t":"18cm6mmの テープと 9cm8mmの テープが あります。2本の テープを あわせると、長さは どれだけに なりますか。","s":["18cm6mm+9cm8mm","14mm=1cm4mm"],"ans":{"k":"len","cm":28,"mm":4}},{"t":"きょ年、わたしは 8さいでした。兄は、わたしより 9さい とし上です。兄は、今 なんさいですか。","s":["8+1=9","9+9=18"],"ans":{"k":"n","v":18,"u":"さい"}},{"t":"16本の はたが いちれつに ならんで います。その あいだに 赤い はたを 1本ずつ 立てると、ぜんぶで なん本に なりますか。","s":["16-1=15","16+15=31"],"ans":{"k":"n","v":31,"u":"本"}},{"t":"さくらさんは、バスていに ならんで います。さくらさんの まえには 4人、うしろには 8人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["4+8+1=13"],"ans":{"k":"n","v":13,"u":"人"}}]},{"n":8,"qs":[{"t":"かきと みかんが あわせて 59こ あります。その うち、かきは 17こです。かきと みかんでは、どちらが どれだけ 多く ありますか。","s":["59-17=42","42-17=25"],"ans":{"k":"pick","opts":["かき","みかん"],"pick":"みかん","v":25,"u":"こ"}},{"t":"36cm7mmの リボンと 8cm7mmの リボンが あります。2本の リボンを あわせると、長さは どれだけに なりますか。","s":["36cm7mm+8cm7mm","14mm=1cm4mm"],"ans":{"k":"len","cm":45,"mm":4}},{"t":"きょ年、わたしは 6さいでした。姉は、わたしより 6さい とし上です。姉は、今 なんさいですか。","s":["6+1=7","7+6=13"],"ans":{"k":"n","v":13,"u":"さい"}},{"t":"42人の 子どもが いちれつに ならんで います。その あいだに おとなが 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["42-1=41","42+41=83"],"ans":{"k":"n","v":83,"u":"人"}},{"t":"りくさんは、かいだんの れつに ならんで います。りくさんの まえには 6人、うしろには 3人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["6+3+1=10"],"ans":{"k":"n","v":10,"u":"人"}}]},{"n":9,"qs":[{"t":"オートバイと 自てん車が あわせて 70だい あります。その うち、オートバイは 23だいです。オートバイと 自てん車では、どちらが どれだけ 多く ありますか。","s":["70-23=47","47-23=24"],"ans":{"k":"pick","opts":["オートバイ","自てん車"],"pick":"自てん車","v":24,"u":"だい"}},{"t":"25cm9mmの ひもと 6cm3mmの ひもが あります。2本の ひもを あわせると、長さは どれだけに なりますか。","s":["25cm9mm+6cm3mm","12mm=1cm2mm"],"ans":{"k":"len","cm":32,"mm":2}},{"t":"きょ年、わたしは 9さいでした。兄は、わたしより 7さい とし上です。兄は、今 なんさいですか。","s":["9+1=10","10+7=17"],"ans":{"k":"n","v":17,"u":"さい"}},{"t":"25きゃくの いすが いちれつに ならんで います。その あいだに いすを 1きゃくずつ ならべると、ぜんぶで なんきゃくに なりますか。","s":["25-1=24","25+24=49"],"ans":{"k":"n","v":49,"u":"きゃく"}},{"t":"あおいさんは、すべりだいの れつに ならんで います。あおいさんの まえには 2人、うしろには 7人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["2+7+1=10"],"ans":{"k":"n","v":10,"u":"人"}}]},{"n":10,"qs":[{"t":"ずかんと まんがが あわせて 88さつ あります。その うち、ずかんは 31さつです。ずかんと まんがでは、どちらが どれだけ 多く ありますか。","s":["88-31=57","57-31=26"],"ans":{"k":"pick","opts":["ずかん","まんが"],"pick":"まんが","v":26,"u":"さつ"}},{"t":"44cm5mmの 毛糸と 9cm8mmの 毛糸が あります。2本の 毛糸を あわせると、長さは どれだけに なりますか。","s":["44cm5mm+9cm8mm","13mm=1cm3mm"],"ans":{"k":"len","cm":54,"mm":3}},{"t":"きょ年、わたしは 7さいでした。姉は、わたしより 5さい とし上です。姉は、今 なんさいですか。","s":["7+1=8","8+5=13"],"ans":{"k":"n","v":13,"u":"さい"}},{"t":"31人の 2年生が いちれつに ならんで います。その あいだに 1年生が 1人ずつ 入ると、ぜんぶで なん人に なりますか。","s":["31-1=30","31+30=61"],"ans":{"k":"n","v":61,"u":"人"}},{"t":"ゆうとさんは、バスていに ならんで います。ゆうとさんの まえには 10人、うしろには 5人 います。ならんで いる 人は、ぜんぶで なん人ですか。","s":["10+5+1=16"],"ans":{"k":"n","v":16,"u":"人"}}]}],"typeKeys":["dochira","nagasa_tashi","toshi","aida","mae_ushiro"]}]};
+  var TYPES = {"kago":{"name":"かご＋ばら"},"sorezore":{"name":"それぞれ 〜ずつ"},"dochira":{"name":"どちらが どれだけ 多い"},"aida":{"name":"いちれつの あいだの 数"},"wa":{"name":"わの あいだの 数"},"nagasa_hiki":{"name":"長さの ひき算"},"nagasa_tashi":{"name":"長さの たし算"},"toshi":{"name":"年れい"},"mae_ushiro":{"name":"まえ・うしろ・自分"}};
+  var LESSONS = {"kago":{"title":"かご＋ばら の もんだい","why":"かごや はこの 中身を ぜんぶ たしてから、ばらの 分を たします。それから 食べた 分を ひきます。「一人 2こずつ」の ときは、食べた 数も 2+2+2… で 先に 出します。","ex":["1かご 6こ が 2かご → <em>6+6=12</em>","ばらの 3こを たして <em>12+3=15</em>","5人が 1こずつ 食べたので <em>15-5=10</em>","こたえ <em>10こ</em>"],"ng":"1かご分だけで <b>6-5</b> と しない。かごが 2つなら 2かご分を たす。","try":{"t":0,"s":1,"i":0}},"sorezore":{"title":"「それぞれ 〜ずつ」の もんだい","why":"「あさと ひるに それぞれ 7こずつ」は、あさに 7こ、ひるに 7こ。ぜんぶで 2回 へって います。だから ひき算も 2回 します。","ex":["<em>53-7=46</em>","つづけて <em>46-7=39</em>","こたえ <em>39こ</em>"],"ng":"1回だけ ひいて <b>46</b> で 止まらない。「それぞれ」は 2人分・2回分。","try":{"t":0,"s":1,"i":1}},"dochira":{"title":"「どちらが どれだけ 多い」の もんだい","why":"ひき算を 2回 します。①あわせた 数から わかって いる ほうを ひいて、もう一方の 数を 出す。②大きい ほうから 小さい ほうを ひく。③「どちらが」も こたえに 書く。","ex":["金魚の 数 → <em>120-40=80</em>","くらべる → <em>80-40=40</em>","こたえ <em>金魚が 40ぴき 多い</em>"],"ng":"1回目の <b>80</b> を こたえに しない。多い ほうの 名前も まちがえない。","try":{"t":0,"s":1,"i":2}},"aida":{"title":"いちれつの「あいだの 数」","why":"れつに ならんだ 人の あいだの 数は、人数より 1 少ない（○|○|○ は 3人で あいだ 2つ）。そこに 1人ずつ 入るので、もとの 人数に あいだの 数を たします。","ex":["あいだ → <em>35-1=34</em>","みんなで → <em>35+34=69</em>","こたえ <em>69人</em>"],"ng":"<b>35-1=34</b> で 止まらない（人は ふえる）。あいだの 数を 出した しきも 書く。","try":{"t":0,"s":1,"i":3}},"wa":{"title":"わ（丸）の「あいだの 数」","why":"わに なると、さいごの 人と さいしょの 人も となり合います。だから あいだの 数は 人数と 同じ。いちれつ（−1）と ちがう ところです。","ex":["36人が わ → あいだも <em>36</em>","みんなで → <em>36+36=72</em>","こたえ <em>72人</em>"],"ng":"いちれつと 同じに <b>36-1=35</b> と しない。","try":{"t":1,"s":1,"i":0}},"nagasa_hiki":{"title":"長さの ひき算（cm と mm）","why":"cmは cmどうし、mmは mmどうしで ひきます。ひっさんは cmと mmを たてに そろえて 書きます。mmが 0に なったら、cmだけ 書きます。","ex":["cm → <em>15-5=10</em>　mm → <em>8-5=3</em>","こたえ <em>10cm3mm</em>","57cm9mm − 6cm9mm なら mmは 0 → こたえ <em>51cm</em>"],"ng":"mmの ひき算を <b>8-5=4</b> の ように ずらさない。<b>51cm0mm</b> とは 書かない。","try":{"t":0,"s":1,"i":4}},"nagasa_tashi":{"title":"長さの たし算（くり上がり）","why":"mmどうしを たして 10を こえたら、10mm を 1cm に くり上げます。cmどうしを たした 数に、その 1cm を たします。","ex":["mm → <em>4+8=12mm → 1cm2mm</em>","cm → <em>23+7=30</em>","あわせて <em>31cm2mm</em>"],"ng":"<b>30cm12mm</b> の まま 書かない。","try":{"t":2,"s":1,"i":1}},"toshi":{"title":"年れいの もんだい","why":"「きょ年 7さい」と 書いて あったら、今は 1つ ふえて 8さい。先に 今の 年れいを 出してから、とし上の 分を たします。しきは 2つ。","ex":["今の わたし → <em>7+1=8</em>","姉は 7さい 上 → <em>8+7=15</em>","こたえ <em>15さい</em>"],"ng":"きょ年の ままで <b>7+7=14</b> と しない。","try":{"t":2,"s":1,"i":2}},"mae_ushiro":{"title":"まえと うしろと 自分","why":"まえの 人と うしろの 人を たしただけでは、自分が 入って いません。さいごに +1 します。○○○○○○ ● ○○○○○ の 図を かくと たしかめられます。","ex":["<em>6+5+1=12</em>","こたえ <em>12人</em>"],"ng":"<b>6+5=11</b> で 止まらない。「ならんで いる 人 ぜんぶ」には 自分も 入る。","try":{"t":2,"s":1,"i":4}}};
+  var TYPE_ORDER = ['dochira', 'aida', 'wa', 'sorezore', 'kago', 'nagasa_hiki', 'nagasa_tashi', 'toshi', 'mae_ushiro'];
+  var DEFAULT_WEAK = ['dochira', 'aida', 'sorezore'];   // the paper tests' misses, used until records exist
+  var MARKS = ['①', '②', '③', '④', '⑤'];
 
-  // ---------- storage: localStorage now, db when the viewer grants it ----------
-  var LS = 'suzu.bunsho.v1';
-  var db = null;
-  var recs = {};                       // {testId: record}
-
-  function blank(id) { return { test: id, sheets: {}, types: {}, updatedAt: null }; }
-  function tries(r) { var n = 0; for (var k in r.sheets) n += r.sheets[k].tries || 0; return n; }
-
-  function readLocal() {
-    try { return JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch (e) { return {}; }
-  }
-  function writeLocal() {
-    try { localStorage.setItem(LS, JSON.stringify(recs)); } catch (e) {}
-  }
-  DATA.tests.forEach(function (t) { recs[t.id] = blank(t.id); });
-  (function () {
-    var l = readLocal();
-    for (var k in l) if (recs[k]) recs[k] = l[k];
-  })();
-
-  function persist(testId) {
-    writeLocal();
-    if (db) db.doc('records/' + testId).set(recs[testId]).catch(function () {});
-  }
-
-  (window.claude && typeof claude.use === 'function' ? claude.use('db') : Promise.resolve(null)).then(function (d) {
-    if (!d) return;                                   // design for absence
-    db = d;
-    DATA.tests.forEach(function (t) {
-      db.doc('records/' + t.id).get().then(function (snap) {
-        if (snap.exists) {
-          var remote = snap.data();
-          if (tries(remote) >= tries(recs[t.id])) { recs[t.id] = remote; writeLocal(); render(); }
-          else db.doc('records/' + t.id).set(recs[t.id]).catch(function () {});
-        } else if (tries(recs[t.id])) {
-          db.doc('records/' + t.id).set(recs[t.id]).catch(function () {});
-        }
-      }).catch(function () {});
-    });
-  }).catch(function () {});
-
-  // ---------- state ----------
-  var st = { t: 0, s: 0, graded: false, picks: {} };
-
+  // ---------- helpers ----------
   var $ = function (id) { return document.getElementById(id); };
-  function el(tag, cls, txt) {
-    var e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (txt != null) e.textContent = txt;
-    return e;
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function html(tag, cls, h) { var e = el(tag, cls); e.innerHTML = h; return e; }
+  function btn(cls, txt, fn) { var b = el('button', cls, txt); b.type = 'button'; b.addEventListener('click', fn); return b; }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function dayKey(iso) { var d = new Date(iso); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function fmtDay(key) { var p = key.split('-'), d = new Date(+p[0], +p[1] - 1, +p[2]); return (+p[1]) + '月' + (+p[2]) + '日（' + '日月火水木金土'[d.getDay()] + '）'; }
+  function fmtTime(iso) { var d = new Date(iso); return d.getHours() + ':' + pad2(d.getMinutes()); }
+  function pct(ok, n) { return n ? Math.round(ok / n * 100) : null; }
+
+  // ---------- problem pool by type ----------
+  var POOL = {};
+  DATA.tests.forEach(function (t, ti) {
+    t.sheets.forEach(function (sh, si) {
+      sh.qs.forEach(function (q, qi) {
+        var k = t.typeKeys[qi];
+        (POOL[k] = POOL[k] || []).push({ q: q, key: k, ti: ti, si: si, qi: qi, ref: t.id + '/' + sh.n + '/' + qi });
+      });
+    });
+  });
+
+  // ---------- storage ----------
+  var LS = 'suzu.bunsho.v1', LOGMAX = 500;
+  function fresh() {
+    var r = { _types: {}, _log: [], _migrated: false };
+    DATA.tests.forEach(function (t) { r[t.id] = { test: t.id, sheets: {}, types: {}, updatedAt: null }; });
+    return r;
   }
-  function test() { return DATA.tests[st.t]; }
-  function sheet() { return test().sheets[st.s]; }
+  function load() {
+    var r = fresh(), l = {};
+    try { l = JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch (e) {}
+    for (var k in l) if (k in r) r[k] = l[k];
+    if (!r._types) r._types = {};
+    if (!r._log) r._log = [];
+    if (!r._migrated) {                       // fold the v1 per-test counters into the global type stats
+      DATA.tests.forEach(function (t) {
+        var pt = (r[t.id] && r[t.id].types) || {};
+        for (var i = 1; i <= 5; i++) {
+          var c = pt[i]; if (!c) continue;
+          var g = r._types[t.typeKeys[i - 1]] || (r._types[t.typeKeys[i - 1]] = { ok: 0, ng: 0 });
+          g.ok += c.ok || 0; g.ng += c.ng || 0;
+        }
+      });
+      r._migrated = true;
+    }
+    return r;
+  }
+  var recs = load();
+  function save() { try { localStorage.setItem(LS, JSON.stringify(recs)); } catch (e) {} }
+  function bump(key, ok) { var g = recs._types[key] || (recs._types[key] = { ok: 0, ng: 0 }); g[ok ? 'ok' : 'ng']++; }
+  function logAttempt(e) { recs._log.push(e); if (recs._log.length > LOGMAX) recs._log.splice(0, recs._log.length - LOGMAX); }
+  function rates() {
+    return TYPE_ORDER.map(function (k) {
+      var g = recs._types[k] || { ok: 0, ng: 0 }, n = g.ok + g.ng;
+      return { key: k, ok: g.ok, ng: g.ng, n: n, rate: n ? g.ok / n : null };
+    });
+  }
+  function isWeak(r) { return r.n >= 2 && r.rate < 0.6; }
+  function weakKeys() {
+    var arr = rates().filter(function (r) { return r.n >= 2 && r.ng > 0; })
+      .sort(function (a, b) { return (a.rate - b.rate) || (b.ng - a.ng); });
+    var keys = arr.slice(0, 3).map(function (r) { return r.key; });
+    DEFAULT_WEAK.forEach(function (k) { if (keys.length < 3 && keys.indexOf(k) < 0) keys.push(k); });
+    return keys;
+  }
 
   // ---------- answer fields ----------
   function numField(ph) {
     var i = el('input', 'num');
     i.type = 'text'; i.inputMode = 'numeric'; i.autocomplete = 'off';
-    i.setAttribute('pattern', '[0-9]*');
-    i.placeholder = ph || '';
-    i.addEventListener('input', function () {
-      this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
-    });
+    i.setAttribute('pattern', '[0-9]*'); i.placeholder = ph || '';
+    i.addEventListener('input', function () { this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4); });
     return i;
   }
-
-  function buildFields(q, i) {
-    var row = el('div', 'row'), a = q.ans;
+  function buildFields(item) {
+    var row = el('div', 'row'), a = item.q.ans;
     row.appendChild(el('span', 'lbl', 'こたえ'));
-
     if (a.k === 'len') {
       var cm = numField(''), mm = numField('0');
       cm.dataset.f = 'cm'; mm.dataset.f = 'mm';
@@ -322,11 +452,9 @@
         var b = el('button', 'opt', o);
         b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.dataset.opt = o;
         b.addEventListener('click', function () {
-          if (st.graded) return;
-          st.picks[i] = o;
-          Array.prototype.forEach.call(box.children, function (c) {
-            c.setAttribute('aria-pressed', String(c.dataset.opt === o));
-          });
+          if (item.graded) return;
+          item.pick = o;
+          Array.prototype.forEach.call(box.children, function (c) { c.setAttribute('aria-pressed', String(c.dataset.opt === o)); });
         });
         box.appendChild(b);
       });
@@ -342,29 +470,26 @@
     }
     return row;
   }
-
   function val(card, f) {
     var i = card.querySelector('[data-f="' + f + '"]');
     return i && i.value.trim() !== '' ? parseInt(i.value, 10) : null;
   }
-
-  function judge(card, q, i) {
-    var a = q.ans;
+  function judgeItem(item) {
+    var a = item.q.ans, card = item.card;
     if (a.k === 'len') {
       var cm = val(card, 'cm'), mm = val(card, 'mm');
       if (cm === null) return null;
       return cm === a.cm && (mm === null ? a.mm === 0 : mm === a.mm);
     }
     if (a.k === 'pick') {
-      var n = val(card, 'n'), p = st.picks[i];
-      if (n === null || !p) return null;
-      return p === a.pick && n === a.v;
+      var n = val(card, 'n');
+      if (n === null || !item.pick) return null;
+      return item.pick === a.pick && n === a.v;
     }
     var v = val(card, 'n');
     if (v === null) return null;
     return v === a.v;
   }
-
   function answerText(a) {
     if (a.k === 'len') return a.cm + 'cm' + (a.mm ? a.mm + 'mm' : '');
     if (a.k === 'pick') return a.pick + 'が ' + a.v + a.u + ' 多い';
@@ -372,33 +497,24 @@
   }
 
   // ---------- handwriting pad (vector strokes, redrawn on resize) ----------
-  var pads = {};            // key -> strokes kept while the page is open
-  var livePads = [];
-  var lastPen = 0;
-  function inkColor() {
-    return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#23211d';
-  }
+  var pads = {}, livePads = [], lastPen = 0;
+  function inkColor() { return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#23211d'; }
   function makePad(key) {
     var strokes = pads[key] || (pads[key] = []);
     var wrap = el('div', 'pad'), bar = el('div', 'pad-bar'), cv = el('canvas', 'pad-cv');
     var ctx = cv.getContext('2d'), tool = 'pen', cur = null;
-
     bar.appendChild(el('span', 'pad-lbl', 'ひっさん・図を ここに 書けます'));
     var tools = {};
     [['pen', 'ペン'], ['eraser', 'けしゴム']].forEach(function (t) {
       var b = el('button', 'tool', t[1]); b.type = 'button';
       b.setAttribute('aria-pressed', String(t[0] === tool));
-      b.addEventListener('click', function () {
-        tool = t[0];
-        for (var k in tools) tools[k].setAttribute('aria-pressed', String(k === tool));
-      });
+      b.addEventListener('click', function () { tool = t[0]; for (var k in tools) tools[k].setAttribute('aria-pressed', String(k === tool)); });
       tools[t[0]] = b; bar.appendChild(b);
     });
     var clr = el('button', 'tool clear', 'ぜんぶ けす'); clr.type = 'button';
     clr.addEventListener('click', function () { strokes.length = 0; redraw(); });
     bar.appendChild(clr);
     wrap.appendChild(bar); wrap.appendChild(cv);
-
     function size() {
       var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
       if (!r.width) return;
@@ -410,220 +526,498 @@
       ctx.lineWidth = s.w * cv.width; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.strokeStyle = ctx.fillStyle = inkColor();
     }
-    function seg(a, b, s) {
-      setStyle(s);
-      ctx.beginPath();
-      ctx.moveTo(a[0] * cv.width, a[1] * cv.height);
-      ctx.lineTo(b[0] * cv.width, b[1] * cv.height);
-      ctx.stroke();
-    }
-    function dot(p, s) {
-      setStyle(s);
-      ctx.beginPath();
-      ctx.arc(p[0] * cv.width, p[1] * cv.height, s.w * cv.width / 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    function seg(a, b, s) { setStyle(s); ctx.beginPath(); ctx.moveTo(a[0] * cv.width, a[1] * cv.height); ctx.lineTo(b[0] * cv.width, b[1] * cv.height); ctx.stroke(); }
+    function dot(p, s) { setStyle(s); ctx.beginPath(); ctx.arc(p[0] * cv.width, p[1] * cv.height, s.w * cv.width / 2, 0, Math.PI * 2); ctx.fill(); }
     function redraw() {
       ctx.clearRect(0, 0, cv.width, cv.height);
-      strokes.forEach(function (s) {
-        if (s.pts.length < 2) dot(s.pts[0], s);
-        for (var i = 1; i < s.pts.length; i++) seg(s.pts[i - 1], s.pts[i], s);
-      });
+      strokes.forEach(function (s) { if (s.pts.length < 2) dot(s.pts[0], s); for (var i = 1; i < s.pts.length; i++) seg(s.pts[i - 1], s.pts[i], s); });
     }
-    function norm(e) {
-      var r = cv.getBoundingClientRect();
-      return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height];
-    }
+    function norm(e) { var r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
     function allowed(e) {
       if (e.pointerType === 'pen') { lastPen = Date.now(); return true; }
-      if (e.pointerType === 'touch' && Date.now() - lastPen < 1500) return false;   // palm while penning
+      if (e.pointerType === 'touch' && Date.now() - lastPen < 1500) return false;
       return true;
     }
     cv.addEventListener('pointerdown', function (e) {
       if (!allowed(e)) return;
       e.preventDefault();
       cur = { erase: tool === 'eraser', w: tool === 'eraser' ? 0.04 : 0.0045, pts: [norm(e)] };
-      strokes.push(cur);
-      dot(cur.pts[0], cur);
+      strokes.push(cur); dot(cur.pts[0], cur);
       try { cv.setPointerCapture(e.pointerId); } catch (x) {}
     });
     cv.addEventListener('pointermove', function (e) {
       if (!cur || !allowed(e)) return;
       var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
       if (!evs.length) evs = [e];
-      evs.forEach(function (ev) {
-        var p = norm(ev), prev = cur.pts[cur.pts.length - 1];
-        cur.pts.push(p); seg(prev, p, cur);
-      });
+      evs.forEach(function (ev) { var p = norm(ev), prev = cur.pts[cur.pts.length - 1]; cur.pts.push(p); seg(prev, p, cur); });
     });
     function end() { cur = null; }
-    cv.addEventListener('pointerup', end);
-    cv.addEventListener('pointercancel', end);
-    cv.addEventListener('lostpointercapture', end);
-
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end); cv.addEventListener('lostpointercapture', end);
     livePads.push({ size: size, redraw: redraw });
     requestAnimationFrame(size);
     return wrap;
   }
   window.addEventListener('resize', function () { livePads.forEach(function (p) { p.size(); }); });
   if (window.matchMedia) {
-    try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-      livePads.forEach(function (p) { p.redraw(); });
-    }); } catch (x) {}
+    try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { livePads.forEach(function (p) { p.redraw(); }); }); } catch (x) {}
   }
-  function padKey(i) { return test().id + '/' + sheet().n + '/' + i; }
+  function dropPads(prefix) { for (var k in pads) if (k.indexOf(prefix) === 0) delete pads[k]; }
 
-  // ---------- render ----------
+  // ---------- problem cards ----------
+  function makeCard(item, idx, padKey, showType) {
+    var card = el('div', 'q');
+    if (showType) card.appendChild(el('span', 'q-type', TYPES[item.key].name));
+    var hd = el('div', 'q-hd');
+    hd.appendChild(el('span', 'q-n', MARKS[idx] || String(idx + 1)));
+    hd.appendChild(el('p', 'q-t', item.q.t));
+    card.appendChild(hd);
+    card.appendChild(makePad(padKey));
+    card.appendChild(buildFields(item));
+    item.card = card; item.pick = null; item.graded = false;
+    return card;
+  }
+  function decorate(item, ok) {
+    var card = item.card, q = item.q;
+    card.classList.add('graded', ok ? 'ok' : 'ng');
+    card.appendChild(el('span', 'mark ' + (ok ? 'o' : 'x'), ok ? '' : '✗'));
+    if (ok) return;
+    var fix = el('div', 'fix');
+    fix.appendChild(el('span', 'k', 'こたえ'));
+    fix.appendChild(el('span', 'a', answerText(q.ans)));
+    var st2 = el('span', 'st');
+    st2.appendChild(el('span', null, 'しき　'));
+    q.s.forEach(function (f, k) { if (k) st2.appendChild(el('span', null, '　→　')); st2.appendChild(el('em', null, f)); });
+    fix.appendChild(st2);
+    var go = btn('linkbtn shu go', '→ せんせいの ワンポイント「' + TYPES[item.key].name + '」', function () { openLesson(item.key); });
+    fix.appendChild(go);
+    card.appendChild(fix);
+  }
+
+  // ---------- set runner (sheet mode / weak mode) ----------
+  var cur = null;
+  function setBar(mainText, again) {
+    $('btnMain').textContent = mainText;
+    $('btnAgain').hidden = !again;
+  }
+  function startSet(o) {
+    livePads.length = 0;
+    o.box.innerHTML = ''; if (o.result) o.result.innerHTML = '';
+    o.graded = false;
+    o.items.forEach(function (it, i) { o.box.appendChild(makeCard(it, i, o.mode + '/' + o.tag + '/' + i, o.mode === 'weak')); });
+    cur = o;
+    setBar('まるつけ', false);
+    $('bar').hidden = false;
+  }
+  function gradeSet() {
+    var o = cur, score = 0, blank = 0, wrong = [];
+    o.items.forEach(function (it) {
+      var v = judgeItem(it), ok = v === true;
+      it.graded = true;
+      if (v === null) blank++;
+      if (ok) score++; else wrong.push(it.key);
+      decorate(it, ok); bump(it.key, ok);
+    });
+    var now = new Date().toISOString();
+    if (o.mode === 'sheet') {
+      var t = DATA.tests[o.ti], sh = t.sheets[o.si], rec = recs[t.id];
+      var prev = rec.sheets[sh.n] || { tries: 0, best: 0 };
+      rec.sheets[sh.n] = { tries: prev.tries + 1, best: Math.max(prev.best, score), last: score, lastAt: now };
+      rec.updatedAt = now;
+      logAttempt({ at: now, mode: 'sheet', test: t.id, sheet: sh.n, score: score, total: o.items.length, wrong: wrong });
+    } else {
+      logAttempt({ at: now, mode: 'weak', keys: o.keys, score: score, total: o.items.length, wrong: wrong });
+    }
+    save();
+
+    var res = el('div', 'score' + (score === o.items.length ? ' all' : ''));
+    var big = el('div', 'big', String(score)); big.appendChild(el('i', null, ' / ' + o.items.length));
+    res.appendChild(big);
+    res.appendChild(el('div', 'msg',
+      score === o.items.length ? 'ぜんもん せいかい！ よくできました。'
+      : blank ? 'まだ 入れて いない ところが あるよ。'
+      : score >= 3 ? 'おしい！ ✗の しきを 見て、もういちど やってみよう。'
+      : '✗の しきを 見て、かんがえ方を たしかめよう。'));
+    o.result.appendChild(res);
+    o.graded = true;
+    setBar(o.nextLabel(), true);
+    if (o.mode === 'sheet') renderChips();
+    window.scrollTo(0, 0);
+  }
+  $('btnMain').addEventListener('click', function () { if (!cur) return; if (!cur.graded) gradeSet(); else cur.next(); });
+  $('btnAgain').addEventListener('click', function () { if (cur) cur.again(); });
+
+  // ---------- views ----------
+  var VIEWS = ['home', 'solve', 'weak', 'lessons', 'records', 'print'];
+  var TITLES = { home: 'すずドリル', solve: 'プリントを とく', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
+  var view = 'home';
+  function show(v) {
+    view = v;
+    VIEWS.forEach(function (n) { $('v-' + n).hidden = n !== v; });
+    $('back').hidden = v === 'home';
+    $('ttl').textContent = TITLES[v];
+    $('tabs').hidden = v !== 'solve';
+    $('bar').hidden = !(cur && cur.view === v);
+    window.scrollTo(0, 0);
+  }
+  $('back').addEventListener('click', function () { renderHome(); show('home'); });
+
+  // ---------- home ----------
+  var ICONS = {
+    solve: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.3V21h3.7L17.8 9.9l-3.7-3.7L3 17.3zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L20.7 7z"/></svg>',
+    weak: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>',
+    lessons: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 9h8M8 12.5h5" stroke-linecap="round"/></svg>',
+    records: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="9" width="4" height="12" rx="1"/></svg>',
+    print: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M7 8V3h10v5"/><rect x="3" y="8" width="18" height="9" rx="2"/><path d="M7 13h10v8H7z"/></svg>'
+  };
+  function todaySummary() {
+    var tk = dayKey(new Date().toISOString()), n = 0, ok = 0;
+    recs._log.forEach(function (e) { if (dayKey(e.at) === tk) { n += e.total; ok += e.score; } });
+    return { n: n, ok: ok };
+  }
+  function renderHome() {
+    var td = todaySummary(), hello = $('hello');
+    hello.innerHTML = '';
+    if (td.n) { hello.appendChild(el('span', null, 'きょうは ')); hello.appendChild(el('b', null, td.n + '問')); hello.appendChild(el('span', null, ' といて、')); hello.appendChild(el('b', null, td.ok + '問')); hello.appendChild(el('span', null, ' せいかい。')); }
+    else hello.textContent = 'きょうは どれから やる？';
+
+    var wk = weakKeys(), weakNames = wk.slice(0, 2).map(function (k) { return TYPES[k].name; }).join('・');
+    var box = $('tiles'); box.innerHTML = '';
+    [
+      ['solve', 'プリントを とく', '1-⑤〜1-⑦　各10まい', true],
+      ['weak', 'にがてを とく', weakNames + ' から 5問'],
+      ['lessons', 'せんせいの ワンポイント', 'かんがえ方を 9つ。ためして みよう'],
+      ['records', 'きろく', 'せいかいりつ・にがて・きょうの けっか'],
+      ['print', 'いんさつ', '紙の プリントで やる']
+    ].forEach(function (d) {
+      var t = btn('tile' + (d[3] ? ' primary' : ''), null, function () { open(d[0]); });
+      t.innerHTML = ICONS[d[0]];
+      t.appendChild(el('b', null, d[1]));
+      t.appendChild(el('span', null, d[2]));
+      box.appendChild(t);
+    });
+  }
+  function open(v) {
+    if (v === 'solve') { if (!(cur && cur.view === 'solve')) startSheet(); renderTabs(); }
+    if (v === 'weak') { if (!(cur && cur.view === 'weak')) renderWeakIntro(); }
+    if (v === 'lessons') renderLessons();
+    if (v === 'records') renderRecords();
+    if (v === 'print') renderPrint();
+    show(v);
+  }
+
+  // ---------- solve (sheet mode) ----------
+  var st = { t: 0, s: 0 };
   function renderTabs() {
     var box = $('tabs'); box.innerHTML = '';
     DATA.tests.forEach(function (t, i) {
-      var b = el('button', 'tab', t.label);
-      b.type = 'button'; b.setAttribute('aria-pressed', String(i === st.t));
-      b.addEventListener('click', function () { st.t = i; st.s = 0; reset(); });
+      var b = btn('tab', t.label, function () { st.t = i; st.s = 0; startSheet(); });
+      b.setAttribute('aria-pressed', String(i === st.t));
       box.appendChild(b);
     });
   }
-
   function renderChips() {
     var box = $('chips'); box.innerHTML = '';
-    var rec = recs[test().id];
-    test().sheets.forEach(function (sh, i) {
-      var r = rec.sheets[sh.n], b = el('button', 'chip');
-      b.type = 'button'; b.setAttribute('aria-pressed', String(i === st.s));
+    var t = DATA.tests[st.t], rec = recs[t.id];
+    t.sheets.forEach(function (sh, i) {
+      var r = rec.sheets[sh.n], b = btn('chip', null, function () { st.s = i; startSheet(); });
+      b.setAttribute('aria-pressed', String(i === st.s));
       b.appendChild(el('span', null, 'No.' + sh.n));
-      if (r) {
-        b.classList.add('done');
-        if (r.best === 5) b.classList.add('full');
-        b.appendChild(el('small', null, r.best + '/5'));
-      } else {
-        b.appendChild(el('small', null, '—'));
-      }
-      b.addEventListener('click', function () { st.s = i; reset(); });
+      if (r) { b.classList.add('done'); if (r.best === 5) b.classList.add('full'); b.appendChild(el('small', null, r.best + '/5')); }
+      else b.appendChild(el('small', null, '—'));
       box.appendChild(b);
     });
   }
+  function startSheet() {
+    var t = DATA.tests[st.t], sh = t.sheets[st.s];
+    var items = sh.qs.map(function (q, i) { return { q: q, key: t.typeKeys[i], ref: t.id + '/' + sh.n + '/' + i }; });
+    renderTabs(); renderChips();
+    $('sheetTitle').textContent = t.label + '　No.' + sh.n;
+    $('note').textContent = t.note || '';
+    startSet({
+      view: 'solve', mode: 'sheet', items: items, box: $('qs'), result: $('result'), tag: t.id + '/' + sh.n, ti: st.t, si: st.s,
+      nextLabel: function () { return st.s < t.sheets.length - 1 ? 'つぎの プリント →' : 'さいしょに もどる'; },
+      next: function () { st.s = st.s < t.sheets.length - 1 ? st.s + 1 : 0; startSheet(); window.scrollTo(0, 0); },
+      again: function () { dropPads('sheet/' + t.id + '/' + sh.n + '/'); startSheet(); }
+    });
+  }
 
-  function renderWeak() {
-    var box = $('weak'), rec = recs[test().id], types = test().types;
+  // ---------- weak mode ----------
+  var lastWeakItems = null;
+  function buildWeakItems(keys) {
+    var counts = keys.length === 1 ? [5] : keys.length === 2 ? [3, 2] : [2, 2, 1], used = {}, items = [];
+    keys.forEach(function (k, idx) {
+      var pool = shuffle((POOL[k] || []).slice()), need = counts[idx] || 0;
+      for (var i = 0; i < pool.length && need > 0; i++) { if (used[pool[i].ref]) continue; used[pool[i].ref] = 1; items.push({ q: pool[i].q, key: k, ref: pool[i].ref }); need--; }
+    });
+    return shuffle(items);
+  }
+  function renderWeakIntro(fixedKey) {
+    var keys = fixedKey ? [fixedKey] : weakKeys(), box = $('wintro');
+    box.hidden = false; $('wqs').innerHTML = ''; $('wresult').innerHTML = '';
+    cur = null; $('bar').hidden = true;
     box.innerHTML = '';
-    var worst = null;
-    for (var k = 1; k <= 5; k++) {
-      var c = rec.types[k];
-      if (!c || (c.ok + c.ng) < 2) continue;
-      if (!worst || c.ng > worst.ng) worst = { i: k, ng: c.ng, all: c.ok + c.ng };
-    }
-    if (worst && worst.ng > 0) {
-      box.appendChild(el('span', null, 'よく まちがえる：'));
-      box.appendChild(el('b', null, '（' + worst.i + '）' + types[worst.i - 1]));
-      box.appendChild(el('span', null, worst.all + '回中 ' + worst.ng + '回'));
-    } else {
-      box.appendChild(el('span', null, 'といた きろくが たまると、にがてな もんだいが ここに 出ます。'));
-    }
+    var p = el('div', 'panel');
+    p.appendChild(el('h3', null, fixedKey ? 'この 型を 5問' : 'いま にがてな 型'));
+    var rs = {}; rates().forEach(function (r) { rs[r.key] = r; });
+    var list = el('div', 'klist');
+    keys.forEach(function (k) {
+      var r = rs[k], row = el('div', 'krow');
+      row.appendChild(el('span', null, TYPES[k].name));
+      var rt = el('span', 'rate' + (isWeak(r) ? ' weak' : ''), r.n ? r.n + '回中 ' + r.ok + '回 せいかい' : 'まだ といて いない');
+      row.appendChild(rt);
+      list.appendChild(row);
+    });
+    p.appendChild(list);
+    var hasRecords = rates().some(function (r) { return r.n >= 2; });
+    p.appendChild(el('p', 'muted', fixedKey ? 'まちがえたら せんせいの ワンポイントに もどれます。'
+      : hasRecords ? 'せいかいりつの ひくい 型から、ランダムに 5問 えらびます。' : 'まだ きろくが 少ないので、学校の テストで まちがえた 型から 出します。'));
+    p.appendChild(btn('btn', '5問 スタート', function () { startWeak(keys); }));
+    box.appendChild(p);
+  }
+  function startWeak(keys, items) {
+    items = items || buildWeakItems(keys);
+    lastWeakItems = items;
+    $('wintro').hidden = true;
+    var tag = String(Date.now());
+    startSet({
+      view: 'weak', mode: 'weak', items: items, keys: keys, box: $('wqs'), result: $('wresult'), tag: tag,
+      nextLabel: function () { return 'べつの 5問 →'; },
+      next: function () { startWeak(keys); },
+      again: function () { dropPads('weak/' + tag + '/'); startWeak(keys, items.map(function (it) { return { q: it.q, key: it.key, ref: it.ref }; })); }
+    });
+    show('weak');
   }
 
-  function renderSheet() {
-    var sh = sheet(), box = $('qs');
+  // ---------- lessons ----------
+  function renderLessons() {
+    var box = $('llist'); box.innerHTML = ''; box.hidden = false; $('ldetail').hidden = true;
+    var rs = {}; rates().forEach(function (r) { rs[r.key] = r; });
+    var order = TYPE_ORDER.slice().sort(function (a, b) { var wa = isWeak(rs[a]) ? 0 : 1, wb = isWeak(rs[b]) ? 0 : 1; return wa - wb; });
+    box.appendChild(el('p', 'hello', 'まちがえやすい ところを、せんせいが 1つずつ せつめいします。'));
+    var list = el('div', 'llist');
+    order.forEach(function (k, i) {
+      var r = rs[k], row = btn('lrow', null, function () { openLesson(k); });
+      row.appendChild(el('span', 'n', String(i + 1)));
+      row.appendChild(el('span', null, LESSONS[k].title));
+      row.appendChild(el('span', 'st' + (isWeak(r) ? ' weak' : ''), isWeak(r) ? 'にがて ' + pct(r.ok, r.n) + '%' : r.n ? pct(r.ok, r.n) + '%' : ''));
+      list.appendChild(row);
+    });
+    box.appendChild(list);
+  }
+  function openLesson(key) {
+    var L = LESSONS[key], d = $('ldetail');
+    $('llist').hidden = true; d.hidden = false; d.innerHTML = '';
+    cur = null; $('bar').hidden = true;
+    d.appendChild(el('span', 'eyebrow', 'せんせいの ワンポイント'));
+    d.appendChild(el('h2', null, L.title));
+    d.appendChild(el('p', 'why', L.why));
+    var ex = el('div', 'ex'); ex.appendChild(el('div', 'h', 'れい'));
+    L.ex.forEach(function (line) { ex.appendChild(html('div', null, line)); });
+    d.appendChild(ex);
+    d.appendChild(html('p', 'ng', '✗ よくある まちがい　' + L.ng));
+
+    var tr = el('div', 'try');
+    tr.appendChild(el('h2', 'sec', 'ためして みよう'));
+    var t = DATA.tests[L.try.t], sh = t.sheets[L.try.s], q = sh.qs[L.try.i];
+    var item = { q: q, key: key, ref: t.id + '/' + sh.n + '/' + L.try.i };
     livePads.length = 0;
-    box.innerHTML = ''; $('result').innerHTML = '';
-    $('sheetTitle').textContent = 'No.' + sh.n;
-    $('sheetSub').textContent = 'こたえを 入れて、まるつけを おしてね';
-    var marks = ['①', '②', '③', '④', '⑤'];
-
-    sh.qs.forEach(function (q, i) {
-      var card = el('div', 'q');
-      card.dataset.i = i;
-      var hd = el('div', 'q-hd');
-      hd.appendChild(el('span', 'q-n', marks[i]));
-      hd.appendChild(el('p', 'q-t', q.t));
-      card.appendChild(hd);
-      card.appendChild(makePad(padKey(i)));
-      card.appendChild(buildFields(q, i));
-      box.appendChild(card);
-    });
-
-    $('btnAgain').hidden = true;
-    $('btnMain').textContent = 'まるつけ';
-    $('note').textContent = DATA.tests[st.t].note;
-    window.scrollTo(0, 0);
-  }
-
-  function reset() {
-    st.graded = false; st.picks = {};
-    renderTabs(); renderChips(); renderWeak(); renderSheet();
-  }
-  function render() { renderChips(); renderWeak(); }
-
-  // ---------- grading ----------
-  function grade() {
-    var sh = sheet(), cards = $('qs').children, score = 0, blankCount = 0;
-    var rec = recs[test().id];
-
-    Array.prototype.forEach.call(cards, function (card, i) {
-      var q = sh.qs[i], v = judge(card, q, i);
-      card.classList.add('graded');
-      if (v === null) blankCount++;
+    dropPads('lesson/' + key + '/');
+    tr.appendChild(makeCard(item, 0, 'lesson/' + key + '/0', false));
+    var acts = el('div', 'actions');
+    var check = btn('btn sm', 'こたえあわせ', function () {
+      var v = judgeItem(item);
+      if (v === null) { alert('こたえを 入れてね。'); return; }
       var ok = v === true;
-      card.classList.add(ok ? 'ok' : 'ng');
-      card.appendChild(el('span', 'mark ' + (ok ? 'o' : 'x'), ok ? '' : '✗'));
-      if (ok) score++;
-
-      if (!ok) {
-        var fix = el('div', 'fix');
-        fix.appendChild(el('span', 'k', 'こたえ'));
-        fix.appendChild(el('span', 'a', answerText(q.ans)));
-        var st2 = el('span', 'st');
-        st2.appendChild(el('span', null, 'しき　'));
-        q.s.forEach(function (f, k) {
-          if (k) st2.appendChild(el('span', null, '　→　'));
-          var em = el('em', null, f); st2.appendChild(em);
-        });
-        fix.appendChild(st2);
-        card.appendChild(fix);
-      }
-
-      var c = rec.types[i + 1] || (rec.types[i + 1] = { ok: 0, ng: 0 });
-      c[ok ? 'ok' : 'ng']++;
+      item.graded = true; decorate(item, ok); bump(key, ok);
+      logAttempt({ at: new Date().toISOString(), mode: 'lesson', keys: [key], score: ok ? 1 : 0, total: 1, wrong: ok ? [] : [key] });
+      save();
+      check.hidden = true;
+      acts.appendChild(btn('btn sm', 'この 型を 5問 れんしゅう', function () { renderWeakIntro(key); show('weak'); }));
+      acts.appendChild(btn('btn sm ghost', 'もういちど', function () { openLesson(key); }));
     });
-
-    var prev = rec.sheets[sh.n] || { tries: 0, best: 0 };
-    rec.sheets[sh.n] = {
-      tries: prev.tries + 1,
-      best: Math.max(prev.best, score),
-      last: score,
-      lastAt: new Date().toISOString()
-    };
-    rec.updatedAt = new Date().toISOString();
-    persist(test().id);
-
-    var res = el('div', 'score' + (score === 5 ? ' all' : ''));
-    var big = el('div', 'big', String(score));
-    big.appendChild(el('i', null, ' / 5'));
-    res.appendChild(big);
-    res.appendChild(el('div', 'msg',
-      score === 5 ? 'ぜんもん せいかい！ よくできました。'
-      : blankCount ? 'まだ 入れて いない ところが あるよ。'
-      : score >= 3 ? 'おしい！ ✗の しきを 見て、もういちど やってみよう。'
-      : '✗の しきを 見て、かんがえ方を たしかめよう。'));
-    $('result').appendChild(res);
-
-    st.graded = true;
-    $('btnAgain').hidden = false;
-    $('btnMain').textContent = st.s < test().sheets.length - 1 ? 'つぎの プリント →' : 'さいしょに もどる';
-    renderChips(); renderWeak();
+    acts.appendChild(check);
+    acts.appendChild(btn('btn sm ghost', 'こうざの 一らんへ', function () { renderLessons(); }));
+    tr.appendChild(acts);
+    d.appendChild(tr);
+    show('lessons');
     window.scrollTo(0, 0);
   }
 
-  $('btnMain').addEventListener('click', function () {
-    if (!st.graded) return grade();
-    st.s = st.s < test().sheets.length - 1 ? st.s + 1 : 0;
-    reset();
-  });
-  $('btnAgain').addEventListener('click', function () {
-    for (var i = 0; i < 5; i++) delete pads[padKey(i)];
-    reset();
-  });
+  // ---------- records ----------
+  function renderRecords() {
+    var box = $('recs'); box.innerHTML = '';
+    var log = recs._log.slice(), total = 0, okAll = 0;
+    log.forEach(function (e) { total += e.total; okAll += e.score; });
+    var td = todaySummary();
 
-  reset();
+    var stats = el('div', 'stats');
+    [[String(total), '問', 'といた もんだい'], [total ? pct(okAll, total) + '' : '—', total ? '%' : '', 'せいかいりつ'], [td.n ? td.ok + '/' + td.n : '—', '', 'きょう']].forEach(function (s) {
+      var c = el('div', 'stat'); var b = el('b', null, s[0]); if (s[1]) b.appendChild(el('i', null, s[1])); c.appendChild(b); c.appendChild(el('span', null, s[2])); stats.appendChild(c);
+    });
+    box.appendChild(stats);
+
+    box.appendChild(html('h2', 'sec', '型べつ <small>タップで せんせいの ワンポイント</small>'));
+    var rs = rates().slice().sort(function (a, b) { var ra = a.rate === null ? 2 : a.rate, rb = b.rate === null ? 2 : b.rate; return ra - rb; });
+    rs.forEach(function (r) {
+      var row = btn('trow', null, function () { openLesson(r.key); });
+      var nm = el('span', 'nm', TYPES[r.key].name);
+      if (isWeak(r)) nm.appendChild(el('span', 'pill', 'にがて'));
+      row.appendChild(nm);
+      row.appendChild(el('span', 'rt', r.n ? r.n + '回中 ' + r.ok + '回（' + pct(r.ok, r.n) + '%）' : 'まだ'));
+      var bg = el('div', 'bar-bg'), fg = el('div', 'bar-fg' + (isWeak(r) ? ' weak' : ''));
+      fg.style.width = (r.n ? pct(r.ok, r.n) : 0) + '%';
+      bg.appendChild(fg); row.appendChild(bg);
+      box.appendChild(row);
+    });
+
+    box.appendChild(html('h2', 'sec', 'プリントべつ <small>いちばん よかった てん</small>'));
+    DATA.tests.forEach(function (t) {
+      box.appendChild(el('p', 'muted', t.label));
+      var g = el('div', 'grid5');
+      t.sheets.forEach(function (sh) {
+        var r = recs[t.id].sheets[sh.n], c = el('div', 'cell' + (r ? (r.best === 5 ? ' full' : '') : ' none'));
+        c.appendChild(el('span', null, 'No.' + sh.n)); c.appendChild(el('b', null, r ? r.best + '/5' : '—'));
+        g.appendChild(c);
+      });
+      box.appendChild(g);
+    });
+
+    box.appendChild(html('h2', 'sec', '日づけべつ <small>さいきん 30日</small>'));
+    if (!log.length) box.appendChild(el('p', 'muted', 'まだ きろくが ありません。'));
+    var days = {}, keys = [];
+    log.reverse().forEach(function (e) { var k = dayKey(e.at); if (!days[k]) { days[k] = []; keys.push(k); } days[k].push(e); });
+    keys.slice(0, 30).forEach(function (k) {
+      var d = el('div', 'day'); d.appendChild(el('h4', null, fmtDay(k)));
+      days[k].forEach(function (e) {
+        var row = el('div', 'lg');
+        row.appendChild(el('span', 'tm', fmtTime(e.at)));
+        row.appendChild(el('span', 'wh', e.mode === 'sheet' ? e.test.replace('1-', '1-') + '　No.' + e.sheet : e.mode === 'weak' ? 'にがて' : 'ワンポイント'));
+        if (e.wrong && e.wrong.length) row.appendChild(el('span', 'wr', '✗ ' + e.wrong.map(function (k2) { return TYPES[k2] ? TYPES[k2].name : k2; }).join('・')));
+        row.appendChild(el('span', 'sc' + (e.score === e.total ? ' all' : ''), e.score + '/' + e.total));
+        d.appendChild(row);
+      });
+      box.appendChild(d);
+    });
+
+    var acts = el('div', 'rec-actions');
+    acts.appendChild(btn('linkbtn', 'きろくを 書き出す', exportRecords));
+    acts.appendChild(btn('linkbtn shu', 'きろくを ぜんぶ けす', function () {
+      if (!confirm('きろくを ぜんぶ けします。よろしいですか？')) return;
+      recs = fresh(); recs._migrated = true; save(); renderRecords();
+    }));
+    box.appendChild(acts);
+  }
+  function exportRecords() {
+    var payload = JSON.stringify({ app: 'すずドリル', exportedAt: new Date().toISOString(), records: recs }, null, 2);
+    var name = 'suzu-drill-' + new Date().toISOString().slice(0, 10) + '.json';
+    try {
+      var file = new File([payload], name, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file], title: 'すずドリル きろく' }).catch(function () {}); return; }
+    } catch (e) {}
+    var done = function () { alert('きろくを コピーしました。メモなどに はりつけて 送ってください。'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(payload).then(done, function () { prompt('この 内容を コピーしてください', payload); });
+    else prompt('この 内容を コピーしてください', payload);
+  }
+
+  // ---------- print ----------
+  var pst = { t: 0, s: 0, src: 'sheet', ans: false };
+  var PDF = [['problems', 'もんだい 10まい'], ['answers', 'こたえ'], ['points', 'ポイント'], ['all', 'ぜんぶ']];
+  function renderPrint() {
+    var c = $('pctl'); c.innerHTML = '';
+    var src = el('div', 'src');
+    var sheetBtn = btn('tab', 'プリントから えらぶ', function () { pst.src = 'sheet'; renderPrint(); });
+    var weakBtn = btn('tab', 'さっきの にがて 5問', function () { pst.src = 'weak'; renderPrint(); });
+    sheetBtn.setAttribute('aria-pressed', String(pst.src === 'sheet')); weakBtn.setAttribute('aria-pressed', String(pst.src === 'weak'));
+    weakBtn.disabled = !lastWeakItems;
+    src.appendChild(sheetBtn); if (lastWeakItems) src.appendChild(weakBtn);
+    src.className = 'tabs inpage src'; c.appendChild(src);
+
+    if (pst.src === 'sheet') {
+      var tabs = el('div', 'tabs inpage'); tabs.style.margin = '12px 0 0';
+      DATA.tests.forEach(function (t, i) { var b = btn('tab', t.label, function () { pst.t = i; pst.s = 0; renderPrint(); }); b.setAttribute('aria-pressed', String(i === pst.t)); tabs.appendChild(b); });
+      c.appendChild(tabs);
+      var row = el('div', 'pick-row'); row.style.marginTop = '10px';
+      DATA.tests[pst.t].sheets.forEach(function (sh, i) { var b = btn('chip', null, function () { pst.s = i; renderPrint(); }); b.setAttribute('aria-pressed', String(i === pst.s)); b.appendChild(el('span', null, 'No.' + sh.n)); row.appendChild(b); });
+      c.appendChild(row);
+    }
+    var opt = el('div', 'opt-row');
+    var lab = el('label'); var cb = el('input'); cb.type = 'checkbox'; cb.checked = pst.ans;
+    cb.addEventListener('change', function () { pst.ans = cb.checked; buildPreview(); });
+    lab.appendChild(cb); lab.appendChild(el('span', null, 'こたえの ページも つける')); opt.appendChild(lab);
+    opt.appendChild(btn('btn sm', '印刷する', doPrint));
+    c.appendChild(opt);
+    c.appendChild(el('p', 'muted', 'iPadでは、印刷ボタンで うまく いかない ときは、下の PDF を ひらいて 共有ボタン → プリント を つかってください。'));
+
+    var pd = $('pdfs'); pd.innerHTML = '';
+    pd.appendChild(html('h2', 'sec', 'PDF で ひらく <small>Safariで ひらきます</small>'));
+    DATA.tests.forEach(function (t) {
+      var r = el('div', 'rowp'); r.appendChild(el('b', null, t.label));
+      PDF.forEach(function (p) { var a = el('a', null, p[1]); a.href = './pdf/' + t.id + '/' + p[0] + '.pdf'; a.target = '_blank'; a.rel = 'noopener'; r.appendChild(a); });
+      pd.appendChild(r);
+    });
+    buildPreview();
+  }
+  function buildPSheet(title, no, items) {
+    var s = el('div', 'psheet');
+    var head = el('div', 'head'); head.appendChild(el('h2', 'ttl', title)); head.appendChild(el('div', 'no', no)); s.appendChild(head);
+    s.appendChild(html('div', 'meta', '日づけ　<span class="fill d">&nbsp;</span>月<span class="fill d">&nbsp;</span>日<span style="flex:1;display:flex;align-items:baseline;gap:2mm">なまえ　<span class="fill nm">&nbsp;</span></span><span class="sc">てんすう　　　／' + items.length + '</span>'));
+    var probs = el('div', 'probs');
+    items.forEach(function (it, i) {
+      var p = el('div', 'p'), pt = el('div', 'pt');
+      pt.appendChild(el('span', 'pn', MARKS[i] || String(i + 1))); pt.appendChild(el('span', null, it.q.t)); p.appendChild(pt);
+      var lines = el('div', 'lines');
+      lines.appendChild(html('div', 'ln', '<span class="lbl">（しき）</span><span class="rule"></span>'));
+      lines.appendChild(html('div', 'ln ans', '<span class="lbl">こたえ</span><span class="rule"></span>'));
+      p.appendChild(lines);
+      p.appendChild(html('div', 'hs', '<span>（ひっさん・図）</span>'));
+      probs.appendChild(p);
+    });
+    s.appendChild(probs);
+    return s;
+  }
+  function buildAnswerSheet(title, no, items) {
+    var s = el('div', 'psheet');
+    var head = el('div', 'head'); head.appendChild(el('h2', 'ttl', 'こたえ　' + title)); head.appendChild(el('div', 'no', no)); s.appendChild(head);
+    var ak = el('div', 'ak'); ak.appendChild(el('h4', null, no));
+    var tb = el('table');
+    items.forEach(function (it, i) {
+      var tr = el('tr');
+      tr.appendChild(el('td', 'cn', MARKS[i] || String(i + 1)));
+      tr.appendChild(el('td', 'cs', it.q.s.join('　→　')));
+      tr.appendChild(el('td', 'ca', answerText(it.q.ans)));
+      tb.appendChild(tr);
+    });
+    ak.appendChild(tb); s.appendChild(ak);
+    return s;
+  }
+  function currentPrintSet() {
+    if (pst.src === 'weak' && lastWeakItems) return { title: 'にがて れんしゅう', no: 'にがて', items: lastWeakItems };
+    var t = DATA.tests[pst.t], sh = t.sheets[pst.s];
+    return { title: '2年　文しょうだい　れんしゅう（' + t.label + '）', no: 'No.' + sh.n, items: sh.qs.map(function (q) { return { q: q }; }) };
+  }
+  function buildPreview() {
+    var a = $('printArea'), set = currentPrintSet();
+    a.innerHTML = '';
+    a.appendChild(buildPSheet(set.title, set.no, set.items));
+    if (pst.ans) a.appendChild(buildAnswerSheet(set.title, set.no, set.items));
+    fitPreview();
+  }
+  function fitPreview() {
+    var a = $('printArea'); if (a.hidden || !a.firstChild) return;
+    var avail = Math.min(document.documentElement.clientWidth, 794 + 28) - 28;
+    a.style.zoom = avail < 794 ? (avail / 794).toFixed(3) : '1';
+  }
+  window.addEventListener('resize', fitPreview);
+  function doPrint() {
+    document.body.classList.add('print-mode');
+    var off = function () { document.body.classList.remove('print-mode'); };
+    window.addEventListener('afterprint', off, { once: true });
+    setTimeout(off, 8000);
+    window.print();
+  }
+
+  // ---------- boot ----------
+  renderHome(); show('home');
 })();
 </script>
 
@@ -633,29 +1027,6 @@
     window.addEventListener('load', function () { navigator.serviceWorker.register('./sw.js').catch(function () {}); });
   }
   if (navigator.storage && navigator.storage.persist) { navigator.storage.persist().catch(function () {}); }
-
-  var LS = "suzu.bunsho.v1";
-  var btn = document.getElementById('btnExport');
-  if (!btn) return;
-  btn.addEventListener('click', function () {
-    var raw = '{}';
-    try { raw = localStorage.getItem(LS) || '{}'; } catch (e) {}
-    var payload = JSON.stringify({ app: 'すずドリル', exportedAt: new Date().toISOString(), records: JSON.parse(raw) }, null, 2);
-    var name = 'suzu-drill-' + new Date().toISOString().slice(0, 10) + '.json';
-    try {
-      var file = new File([payload], name, { type: 'application/json' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: 'すずドリル きろく' }).catch(function () {});
-        return;
-      }
-    } catch (e) {}
-    var done = function () { alert('きろくを コピーしました。メモなどに はりつけて 送ってください。'); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(payload).then(done, function () { prompt('この 内容を コピーしてください', payload); });
-    } else {
-      prompt('この 内容を コピーしてください', payload);
-    }
-  });
 })();
 </script>
 </body>
