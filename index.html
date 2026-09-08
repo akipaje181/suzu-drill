@@ -437,6 +437,41 @@
     .psheet:last-child{break-after:auto; page-break-after:auto}
     .psheet .p{break-inside:avoid; page-break-inside:avoid}
   }
+
+  /* きょうの クエスト */
+  .qcard{margin:6px 0 10px; padding:12px 14px 10px; border-radius:16px; background:var(--paper); border:1.5px solid var(--rule)}
+  .qhead{display:flex; align-items:center; gap:10px}
+  .qhead .char{width:60px; height:60px; flex:none}
+  .qhead .say{flex:1; min-width:0; font-family:var(--f-round); font-size:15px; line-height:1.5}
+  .qhead .say small{display:block; font-family:var(--f-kaku); font-size:12px; color:var(--ink-soft); margin-top:2px}
+  .ohayo{min-height:48px; padding:6px 20px; border-radius:999px; background:var(--shu); color:#fff; border:0; font-family:var(--f-round); font-size:17px; font-weight:700; flex:none; box-shadow:0 3px 0 var(--shu-ink)}
+  .ohayo:active{transform:translateY(2px); box-shadow:none}
+  .omikuji{display:flex; gap:6px 14px; align-items:center; flex-wrap:wrap; margin:10px 0 2px; padding:8px 12px; border-radius:12px; background:var(--shu-wash); font-family:var(--f-round); font-size:14px}
+  .omikuji b.luck{font-size:24px; color:var(--shu-ink); margin-left:4px}
+  .omikuji .dot{display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; margin-right:4px; border:1px solid rgba(0,0,0,.15)}
+  .omikuji .fl{width:100%; color:var(--ink-soft); font-size:13px}
+  .qtitle{display:flex; justify-content:space-between; align-items:baseline; font-family:var(--f-round); font-size:16px; font-weight:700; margin:10px 0 2px}
+  .qtitle small{font-family:var(--f-kaku); font-weight:500; font-size:12px; color:var(--ink-soft)}
+  .qlist{list-style:none; margin:0; padding:0}
+  .qlist li{display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px dashed var(--rule-soft)}
+  .qchk{width:46px; height:46px; border-radius:12px; border:2.5px solid var(--field-line); background:var(--field); font-size:24px; font-weight:700; color:#fff; display:flex; align-items:center; justify-content:center; padding:0; flex:none; transition:transform .12s}
+  .qchk.on{background:var(--shu); border-color:var(--shu)}
+  .qchk:active{transform:scale(.92)}
+  .qtxt{flex:1; min-width:0; font-family:var(--f-round); font-size:16px; line-height:1.4}
+  .qtxt small{display:block; font-family:var(--f-kaku); font-size:11.5px; color:var(--ink-soft)}
+  .qok{min-height:34px; padding:2px 10px; border-radius:999px; border:1.5px solid var(--rule); background:var(--paper); font-size:12px; font-family:var(--f-round); color:var(--ink-soft); flex:none}
+  .qok.on{border-color:var(--ok-ink); color:var(--ok-ink); background:var(--ok-wash)}
+  .qbig{margin-top:10px; padding:8px 12px; border-radius:12px; background:var(--ok-wash); font-family:var(--f-round); font-size:14px; line-height:1.5}
+  .qbig b{color:var(--ok-ink)}
+  .qbig small{display:block; font-family:var(--f-kaku); font-size:12px; color:var(--ink-soft)}
+  .qfoot{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; font-family:var(--f-round); font-size:13px; color:var(--ink-soft)}
+  .moods{display:flex; gap:8px}
+  .moods button{width:46px; height:46px; border-radius:50%; font-size:24px; border:2px solid var(--rule); background:var(--field); padding:0; display:flex; align-items:center; justify-content:center}
+  .moods button[aria-pressed="true"]{border-color:var(--shu); background:var(--shu-wash); transform:scale(1.1)}
+  .qmodal{position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; padding:20px}
+  .qmodal .box{background:var(--ground); border-radius:18px; padding:16px 16px 14px; max-width:540px; width:100%; max-height:90vh; overflow:auto; display:flex; flex-direction:column; align-items:center; gap:6px}
+  .qmodal .box .gres{width:100%}
+  .qstat{font-size:13px; color:var(--ink-soft); margin:2px 0 8px}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -1163,6 +1198,9 @@
 
   // ---------- home ----------
   var ICONS = {
+    scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+    daily: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/><path d="M9 15l2 2 4-4" stroke-linecap="round"/></svg>',
+    kanji: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18" stroke-dasharray="2 2"/><path d="M8 9h8M12 7v10M9 17h6" stroke-linecap="round"/></svg>',
     solve: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.3V21h3.7L17.8 9.9l-3.7-3.7L3 17.3zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L20.7 7z"/></svg>',
     weak: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>',
     lessons: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 9h8M8 12.5h5" stroke-linecap="round"/></svg>',
@@ -2035,7 +2073,8 @@
   function toastText(t) { var x = el('div', 'toast', t); document.body.appendChild(x); setTimeout(function () { x.remove(); }, 4000); }
 
   // ---------- game: ポイント・レベル・もくひょう・スタンプ・メダル・なかま・マイルーム ----------
-  var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20 };
+  var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20,
+    quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100 };   // クエスト系（bigGoal=1レベルぶん）
   var LEVEL_NEED = 100;
   var COLORS = ['#f4c14d', '#7ec8e3', '#f49ac1', '#8fd18f', '#c9a3ff', '#ffb27a'];
   var STAGES = [['たまご', 1], ['あかちゃん', 3], ['こども', 7], ['おとな', 15], ['マスター', 30]];
@@ -2053,7 +2092,9 @@
     { id: 'kuma', name: 'くまきち', sp: 'kuma', color: '#c69b6d', need: '30まい とく', ok: function (c) { return c.sheets >= 30; } },
     { id: 'pen', name: 'ペンすけ', sp: 'penguin', color: '#4b5b7a', need: '7日 つづける', ok: function (c) { return c.streakMax >= 7; } },
     { id: 'kaeru', name: 'かえるん', sp: 'kaeru', color: '#8fd18f', need: '型マスター ×3', ok: function (c) { return c.masters >= 3; } },
-    { id: 'robo', name: 'ロボまる', sp: 'robo', color: '#a9b6c9', need: 'スタンプカード 1まい', ok: function (c) { return c.stamps >= 30; } }
+    { id: 'robo', name: 'ロボまる', sp: 'robo', color: '#a9b6c9', need: 'スタンプカード 1まい', ok: function (c) { return c.stamps >= 30; } },
+    { id: 'hiyo', name: 'ひよぴ', sp: 'hiyo', color: '#f9e07a', need: 'あいさつ 5日 れんぞく', ok: function (c) { return c.morningMax >= 5; } },
+    { id: 'fukurou', name: 'ふくろう', sp: 'fukurou', color: '#b08968', need: 'クエスト ぜんぶクリア ×5', ok: function (c) { return c.allclears >= 5; } }
   ];
   var DECOR = [
     { id: 'rug', name: 'ラグ', need: 'Lv.2', ok: function (c) { return c.level >= 2; } },
@@ -2085,9 +2126,15 @@
     { id: 'weak10', ic: '🔁', name: 'にがて れんしゅう ×10', desc: 'にがてモードを 10回', ok: function (c) { return c.weakSets >= 10; } },
     { id: 'scan1', ic: '📷', name: 'テストを もってきた', desc: 'テストの 写真から ページを 作った', ok: function (c) { return c.scans >= 1; } },
     { id: 'lessons5', ic: '📖', name: 'せんせいの はなし ×5', desc: 'ワンポイントを 5つ 読んだ', ok: function (c) { return c.lessons >= 5; } },
-    { id: 'mates3', ic: '🤝', name: 'なかま 3びき', desc: 'なかまが 3びきに なった', ok: function (c) { return c.mates >= 3; } }
+    { id: 'mates3', ic: '🤝', name: 'なかま 3びき', desc: 'なかまが 3びきに なった', ok: function (c) { return c.mates >= 3; } },
+    { id: 'quest1', ic: '✅', name: 'はじめての クエスト', desc: '学校か おうちの クエストを クリア', ok: function (c) { return c.quests >= 1; } },
+    { id: 'allclear1', ic: '🌟', name: 'ぜんぶ クリア', desc: 'その日の クエストを ぜんぶ クリア', ok: function (c) { return c.allclears >= 1; } },
+    { id: 'allclear7', ic: '🌈', name: 'ぜんぶ クリア ×7', desc: 'ぜんぶクリアの 日が 7日', ok: function (c) { return c.allclears >= 7; } },
+    { id: 'morning7', ic: '🌅', name: 'あいさつ 7日', desc: '7日 れんぞくで あいさつした', ok: function (c) { return c.morningMax >= 7; } },
+    { id: 'big1', ic: '🏅', name: 'おおきな もくひょう', desc: 'こんしゅうの おおきな もくひょうを クリア', ok: function (c) { return c.bigGoals >= 1; } },
+    { id: 'oks10', ic: '👪', name: 'おうちの人の ✓ ×10', desc: 'おうちの人に ✓ を 10回 もらった', ok: function (c) { return c.oks >= 10; } }
   ];
-  function levelOf() { var xp = game ? game.xp : 0, lv = Math.min(99, Math.floor(xp / LEVEL_NEED) + 1); return { level: lv, into: xp - (lv - 1) * LEVEL_NEED, need: LEVEL_NEED }; }
+  function levelOf() { var xp = game ? game.xp : 0, lv = Math.min(999, Math.floor(xp / LEVEL_NEED) + 1); return { level: lv, into: xp - (lv - 1) * LEVEL_NEED, need: LEVEL_NEED }; }
   function stageOf(level) { var st = 0; STAGES.forEach(function (x, i) { if (level >= x[1]) st = i; }); return st; }
   function isSetLog(e) { return (e.mode === 'sheet' || e.mode === 'daily' || e.mode === 'weak' || e.mode === 'kanji') && (e.total || 0) >= 5; }
   function weekKey(d) { var x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return dayKey(x.toISOString()); }
@@ -2102,6 +2149,12 @@
     var ks = Object.keys(stamps).sort(), best = 0, run = 0, prev = null;
     ks.forEach(function (k) { var d = new Date(k + 'T00:00:00'); if (prev && (d - prev) === 86400000) run++; else run = 1; best = Math.max(best, run); prev = d; });
     return best;
+  }
+  function streakIn(map) {   // きょう（または きのう）まで つづいている 日数
+    var n = 0, d = new Date(), k = dayKey(d.toISOString());
+    if (!map[k]) { d.setDate(d.getDate() - 1); k = dayKey(d.toISOString()); if (!map[k]) return 0; }
+    while (map[k]) { n++; d.setDate(d.getDate() - 1); k = dayKey(d.toISOString()); }
+    return n;
   }
   function streak() {
     var n = 0, d = new Date(), k = dayKey(d.toISOString());
@@ -2126,6 +2179,10 @@
     ['wear', 'lessonsRead', 'wasWeak', 'mates', 'decor', 'goalsDone'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     if (!game.bonus) game.bonus = { days: {}, weeks: {} };
     if (!game.goals) goals();
+    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear'].forEach(function (k) { if (!game[k]) game[k] = {}; });
+    if (!game.quests) { game.quests = { on: {}, custom: [] }; QUEST_DEFAULT.forEach(function (id) { game.quests.on[id] = 1; }); }
+    if (!game.quests.custom) game.quests.custom = [];
+    bigGoal();
     if (typeof game.streakMax !== 'number') game.streakMax = streakFrom(game.stamps);
     rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
     checkUnlocks();
@@ -2134,7 +2191,9 @@
     var rs = rates(), masters = 0, weakwin = false, goalDays = Object.keys(game.bonus.days).length, weekGoals = 0;
     rs.forEach(function (r) { if (r.n >= 5 && r.rate >= 0.8) masters++; if (game.wasWeak[r.key] && r.n >= 5 && r.rate >= 0.7) weakwin = true; });
     for (var w in game.bonus.weeks) { if (game.bonus.weeks[w].days || game.bonus.weeks[w].sheets) weekGoals++; }
-    return { sheets: game.sets, perfects: game.perfects, streak: streak(), streakMax: game.streakMax || 0, stamps: Object.keys(game.stamps).length, masters: masters, weakwin: weakwin,
+    var quests = 0, oks = 0; for (var qk in game.qdone) quests += Object.keys(game.qdone[qk]).length; for (var ok in game.qok) oks += Object.keys(game.qok[ok]).length;
+    return { quests: quests, oks: oks, allclears: Object.keys(game.allclear).length, mornings: Object.keys(game.morning).length, morningMax: Math.max(streakFrom(game.morning), streakIn(game.morning)), bigGoals: Object.keys(bigGoal().done).length,
+      sheets: game.sets, perfects: game.perfects, streak: streak(), streakMax: game.streakMax || 0, stamps: Object.keys(game.stamps).length, masters: masters, weakwin: weakwin,
       weakSets: game.weakSets, scans: game.scans, lessons: Object.keys(game.lessonsRead).length, level: levelOf().level, medals: Object.keys(game.badges).length, mates: Object.keys(game.mates).length, goalDays: goalDays, weekGoals: weekGoals };
   }
   function checkUnlocks() {   // メダル・なかま・かざり を まとめて 判定
@@ -2180,6 +2239,7 @@
     var ws = weekStats(), wb = game.bonus.weeks[ws.key] || (game.bonus.weeks[ws.key] = {});
     if (ws.days >= g.weekDays && !wb.days) { wb.days = 1; lines.push(['📅 こんしゅう ' + g.weekDays + '日 たっせい！', XP.goalWeek]); flags.week = true; }
     if (ws.sheets >= g.weekSheets && !wb.sheets) { wb.sheets = 1; lines.push(['📅 こんしゅう ' + g.weekSheets + 'まい たっせい！', XP.goalWeek]); flags.week = true; }
+    questBonusLines(k).forEach(function (l) { lines.push(l); });
     var total = 0; lines.forEach(function (l) { total += l[1]; });
     return gameEvent(total, { stamp: first, lines: lines });
   }
@@ -2261,11 +2321,13 @@
     if (sp === 'neko' && st) out += '<path d="M' + (cx - r * .75) + ' ' + (top + 18) + ' l-4 -30 26 16z M' + (cx + r * .75) + ' ' + (top + 18) + ' l4 -30 -26 16z" fill="' + c + '"/>';
     if (sp === 'kuma' && st) out += '<circle cx="' + (cx - r * .72) + '" cy="' + (top + 10) + '" r="15" fill="' + c + '"/><circle cx="' + (cx - r * .72) + '" cy="' + (top + 10) + '" r="7" fill="' + dk + '" opacity=".5"/><circle cx="' + (cx + r * .72) + '" cy="' + (top + 10) + '" r="15" fill="' + c + '"/><circle cx="' + (cx + r * .72) + '" cy="' + (top + 10) + '" r="7" fill="' + dk + '" opacity=".5"/>';
     if (sp === 'robo' && st) out += '<path d="M' + cx + ' ' + top + ' v-22" stroke="#6b7a8f" stroke-width="4"/><circle cx="' + cx + '" cy="' + (top - 26) + '" r="6" fill="#e2574c"/>';
+    if (sp === 'fukurou' && st) out += '<path d="M' + (cx - r * .7) + ' ' + (top + 16) + ' l-6 -26 24 12z M' + (cx + r * .7) + ' ' + (top + 16) + ' l6 -26 -24 12z" fill="' + c + '"/>';
+    if (sp === 'hiyo' && st) out += '<path d="M' + cx + ' ' + (top + 2) + ' q-6 -12 -14 -14 M' + cx + ' ' + (top + 2) + ' q0 -14 3 -20 M' + cx + ' ' + (top + 2) + ' q6 -12 14 -14" fill="none" stroke="' + dk + '" stroke-width="3" stroke-linecap="round"/>';
     if (!st) {
       out += '<ellipse cx="100" cy="112" rx="56" ry="70" fill="' + c + '"/><ellipse cx="82" cy="75" rx="9" ry="6" fill="' + shade(c, 40) + '" opacity=".7"/><circle cx="125" cy="150" r="7" fill="' + dk + '" opacity=".35"/><circle cx="70" cy="135" r="5" fill="' + dk + '" opacity=".35"/>';
       out += '<path d="M118 52 l7 10 -8 6 9 9 -6 8" fill="none" stroke="' + dk + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
     } else {
-      var feet = sp === 'penguin' ? '#f2a33a' : dk;
+      var feet = (sp === 'penguin' || sp === 'hiyo') ? '#f2a33a' : dk;
       out += '<ellipse cx="' + (cx - r * .45) + '" cy="' + (cy + r - 2) + '" rx="14" ry="7" fill="' + feet + '"/><ellipse cx="' + (cx + r * .45) + '" cy="' + (cy + r - 2) + '" rx="14" ry="7" fill="' + feet + '"/>';
       if (st >= 3 && !sp) out += '<ellipse cx="' + (cx - r * .8) + '" cy="' + (cy - r * .55) + '" rx="12" ry="22" fill="' + c + '" transform="rotate(-25 ' + (cx - r * .8) + ' ' + (cy - r * .55) + ')"/><ellipse cx="' + (cx + r * .8) + '" cy="' + (cy - r * .55) + '" rx="12" ry="22" fill="' + c + '" transform="rotate(25 ' + (cx + r * .8) + ' ' + (cy - r * .55) + ')"/>';
       out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + c + '"/>';
@@ -2284,9 +2346,10 @@
       if (m === 'excited') return '<path d="M' + x + ' ' + (ey - 9) + ' l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#e6a100"/>';
       return '<g class="eye"><circle cx="' + x + '" cy="' + ey + '" r="7" fill="#2b2620"/><circle cx="' + (x + 2.5) + '" cy="' + (ey - 2.5) + '" r="2.4" fill="#fff"/></g>';
     };
+    if (sp === 'fukurou') out += '<circle cx="' + (cx - ex) + '" cy="' + ey + '" r="14" fill="#fff8e6"/><circle cx="' + (cx + ex) + '" cy="' + ey + '" r="14" fill="#fff8e6"/>';
     out += eye(cx - ex) + eye(cx + ex);
     var my = ey + 14;
-    if (sp === 'penguin') out += '<path d="M' + (cx - 9) + ' ' + (my - 4) + ' l18 0 -9 10z" fill="#f2a33a"/>';
+    if (sp === 'penguin' || sp === 'hiyo' || sp === 'fukurou') out += '<path d="M' + (cx - 9) + ' ' + (my - 4) + ' l18 0 -9 10z" fill="' + (sp === 'fukurou' ? '#d98b3a' : '#f2a33a') + '"/>';
     else if (sp === 'neko') out += '<path d="M' + (cx - 28) + ' ' + (my - 4) + ' h16 M' + (cx - 28) + ' ' + (my + 4) + ' h16 M' + (cx + 12) + ' ' + (my - 4) + ' h16 M' + (cx + 12) + ' ' + (my + 4) + ' h16" stroke="#2b2620" stroke-width="2" stroke-linecap="round"/><path d="M' + (cx - 5) + ' ' + my + ' q5 6 10 0" fill="none" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/>';
     else if (m === 'happy') out += '<path d="M' + (cx - 10) + ' ' + my + ' q10 12 20 0" fill="none" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/>';
     else if (m === 'hungry') out += '<path d="M' + (cx - 9) + ' ' + (my + 3) + ' q4 -4 9 0 q5 4 9 0" fill="none" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/>';
@@ -2333,7 +2396,7 @@
     if (d.lamp) s += '<rect x="500" y="170" width="4" height="36" fill="#6f695d"/><path d="M484 172 h36 l-6 -18 h-24z" fill="#f2c94c"/>';
     if (d.globe) s += '<circle cx="350" cy="190" r="14" fill="#7ec8e3"/><path d="M340 184 q10 -4 18 4 q-10 6 -14 12" fill="#8fd18f"/><rect x="346" y="203" width="8" height="4" fill="#6f695d"/>';
     s += '<rect x="404" y="192" width="82" height="14" rx="3" fill="#fff" stroke="#c9c2b4"/><text x="445" y="203" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + game.name + '　Lv.' + lv + '</text>';
-    var spots = [[150, 262], [230, 292], [70, 290], [470, 292], [560, 296], [300, 250]], k = 0, mates = MATES.filter(function (m) { return game.mates[m.id]; });
+    var spots = [[150, 262], [230, 292], [70, 290], [470, 292], [560, 296], [300, 250], [390, 300], [600, 270]], k = 0, mates = MATES.filter(function (m) { return game.mates[m.id]; });
     var talker = mates.length ? Math.floor(Math.random() * mates.length) : -1;
     mates.forEach(function (m, i) {
       var p = spots[k++ % spots.length];
@@ -2345,6 +2408,192 @@
   function goalLine() {
     var g = goals(), k = dayKey(new Date().toISOString()), td = sheetsOnDay(k), ws = weekStats();
     return 'きょう ' + Math.min(td, g.day) + '/' + g.day + 'まい' + (td >= g.day ? ' ✓' : '') + '　こんしゅう ' + ws.days + '/' + g.weekDays + '日・' + ws.sheets + '/' + g.weekSheets + 'まい';
+  }
+
+  // ---------- クエスト: 学校・おうちの もくひょう、あいさつ＆おみくじ、ふりかえり、おおきな もくひょう ----------
+  var QUEST_PRESETS = [
+    { id: 's_hand', cat: 'school', ic: '🙋', text: '「はい」と 手を あげる' },
+    { id: 's_greet', cat: 'school', ic: '👋', text: '先生や ともだちに あいさつする' },
+    { id: 's_forget', cat: 'school', ic: '🎒', text: 'わすれものを しない' },
+    { id: 's_kind', cat: 'school', ic: '🤝', text: 'ともだちに やさしくする' },
+    { id: 's_lunch', cat: 'school', ic: '🍚', text: 'きゅうしょくを のこさず たべる' },
+    { id: 's_sit', cat: 'school', ic: '🪑', text: 'しせいよく すわる' },
+    { id: 's_listen', cat: 'school', ic: '👂', text: '先生の はなしを さいごまで きく' },
+    { id: 's_shoes', cat: 'school', ic: '👟', text: 'くつを そろえる' },
+    { id: 'h_ready', cat: 'home', ic: '🎽', text: 'じぶんで あさの したくを する' },
+    { id: 'h_help', cat: 'home', ic: '🍽️', text: 'おてつだいを する' },
+    { id: 'h_bed', cat: 'home', ic: '🌙', text: '9時までに ねる' },
+    { id: 'h_pack', cat: 'home', ic: '📚', text: 'あしたの じゅんびを する' },
+    { id: 'h_read', cat: 'home', ic: '📖', text: '本を 10ぷん よむ' },
+    { id: 'h_teeth', cat: 'home', ic: '🪥', text: 'はを みがく' },
+    { id: 'h_thanks', cat: 'home', ic: '💛', text: '「ありがとう」を いう' },
+    { id: 'h_tidy', cat: 'home', ic: '🧸', text: 'おもちゃを かたづける' }
+  ];
+  var QUEST_DEFAULT = ['s_hand', 's_greet', 'h_ready', 'h_help'];   // さいしょから 出ている クエスト
+  var QCAT = { learn: 'ドリル', school: '学校', home: 'おうち' };
+  var LUCKS = [['大吉', 3], ['中吉', 3], ['小吉', 2], ['吉', 2]];   // うんせい と 出やすさ（わるいのは 出ない）
+  var LUCKY_COLORS = [['あか', '#e2574c'], ['あお', '#4d8fd6'], ['きいろ', '#f2c94c'], ['みどり', '#6cbf6c'], ['ピンク', '#f49ac1'], ['むらさき', '#c9a3ff'], ['オレンジ', '#ffb27a'], ['みずいろ', '#7ec8e3']];
+  var LUCKY_ITEMS = ['えんぴつ', 'けしゴム', 'ハンカチ', 'くつした', 'ぼうし', 'ノート', 'コップ', 'ものさし', 'おりがみ', 'ふでばこ', 'すいとう', 'ティッシュ'];
+  var FORTUNE_LINES = ['きょうは 手を あげると いいことが あるよ', 'ともだちに やさしくすると ラッキー', 'あさごはんを しっかり たべると げんきに なれる日', '字を ていねいに 書くと ○が ふえるよ', 'にがてな もんだいに ちょうせんすると ぐんと のびる日', 'にこにこ していると いいことが おきるよ', 'せなかを ピンと のばすと かっこいい日', 'あいさつが ラッキーを つれてくるよ', 'おてつだいを すると おうちの人が よろこぶ日', 'そらを 見上げると いいことが 見つかるかも'];
+  var MOODS = [['😄', 'さいこう'], ['😊', 'よかった'], ['😐', 'ふつう'], ['😢', 'つかれた']];
+  function todayKey() { return dayKey(new Date().toISOString()); }
+  function hashStr(t) { var h = 2166136261; for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; }
+  function fortune(k) {   // その日 かわらない おみくじ
+    var h = hashStr(k + '|' + (game.name || '')), pick = function (arr, seed) { return arr[seed % arr.length]; };
+    var tw = 0; LUCKS.forEach(function (l) { tw += l[1]; });
+    var r = h % tw, luck = LUCKS[0][0]; for (var i = 0; i < LUCKS.length; i++) { if (r < LUCKS[i][1]) { luck = LUCKS[i][0]; break; } r -= LUCKS[i][1]; }
+    return { luck: luck, color: pick(LUCKY_COLORS, h >>> 4), item: pick(LUCKY_ITEMS, h >>> 9), line: pick(FORTUNE_LINES, h >>> 14) };
+  }
+  function greet() { var h = new Date().getHours(); return h < 11 ? 'おはよう！' : h < 17 ? 'こんにちは！' : 'こんばんは！'; }
+  function qday(map, k) { return map[k] || (map[k] = {}); }
+  function questDefs() {   // いま 出している クエスト（学校は 月〜金だけ）
+    var q = game.quests, wd = new Date().getDay(), weekday = wd >= 1 && wd <= 5, out = [];
+    QUEST_PRESETS.forEach(function (p) { if (q.on[p.id]) out.push(p); });
+    q.custom.forEach(function (c) { out.push(c); });
+    return out.filter(function (d) { return d.cat !== 'school' || weekday; });
+  }
+  function questState(k) {
+    var g = goals(), n = sheetsOnDay(k), done = game.qdone[k] || {}, ok = game.qok[k] || {};
+    var list = [{ id: 'learn', cat: 'learn', ic: '📘', text: 'ドリルを ' + g.day + 'まい とく', prog: Math.min(n, g.day) + ' / ' + g.day + 'まい', done: n >= g.day }];
+    questDefs().forEach(function (d) { list.push({ id: d.id, cat: d.cat, ic: d.ic, text: d.text, done: !!done[d.id], ok: !!ok[d.id] }); });
+    var c = 0; list.forEach(function (x) { if (x.done) c++; });
+    return { list: list, done: c, total: list.length, all: c === list.length };
+  }
+  function bigGoal() { return game.big || (game.big = { need: 3, reward: '', done: {} }); }
+  function bigProgress() { var wk = weekKey(new Date()), n = 0; for (var k in game.allclear) { if (weekKey(new Date(k + 'T00:00:00')) === wk) n++; } return { key: wk, n: n }; }
+  // ぜんぶクリア／おおきな もくひょう の ボーナス行（状態も 更新する）
+  function questBonusLines(k) {
+    var lines = [], qs = questState(k);
+    if (qs.all && qs.total > 1 && !game.allclear[k]) {
+      game.allclear[k] = 1; lines.push(['🌟 きょうの クエスト ぜんぶ クリア！', XP.allClear]);
+      var bg = bigGoal(), bp = bigProgress();
+      if (bp.n >= bg.need && !bg.done[bp.key]) { bg.done[bp.key] = 1; lines.push(['🏅 おおきな もくひょう クリア！' + (bg.reward ? '　ごほうび「' + bg.reward + '」' : ''), XP.bigGoal]); }
+    }
+    return lines;
+  }
+  function finishQuestEvent(lines) {
+    var total = 0; lines.forEach(function (l) { total += l[1]; });
+    var ev = total ? gameEvent(total, { lines: lines }) : null;
+    save(); renderCharCard();
+    if (!ev) return;
+    if (ev.up || ev.badges.length || ev.mates.length) showModal(gameResultPanel(ev)); else showToast(ev);
+  }
+  function toggleQuest(id) {
+    var k = todayKey(), dn = qday(game.qdone, k), paid = qday(game.qpaid, k), lines = [];
+    if (dn[id]) { delete dn[id]; save(); renderCharCard(); return; }   // まちがえて おしたとき（ポイントは そのまま）
+    dn[id] = new Date().toISOString();
+    var d = null; questState(k).list.forEach(function (x) { if (x.id === id) d = x; });
+    if (!paid[id]) { paid[id] = 1; lines.push([(d ? d.ic + ' ' + d.text : 'クエスト') + '　クリア', XP.quest]); }
+    questBonusLines(k).forEach(function (l) { lines.push(l); });
+    finishQuestEvent(lines);
+  }
+  function parentOk(id) {
+    var k = todayKey(), ok = qday(game.qok, k); if (ok[id]) return;
+    if (!confirm('おうちの人が おしてください。\nこの クエストは できましたか？')) return;
+    ok[id] = 1; finishQuestEvent([['👪 おうちの人の ✓', XP.parentOk]]);
+  }
+  function checkIn() {   // あいさつ（1日1回）→ おみくじが ひらく
+    var k = todayKey(); if (game.morning[k]) return;
+    var h = new Date().getHours(); game.morning[k] = h + 1;
+    var lines = [['☀️ ' + greet().replace('！', '') + 'の あいさつ', XP.morning]];
+    if (h < 8) lines.push(['🌅 はやおき ボーナス', XP.early]);
+    var s = streakIn(game.morning); if (s >= 2) lines.push(['あいさつ れんぞく ' + s + '日', Math.min(s, 7) * 2]);
+    finishQuestEvent(lines);
+  }
+  function setMood(i) {
+    var k = todayKey(), first = game.evening[k] === undefined; game.evening[k] = i;
+    if (first) finishQuestEvent([['📝 きょうの ふりかえり', XP.evening]]); else { save(); renderCharCard(); }
+  }
+  function showModal(node) {
+    var m = el('div', 'qmodal'), box = el('div', 'box'); box.appendChild(node);
+    box.appendChild(btn('ohayo', 'OK', function () { m.remove(); }));
+    m.addEventListener('click', function (e) { if (e.target === m || (e.target.closest && e.target.closest('button.linkbtn'))) m.remove(); });
+    m.appendChild(box); document.body.appendChild(m);
+  }
+  function questCard() {
+    var k = todayKey(), qs = questState(k), f = fortune(k), checked = !!game.morning[k], card = el('div', 'qcard');
+    var hd = el('div', 'qhead');
+    hd.appendChild(html('div', null, charSVG({ stage: stageOf(levelOf().level), color: game.color, wear: game.wear, mood: qs.all && checked ? 'excited' : checked ? 'happy' : 'normal' })));
+    var say = el('div', 'say');
+    if (checked) {
+      say.appendChild(el('span', null, qs.all ? 'きょうの クエスト ぜんぶ クリア！ すごい！' : qs.done > 1 ? 'いいちょうし！ のこり ' + (qs.total - qs.done) + 'こ' : 'きょうの クエスト、いっしょに がんばろう！'));
+      say.appendChild(el('small', null, 'あいさつ れんぞく ' + streakIn(game.morning) + '日'));
+    } else {
+      say.appendChild(el('span', null, greet() + '　' + game.name + 'に あいさつしよう'));
+      say.appendChild(el('small', null, 'タップすると きょうの おみくじが ひける（+' + XP.morning + (new Date().getHours() < 8 ? '、はやおき +' + XP.early : '') + '）'));
+    }
+    hd.appendChild(say);
+    if (!checked) hd.appendChild(btn('ohayo', greet(), checkIn));
+    card.appendChild(hd);
+    if (checked) {
+      var om = el('div', 'omikuji');
+      om.appendChild(html('span', null, 'きょうの うんせい<b class="luck">' + f.luck + '</b>'));
+      om.appendChild(html('span', null, '<i class="dot" style="background:' + f.color[1] + '"></i>ラッキーカラー ' + f.color[0]));
+      om.appendChild(el('span', null, '🍀 ラッキーアイテム ' + f.item));
+      om.appendChild(el('span', 'fl', f.line));
+      card.appendChild(om);
+    }
+    var tt = el('div', 'qtitle'); tt.appendChild(el('span', null, 'きょうの クエスト')); tt.appendChild(el('small', null, qs.done + ' / ' + qs.total + '　ぜんぶ クリアで +' + XP.allClear));
+    card.appendChild(tt);
+    var ul = el('ul', 'qlist');
+    qs.list.forEach(function (q) {
+      var li = el('li'), learn = q.id === 'learn';
+      var cb = btn('qchk' + (q.done ? ' on' : ''), q.done ? '✓' : '', function () { if (learn) open('daily'); else toggleQuest(q.id); });
+      cb.setAttribute('aria-label', q.text); cb.setAttribute('aria-pressed', String(q.done));
+      li.appendChild(cb);
+      var tx = el('div', 'qtxt', q.ic + ' ' + q.text);
+      tx.appendChild(el('small', null, QCAT[q.cat] + (q.prog ? '　' + q.prog : '') + (q.done && !learn ? '　+' + XP.quest : learn && !q.done ? '　タップで ドリルへ' : '')));
+      li.appendChild(tx);
+      if (!learn && q.done) li.appendChild(btn('qok' + (q.ok ? ' on' : ''), q.ok ? '👪 ✓ もらった' : '👪 おうちの人の ✓', function () { parentOk(q.id); }));
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    var bg = bigGoal(), bp = bigProgress(), big = el('div', 'qbig');
+    big.appendChild(html('span', null, '🏅 こんしゅうの おおきな もくひょう：ぜんぶクリアの 日を <b>' + bg.need + '日</b>　→ いま <b>' + Math.min(bp.n, bg.need) + '日</b>' + (bg.done[bp.key] ? '　クリア！🎉' : '')));
+    big.appendChild(el('small', null, (bg.reward ? 'ごほうび：' + bg.reward + '　' : '') + 'クリアで 1レベル アップ' + (bg.reward ? '' : '（ごほうびは マイルームで きめられる）')));
+    card.appendChild(big);
+    var ft = el('div', 'qfoot'), mv = game.evening[k], md = el('div', 'moods');
+    ft.appendChild(el('span', null, mv === undefined ? 'きょうは どうだった？（ふりかえり +' + XP.evening + '）' : 'きょうは「' + MOODS[mv][1] + '」の 日'));
+    MOODS.forEach(function (m, i) { var b = btn(null, m[0], function () { setMood(i); }); b.setAttribute('aria-pressed', String(mv === i)); b.setAttribute('aria-label', m[1]); md.appendChild(b); });
+    ft.appendChild(md);
+    card.appendChild(ft);
+    return card;
+  }
+  function renderQuestSettings(box) {   // マイルーム: おうちの人が クエストを えらぶ
+    var c = gameCtx();
+    box.appendChild(html('h2', 'sec', 'クエスト <small>学校・おうちの もくひょう（おうちの人と きめる）</small>'));
+    var qp = el('div', 'panel');
+    qp.appendChild(el('p', 'qstat', 'クリアした クエスト ' + c.quests + 'こ　／　ぜんぶクリアの 日 ' + c.allclears + '日　／　あいさつ ' + c.mornings + '日　／　おうちの人の ✓ ' + c.oks + '回'));
+    qp.appendChild(el('p', 'muted', 'ホームの「きょうの クエスト」に 出ます。学校の クエストは 月〜金だけ。1つ +' + XP.quest + '、おうちの人の ✓ +' + XP.parentOk + '、ぜんぶ クリア +' + XP.allClear + '、あいさつ +' + XP.morning + '（8時前 +' + XP.early + '）、ふりかえり +' + XP.evening + '。'));
+    ['school', 'home'].forEach(function (cat) {
+      qp.appendChild(el('h3', null, cat === 'school' ? '🏫 学校' : '🏠 おうち'));
+      var grid = el('div', 'accs');
+      QUEST_PRESETS.forEach(function (p) {
+        if (p.cat !== cat) return;
+        var on = !!game.quests.on[p.id], b = btn('acc', null, function () { if (on) delete game.quests.on[p.id]; else game.quests.on[p.id] = 1; save(); renderGrow(); });
+        b.setAttribute('aria-pressed', String(on)); b.appendChild(el('span', null, p.ic + ' ' + p.text)); b.appendChild(el('small', null, on ? '出している' : 'タップで 出す')); grid.appendChild(b);
+      });
+      game.quests.custom.forEach(function (cq) {
+        if (cq.cat !== cat) return;
+        var b = btn('acc', null, function () { if (confirm('「' + cq.text + '」を けしますか？')) { game.quests.custom = game.quests.custom.filter(function (x) { return x !== cq; }); save(); renderGrow(); } });
+        b.setAttribute('aria-pressed', 'true'); b.appendChild(el('span', null, cq.ic + ' ' + cq.text)); b.appendChild(el('small', null, 'じぶんで 書いた（タップで けす）')); grid.appendChild(b);
+      });
+      var add = btn('acc', null, function () {
+        var v = prompt((cat === 'school' ? '学校' : 'おうち') + 'の もくひょうを 書いてね（例：' + (cat === 'school' ? 'そうじを がんばる' : 'おふろを あらう') + '）');
+        if (v && v.trim()) { game.quests.custom.push({ id: 'c' + Date.now(), cat: cat, ic: cat === 'school' ? '🏫' : '🏠', text: v.trim().slice(0, 24) }); save(); renderGrow(); }
+      });
+      add.appendChild(el('span', null, '＋ じぶんで 書く')); grid.appendChild(add);
+      qp.appendChild(grid);
+    });
+    qp.appendChild(el('h3', null, '🏅 こんしゅうの おおきな もくひょう'));
+    var bg = bigGoal();
+    qp.appendChild(stepper('ぜんぶクリアの日', function () { return bg.need; }, function (v) { bg.need = v; }, 1, 7, '日'));
+    qp.appendChild(btn('linkbtn', 'ごほうび：' + (bg.reward || 'まだ きめていない') + ' ✎', function () {
+      var v = prompt('クリアしたときの ごほうび（例：日よう日に こうえんへ いく）', bg.reward || '');
+      if (v !== null) { bg.reward = v.trim().slice(0, 30); save(); renderGrow(); }
+    }));
+    qp.appendChild(el('p', 'muted', 'クリアすると +' + XP.bigGoal + ' ポイント（1レベルぶん）。しゅうは 月よう日に かわります。'));
+    box.appendChild(qp);
   }
   function renderCharCard() {
     var box = $('charCard'); if (!box) return; box.innerHTML = '';
@@ -2361,6 +2610,7 @@
     info.appendChild(el('div', 'goal', goalLine()));
     card.appendChild(info);
     box.appendChild(card);
+    box.appendChild(questCard());
   }
   function stepper(label, get, set, min, max, unit) {
     var row = el('div', 'stp');
@@ -2393,6 +2643,7 @@
     gp.appendChild(stepper('1しゅうかんに', function () { return g.weekSheets; }, function (v) { g.weekSheets = v; }, 3, 30, 'まい'));
     gp.appendChild(el('p', 'muted', 'きょうの もくひょう +' + XP.goalDay + '　しゅうの もくひょう +' + XP.goalWeek + 'ずつ。1まい +' + XP.sheet + '、5まいごと +20、10まいごと +50、その日の 1まいめ +' + XP.day + '、れんぞく日数 ×5（7日まで）。'));
     box.appendChild(gp);
+    renderQuestSettings(box);
 
     box.appendChild(html('h2', 'sec', 'なかま <small>' + Object.keys(game.mates).length + ' / ' + MATES.length + '</small>'));
     var mg = el('div', 'medals');
