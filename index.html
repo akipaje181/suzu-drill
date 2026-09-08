@@ -145,6 +145,7 @@
   .sizes{display:inline-flex; gap:4px; margin-left:4px}
   .tool.sz{width:44px; padding:0; display:inline-flex; align-items:center; justify-content:center}
   .tool.sz i{display:block; border-radius:50%; background:currentColor}
+  .sizes.era .tool.sz i{border-radius:3px; background:none; border:2px solid currentColor}
   .tool.clear{color:var(--shu-ink); margin-left:auto}
   .pad-area{position:relative; height:400px}
   .pad-guide{position:absolute; inset:0; display:flex; gap:12px; padding:10px 12px 12px; pointer-events:none}
@@ -518,15 +519,25 @@
 
   // ---------- handwriting pad (vector strokes, redrawn on resize) ----------
   var pads = {}, livePads = [], lastPen = 0, fingerPad = null;
-  var PEN_W = { s: 0.0030, m: 0.0048, l: 0.0078 }, ERASER_W = 0.040;   // fraction of the canvas width
-  var penSize = 'm';
-  try { var sv = localStorage.getItem('suzu.pen.size'); if (PEN_W[sv]) penSize = sv; } catch (e) {}
-  var sizeBtns = [];
-  function setPenSize(sz) {
-    penSize = sz;
-    try { localStorage.setItem('suzu.pen.size', sz); } catch (e) {}
-    sizeBtns = sizeBtns.filter(function (b) { return b.isConnected; });
-    sizeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.sz === sz)); });
+  var W = {                                        // stroke width as a fraction of the canvas width
+    pen:    { s: 0.0030, m: 0.0048, l: 0.0078 },
+    eraser: { s: 0.022,  m: 0.040,  l: 0.075  }
+  };
+  var DOT = {                                      // size-button dot, in px, per tool
+    pen:    { s: 6, m: 10, l: 15 },
+    eraser: { s: 9, m: 14, l: 20 }
+  };
+  var curSize = { pen: 'm', eraser: 'm' };         // remembered separately for each tool
+  try {
+    var sp = localStorage.getItem('suzu.pen.size'); if (W.pen[sp]) curSize.pen = sp;
+    var se = localStorage.getItem('suzu.eraser.size'); if (W.eraser[se]) curSize.eraser = se;
+  } catch (e) {}
+  var sizePads = [];
+  function setSize(tool, sz) {
+    curSize[tool] = sz;
+    try { localStorage.setItem(tool === 'pen' ? 'suzu.pen.size' : 'suzu.eraser.size', sz); } catch (e) {}
+    sizePads = sizePads.filter(function (f) { return f.live(); });
+    sizePads.forEach(function (f) { f.sync(); });
   }
   function inkColor() { return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#23211d'; }
   function makePad(key) {
@@ -542,18 +553,33 @@
     [['pen', 'ペン'], ['eraser', 'けしゴム']].forEach(function (t) {
       var b = el('button', 'tool', t[1]); b.type = 'button';
       b.setAttribute('aria-pressed', String(t[0] === tool));
-      b.addEventListener('click', function () { tool = t[0]; for (var k in tools) tools[k].setAttribute('aria-pressed', String(k === tool)); });
+      b.addEventListener('click', function () {
+        tool = t[0];
+        for (var k in tools) tools[k].setAttribute('aria-pressed', String(k === tool));
+        syncSizes();
+      });
       tools[t[0]] = b; bar.appendChild(b);
     });
-    var sizes = el('span', 'sizes');
-    [['s', 'ほそい', 6], ['m', 'ふつう', 10], ['l', 'ふとい', 15]].forEach(function (z) {
-      var b = el('button', 'tool sz'); b.type = 'button'; b.dataset.sz = z[0]; b.title = z[1];
-      b.setAttribute('aria-label', 'ペンの ふとさ：' + z[1]);
-      b.setAttribute('aria-pressed', String(z[0] === penSize));
-      var d = el('i'); d.style.width = d.style.height = z[2] + 'px'; b.appendChild(d);
-      b.addEventListener('click', function () { setPenSize(z[0]); if (tool !== 'pen') tools.pen.click(); });
-      sizeBtns.push(b); sizes.appendChild(b);
+    var sizes = el('span', 'sizes'), szBtns = [];
+    [['s', 'ほそい'], ['m', 'ふつう'], ['l', 'ふとい']].forEach(function (z) {
+      var b = el('button', 'tool sz'); b.type = 'button'; b.dataset.sz = z[0]; b.dataset.label = z[1];
+      b.appendChild(el('i'));
+      b.addEventListener('click', function () { setSize(tool, z[0]); });   // stay on the current tool
+      szBtns.push(b); sizes.appendChild(b);
     });
+    function syncSizes() {
+      var name = tool === 'eraser' ? 'けしゴム' : 'ペン';
+      sizes.classList.toggle('era', tool === 'eraser');
+      szBtns.forEach(function (b) {
+        var sz = b.dataset.sz, px = DOT[tool][sz];
+        b.querySelector('i').style.width = b.querySelector('i').style.height = px + 'px';
+        b.title = name + 'の ふとさ：' + b.dataset.label;
+        b.setAttribute('aria-label', b.title);
+        b.setAttribute('aria-pressed', String(sz === curSize[tool]));
+      });
+    }
+    syncSizes();
+    sizePads.push({ live: function () { return sizes.isConnected; }, sync: syncSizes });
     bar.appendChild(sizes);
     var fb = el('button', 'tool finger', '指で かく'); fb.type = 'button'; fb.setAttribute('aria-pressed', 'false');
     var api = { off: function () { setFinger(false); } };
@@ -627,7 +653,7 @@
       else if (e.pointerType === 'touch' && (!finger || !e.isPrimary)) return;   // a finger scrolls unless 指で かく; 2nd finger never draws
       e.preventDefault();
       rect = cv.getBoundingClientRect();
-      var s = { erase: tool === 'eraser', w: tool === 'eraser' ? ERASER_W : PEN_W[penSize], pts: [norm(e)], t: now, ptype: e.pointerType };
+      var s = { erase: tool === 'eraser', w: W[tool][curSize[tool]], pts: [norm(e)], t: now, ptype: e.pointerType };
       strokes.push(s); active[e.pointerId] = s;
       dot(s.pts[0], s);
       try { cv.setPointerCapture(e.pointerId); } catch (x) {}
