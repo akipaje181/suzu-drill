@@ -138,16 +138,27 @@
 
   /* ---------- handwriting pad ---------- */
   .pad{margin:12px 0 0; border:1.5px dashed var(--field-line); border-radius:10px; overflow:hidden; background:var(--field)}
-  .pad-bar{display:flex; align-items:center; gap:6px; padding:6px 8px; border-bottom:1px dashed var(--rule)}
-  .pad-lbl{font-family:var(--f-round); font-size:12.5px; color:var(--ink-faint); margin-right:auto; padding-left:2px}
+  .pad-bar{display:flex; align-items:center; gap:6px; padding:6px 8px; border-bottom:1px dashed var(--rule); flex-wrap:wrap}
   .tool{min-height:38px; padding:4px 13px; border-radius:8px; font-size:14px; font-family:var(--f-round); border:1.5px solid var(--field-line); background:var(--paper); color:var(--ink)}
   .tool[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
-  .tool.clear{color:var(--shu-ink)}
-  .pad-cv{
-    display:block; width:100%; height:200px; touch-action:none; user-select:none; -webkit-user-select:none;
+  .sizes{display:inline-flex; gap:4px; margin-left:4px}
+  .tool.sz{width:44px; padding:0; display:inline-flex; align-items:center; justify-content:center}
+  .tool.sz i{display:block; border-radius:50%; background:currentColor}
+  .tool.clear{color:var(--shu-ink); margin-left:auto}
+  .pad-area{position:relative; height:250px}
+  .pad-guide{position:absolute; inset:0; display:flex; gap:10px; padding:8px 10px 10px; pointer-events:none}
+  .g-left{flex:1 1 56%; display:flex; flex-direction:column; min-width:0}
+  .g-line{flex:1.35; position:relative; border-bottom:1.5px solid var(--field-line)}
+  .g-line.ans{flex:1; border-bottom-width:2px; border-bottom-color:var(--ink-faint)}
+  .g-line span{position:absolute; left:2px; bottom:3px; font-family:var(--f-round); font-size:13px; color:var(--ink-faint); line-height:1}
+  .g-right{
+    flex:0 0 42%; position:relative; border:1.5px dashed var(--field-line); border-radius:6px;
     background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size:30px 30px; background-position:-1px -1px;
+    background-size:26px 26px; background-position:-1px -1px;
   }
+  .g-right span{position:absolute; top:2px; left:6px; font-family:var(--f-round); font-size:12px; color:var(--ink-faint); background:var(--field); padding:0 3px; line-height:1.3}
+  .pad-cv{position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none}
+  @media (max-width:560px){ .pad-area{height:430px} .pad-guide{flex-direction:column} .g-right{flex:0 0 200px} .g-left{flex:1 1 auto} }
 
   /* ---------- marking ---------- */
   .q.ok{border-color:var(--ok-ink)}
@@ -440,7 +451,7 @@
   }
   function buildFields(item) {
     var row = el('div', 'row'), a = item.q.ans;
-    row.appendChild(el('span', 'lbl', 'こたえ'));
+    row.appendChild(el('span', 'lbl', 'こたえ（数字で）'));
     if (a.k === 'len') {
       var cm = numField(''), mm = numField('0');
       cm.dataset.f = 'cm'; mm.dataset.f = 'mm';
@@ -498,12 +509,25 @@
 
   // ---------- handwriting pad (vector strokes, redrawn on resize) ----------
   var pads = {}, livePads = [], lastPen = 0;
+  var PEN_W = { s: 0.0034, m: 0.0055, l: 0.0090 }, ERASER_W = 0.045;   // fraction of the canvas width
+  var penSize = 'm';
+  try { var sv = localStorage.getItem('suzu.pen.size'); if (PEN_W[sv]) penSize = sv; } catch (e) {}
+  var sizeBtns = [];
+  function setPenSize(sz) {
+    penSize = sz;
+    try { localStorage.setItem('suzu.pen.size', sz); } catch (e) {}
+    sizeBtns = sizeBtns.filter(function (b) { return b.isConnected; });
+    sizeBtns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.sz === sz)); });
+  }
   function inkColor() { return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#23211d'; }
   function makePad(key) {
     var strokes = pads[key] || (pads[key] = []);
-    var wrap = el('div', 'pad'), bar = el('div', 'pad-bar'), cv = el('canvas', 'pad-cv');
-    var ctx = cv.getContext('2d'), tool = 'pen', cur = null;
-    bar.appendChild(el('span', 'pad-lbl', 'ひっさん・図を ここに 書けます'));
+    var wrap = el('div', 'pad'), bar = el('div', 'pad-bar'), area = el('div', 'pad-area'), guide = el('div', 'pad-guide'), cv = el('canvas', 'pad-cv');
+    guide.innerHTML = '<div class="g-left"><div class="g-line"><span>（しき）</span></div><div class="g-line ans"><span>こたえ</span></div></div><div class="g-right"><span>（ひっさん・図）</span></div>';
+    area.appendChild(guide); area.appendChild(cv);
+    var ctx = cv.getContext('2d', { desynchronized: true }) || cv.getContext('2d');
+    var tool = 'pen', active = {}, rect = null;
+
     var tools = {};
     [['pen', 'ペン'], ['eraser', 'けしゴム']].forEach(function (t) {
       var b = el('button', 'tool', t[1]); b.type = 'button';
@@ -511,14 +535,26 @@
       b.addEventListener('click', function () { tool = t[0]; for (var k in tools) tools[k].setAttribute('aria-pressed', String(k === tool)); });
       tools[t[0]] = b; bar.appendChild(b);
     });
+    var sizes = el('span', 'sizes');
+    [['s', 'ほそい', 6], ['m', 'ふつう', 10], ['l', 'ふとい', 15]].forEach(function (z) {
+      var b = el('button', 'tool sz'); b.type = 'button'; b.dataset.sz = z[0]; b.title = z[1];
+      b.setAttribute('aria-label', 'ペンの ふとさ：' + z[1]);
+      b.setAttribute('aria-pressed', String(z[0] === penSize));
+      var d = el('i'); d.style.width = d.style.height = z[2] + 'px'; b.appendChild(d);
+      b.addEventListener('click', function () { setPenSize(z[0]); if (tool !== 'pen') tools.pen.click(); });
+      sizeBtns.push(b); sizes.appendChild(b);
+    });
+    bar.appendChild(sizes);
     var clr = el('button', 'tool clear', 'ぜんぶ けす'); clr.type = 'button';
     clr.addEventListener('click', function () { strokes.length = 0; redraw(); });
     bar.appendChild(clr);
-    wrap.appendChild(bar); wrap.appendChild(cv);
+    wrap.appendChild(bar); wrap.appendChild(area);
+
     function size() {
-      var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
-      if (!r.width) return;
-      cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+      rect = cv.getBoundingClientRect();
+      var dpr = window.devicePixelRatio || 1;
+      if (!rect.width) return;
+      cv.width = Math.round(rect.width * dpr); cv.height = Math.round(rect.height * dpr);
       redraw();
     }
     function setStyle(s) {
@@ -526,33 +562,66 @@
       ctx.lineWidth = s.w * cv.width; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.strokeStyle = ctx.fillStyle = inkColor();
     }
-    function seg(a, b, s) { setStyle(s); ctx.beginPath(); ctx.moveTo(a[0] * cv.width, a[1] * cv.height); ctx.lineTo(b[0] * cv.width, b[1] * cv.height); ctx.stroke(); }
-    function dot(p, s) { setStyle(s); ctx.beginPath(); ctx.arc(p[0] * cv.width, p[1] * cv.height, s.w * cv.width / 2, 0, Math.PI * 2); ctx.fill(); }
+    var X = function (p) { return p[0] * cv.width; }, Y = function (p) { return p[1] * cv.height; };
+    function dot(p, s) { setStyle(s); ctx.beginPath(); ctx.arc(X(p), Y(p), s.w * cv.width / 2, 0, Math.PI * 2); ctx.fill(); }
+    // smoothed: the piece ending at point i is a quadratic curve between the neighbouring midpoints
+    function drawFrom(s, i) {
+      var p = s.pts;
+      if (i < 1) return;
+      setStyle(s); ctx.beginPath();
+      if (i === 1) { ctx.moveTo(X(p[0]), Y(p[0])); ctx.lineTo(X(p[1]), Y(p[1])); }
+      else {
+        var m1 = [(p[i - 2][0] + p[i - 1][0]) / 2, (p[i - 2][1] + p[i - 1][1]) / 2];
+        var m2 = [(p[i - 1][0] + p[i][0]) / 2, (p[i - 1][1] + p[i][1]) / 2];
+        ctx.moveTo(X(m1), Y(m1)); ctx.quadraticCurveTo(X(p[i - 1]), Y(p[i - 1]), X(m2), Y(m2));
+      }
+      ctx.stroke();
+    }
+    function drawTail(s) {
+      var p = s.pts, n = p.length; if (n < 2) return;
+      var m = [(p[n - 2][0] + p[n - 1][0]) / 2, (p[n - 2][1] + p[n - 1][1]) / 2];
+      setStyle(s); ctx.beginPath(); ctx.moveTo(X(m), Y(m)); ctx.lineTo(X(p[n - 1]), Y(p[n - 1])); ctx.stroke();
+    }
     function redraw() {
       ctx.clearRect(0, 0, cv.width, cv.height);
-      strokes.forEach(function (s) { if (s.pts.length < 2) dot(s.pts[0], s); for (var i = 1; i < s.pts.length; i++) seg(s.pts[i - 1], s.pts[i], s); });
+      strokes.forEach(function (s) {
+        if (s.pts.length < 2) { dot(s.pts[0], s); return; }
+        for (var i = 1; i < s.pts.length; i++) drawFrom(s, i);
+        drawTail(s);
+      });
     }
-    function norm(e) { var r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
-    function allowed(e) {
-      if (e.pointerType === 'pen') { lastPen = Date.now(); return true; }
-      if (e.pointerType === 'touch' && Date.now() - lastPen < 1500) return false;
-      return true;
+    function norm(e) { if (!rect) rect = cv.getBoundingClientRect(); return [(e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height]; }
+    function dropRecentTouch(now) {          // the palm that landed just before the pencil did
+      var changed = false;
+      for (var i = strokes.length - 1; i >= 0; i--) {
+        if (strokes[i].ptype === 'touch' && now - strokes[i].t < 900) { strokes.splice(i, 1); changed = true; }
+      }
+      for (var id in active) if (active[id].ptype === 'touch') delete active[id];
+      if (changed) redraw();
     }
     cv.addEventListener('pointerdown', function (e) {
-      if (!allowed(e)) return;
+      var now = Date.now();
+      if (e.pointerType === 'pen') { lastPen = now; dropRecentTouch(now); }
+      else if (e.pointerType === 'touch' && (!e.isPrimary || now - lastPen < 2000)) return;   // 2nd finger / palm
       e.preventDefault();
-      cur = { erase: tool === 'eraser', w: tool === 'eraser' ? 0.04 : 0.0045, pts: [norm(e)] };
-      strokes.push(cur); dot(cur.pts[0], cur);
+      rect = cv.getBoundingClientRect();
+      var s = { erase: tool === 'eraser', w: tool === 'eraser' ? ERASER_W : PEN_W[penSize], pts: [norm(e)], t: now, ptype: e.pointerType };
+      strokes.push(s); active[e.pointerId] = s;
+      dot(s.pts[0], s);
       try { cv.setPointerCapture(e.pointerId); } catch (x) {}
     });
     cv.addEventListener('pointermove', function (e) {
-      if (!cur || !allowed(e)) return;
-      var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+      var s = active[e.pointerId]; if (!s) return;
+      if (e.pointerType === 'pen') lastPen = Date.now();
+      var evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
       if (!evs.length) evs = [e];
-      evs.forEach(function (ev) { var p = norm(ev), prev = cur.pts[cur.pts.length - 1]; cur.pts.push(p); seg(prev, p, cur); });
+      for (var k = 0; k < evs.length; k++) { s.pts.push(norm(evs[k])); drawFrom(s, s.pts.length - 1); }
     });
-    function end() { cur = null; }
+    function end(e) { var s = active[e.pointerId]; if (!s) return; drawTail(s); delete active[e.pointerId]; }
     cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end); cv.addEventListener('lostpointercapture', end);
+    ['touchstart', 'touchmove', 'touchend'].forEach(function (t) { cv.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+    cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
     livePads.push({ size: size, redraw: redraw });
     requestAnimationFrame(size);
     return wrap;
