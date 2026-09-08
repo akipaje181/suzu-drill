@@ -472,6 +472,26 @@
   .qmodal .box{background:var(--ground); border-radius:18px; padding:16px 16px 14px; max-width:540px; width:100%; max-height:90vh; overflow:auto; display:flex; flex-direction:column; align-items:center; gap:6px}
   .qmodal .box .gres{width:100%}
   .qstat{font-size:13px; color:var(--ink-soft); margin:2px 0 8px}
+
+  /* 立ち上げの 声かけ */
+  .wel{position:relative; margin:14px 0 2px; padding:12px 14px; border-radius:18px; background:linear-gradient(135deg, var(--shu-wash), var(--paper)); border:1.5px solid var(--shu); animation:welin .45s ease}
+  @keyframes welin{from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:none}}
+  .welbody{display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; padding:0 22px 0 0; text-align:left; color:var(--ink)}
+  .wel .char{width:78px; height:78px; flex:none; animation:welbob 2.4s ease-in-out infinite}
+  @keyframes welbob{0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)}}
+  .weltxt{flex:1; min-width:0}
+  .welmain{font-family:var(--f-round); font-size:17px; font-weight:700; line-height:1.45}
+  .welsub{font-size:13px; color:var(--ink-soft); line-height:1.5; margin-top:3px}
+  .welhint{font-size:11.5px; color:var(--ink-faint); margin-top:4px}
+  .wel.pop .welmain, .wel.pop .welsub{animation:welpop .3s ease}
+  @keyframes welpop{from{opacity:0; transform:scale(.97)} to{opacity:1; transform:none}}
+  .welx{position:absolute; top:4px; right:6px; background:none; border:0; font-size:15px; line-height:1; color:var(--ink-faint); padding:8px 9px}
+  @media (max-width:430px){
+    .qhead{flex-wrap:wrap}
+    .qhead .ohayo{width:100%; margin-top:2px}
+    .welbody{gap:10px}
+    .wel .char{width:64px; height:64px}
+  }
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -1239,6 +1259,7 @@
     });
   }
   function open(v) {
+    welcomeGone = true;   // ホームから 出たら 声かけは しまう
     if (v === 'grow') renderGrow();
     if (v === 'kanji') { if (!(cur && cur.view === 'kanji')) renderKanji(); }
     if (v === 'scan') renderScan();
@@ -2595,9 +2616,69 @@
     qp.appendChild(el('p', 'muted', 'クリアすると +' + XP.bigGoal + ' ポイント（1レベルぶん）。しゅうは 月よう日に かわります。'));
     box.appendChild(qp);
   }
+
+  // ---------- アプリを 立ち上げたときの 声かけ（ポジティブな ひとこと） ----------
+  var CHEER = [
+    'まちがえても だいじょうぶ。まちがいは つよくなる もとだよ',
+    'ゆっくりでも いいよ。じぶんの ペースで いこう',
+    '1問でも やったら、それは えらいこと',
+    'きみは やれば できる。ぼくは しってるよ',
+    'ていねいに 書けると、気もちも すっきりするね',
+    '「わからない」って いえるのも すごい ちから',
+    'むずかしいほど、できたときは うれしいね',
+    'きょうの ちいさな 1歩が、あしたの じしんに なるよ',
+    'つかれたら やすんで いいよ。また いっしょに やろう',
+    'きみが がんばるところ、ぼく ちゃんと 見てるよ'
+  ];
+  var WEL_MORNING = ['きょうも いい日に なるよ', 'あさの きみは とても かっこいい', 'きょうは なにか いいことが おきそう', 'あさ いちばんに あえて うれしいな'];
+  var WEL_DAY = ['よく きたね！ まってたよ', 'きみが くると ぼく げんきに なる', 'さあ、いっしょに はじめよう', 'いま きたのは いい えらび だね'];
+  var WEL_NIGHT = ['きょうも おつかれさま', 'ねる前の ひとくちでも りっぱだよ', 'きょうの じぶんを ほめて あげよう', 'よふかしせずに、むりの ない ぶんだけ'];
+  var welcomeGone = false;
+  function activeDays() {   // アプリを つかった 日（れんしゅう・あいさつ・クエスト）
+    var m = {};
+    [game.stamps, game.morning, game.qdone, game.evening].forEach(function (o) { for (var k in o) m[k] = 1; });
+    return Object.keys(m).sort();
+  }
+  function daysSinceLast() {   // さいごに つかった 日から なん日 たったか（はじめては -1）
+    var ks = activeDays(); if (!ks.length) return -1;
+    var last = new Date(ks[ks.length - 1] + 'T00:00:00'), now = new Date(todayKey() + 'T00:00:00');
+    return Math.round((now - last) / 86400000);
+  }
+  function welcomePool() {   // そのときの がんばりに あわせた ことばを あつめる
+    var k = todayKey(), h = new Date().getHours(), lv = levelOf(), ds = daysSinceLast(), pool = [];
+    if (ds < 0) return ['はじめまして！ ぼくは ' + game.name + '。きみと いっしょに つよく なりたいな'];
+    var qs = questState(k), today = sheetsOnDay(k), s = streakIn(game.stamps), todayDone = !!game.stamps[k];
+    if (ds >= 4) pool.push('おかえり！ また あえて うれしいよ', 'まってたよ！ きょう あえて うれしいな');
+    if (qs.all && qs.total > 1) pool.push('きょうは クエスト ぜんぶ クリア！ かっこいいね', 'きょうは もう ばっちり。ゆっくり しても いいよ');
+    else if (today) pool.push('きょうも やってるね。その ちょうし！', 'きょうは もう ' + today + 'まい。えらい！');
+    if (s >= 3) pool.push(todayDone ? s + '日 つづいてるね。すごい！' : 'きのうまで ' + s + '日 つづいてるよ。きょうも いこう！');
+    if (lv.into >= 70) pool.push('あと ' + (lv.need - lv.into) + 'ポイントで Lv.' + (lv.level + 1) + '！ もう すぐだね');
+    if (ds === 1) { var y = new Date(); y.setDate(y.getDate() - 1); var yn = sheetsOnDay(dayKey(y.toISOString())); if (yn) pool.push('きのうは ' + yn + 'まい がんばったね。ちゃんと 見てたよ'); }
+    if (Object.keys(game.badges).length >= 3) pool.push('メダル ' + Object.keys(game.badges).length + 'こ。ここまで よく きたね');
+    (h < 11 ? WEL_MORNING : h < 17 ? WEL_DAY : WEL_NIGHT).forEach(function (t) { pool.push(t); });
+    return pool;
+  }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function welcomeCard() {
+    var c = el('div', 'wel'); c.setAttribute('role', 'status');
+    var body = el('button', 'welbody'); body.type = 'button';
+    body.appendChild(html('div', null, charSVG({ stage: stageOf(levelOf().level), color: game.color, wear: game.wear, mood: 'happy' })));
+    var tx = el('div', 'weltxt'), main = el('div', 'welmain', pick(welcomePool())), sub = el('div', 'welsub', pick(CHEER));
+    tx.appendChild(main); tx.appendChild(sub); tx.appendChild(el('div', 'welhint', 'タップすると ' + game.name + 'が もう ひとこと 言うよ'));
+    body.appendChild(tx);
+    body.addEventListener('click', function () {
+      main.textContent = pick(welcomePool()); sub.textContent = pick(CHEER);
+      c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
+    });
+    c.appendChild(body);
+    var x = btn('welx', '✕', function () { welcomeGone = true; c.remove(); }); x.setAttribute('aria-label', 'とじる');
+    c.appendChild(x);
+    return c;
+  }
   function renderCharCard() {
     var box = $('charCard'); if (!box) return; box.innerHTML = '';
     if (!game) initGame();
+    if (!welcomeGone) box.appendChild(welcomeCard());   // 立ち上げのときだけ 出す
     var lv = levelOf(), card = btn('ccard room', null, function () { renderGrow(); show('grow'); });
     card.innerHTML = roomSVG();
     var info = el('div', 'cinfo');
