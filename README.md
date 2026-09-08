@@ -28,6 +28,17 @@ iPadのSafariで開き「ホーム画面に追加」で使います。ログイ�
 - 印刷「かんじ ノート」: 1グループ=A4 1枚（手本＋よみ・ことば＋なぞり1ます＋空き3ます）。`?gen=kanji:g3` または `?gen=kanji:all` でPDF化。
 - ポイントは1問あたり 答えた+1／正解+2（10問なので算数の5問と同程度）。1セッション＝1まい として目標にも数える。
 
+## テストの写真の取り込み（かんたん版：APIキー不要）
+1. iPad「テストを よみとる」→ 撮る → 名前を黒塗り → **おくる** → 共有シートで「ファイルに保存」
+   → `iCloud Drive › すずドリル › テストの写真`（AirDrop で Mac に送ってもよい）
+2. Mac 側の同じフォルダ: `~/Library/Mobile Documents/com~apple~CloudDocs/すずドリル/テストの写真/`
+   Claude Code に「テストの写真を入れた」と伝える → Claude が写真を読んで型と○✗を判定
+3. `python3 tools_add_page.py "9/12 小テスト 1-⑧" dochira:x aida:o sorezore:x ... --push`
+   → `index.html` の `var PAGES_PRESET` にページが追加され、sw.js の版が上がり、push される
+4. iPad は次にアプリを開いたとき（ネット接続時）にページを取り込み、○✗を記録に反映、トーストで通知
+   （`applyPresetPages`。削除したページは `_pagesDeleted` に記録され再取り込みしない）
+読み終えた写真は `よみとり済み` フォルダへ移す。
+
 ## テストの読み取り（AI）
 - ホームの「テストを よみとる」：写真 → 名前を黒塗り → Claude で型・○✗を読み取り → 確認 → その子用の10まいページ。
 - ブラウザから直接 Anthropic API を呼ぶ（`@anthropic-ai/sdk@0.124.0` を jsDelivr の ESM で読み込み、`dangerouslyAllowBrowser`）。
