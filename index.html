@@ -275,17 +275,17 @@
   .psheet .fill{border-bottom:.8pt solid #cfc8b8; display:inline-block}
   .psheet .d{width:9mm} .psheet .nm{flex:1; min-width:40mm}
   .psheet .sc{border:.9pt solid #cfc8b8; padding:1mm 3mm; white-space:nowrap}
-  .psheet .probs{display:flex; flex-direction:column; gap:3.5mm; margin-top:4mm}
+  .psheet .probs{display:flex; flex-direction:column; gap:3mm; margin-top:4mm}
   .psheet .p{display:grid; grid-template-columns:1fr 62mm; grid-template-rows:auto auto; column-gap:5mm; row-gap:2mm}
-  .psheet .pt{grid-column:1; grid-row:1; display:flex; gap:2.6mm; align-items:flex-start; font-family:var(--f-round); font-size:10.5pt; line-height:1.74; line-break:strict; text-align:justify}
+  .psheet .pt{grid-column:1; grid-row:1; display:flex; gap:2.6mm; align-items:flex-start; font-family:var(--f-round); font-size:10pt; line-height:1.62; line-break:strict; text-align:justify}
   .psheet .pn{font-weight:700; font-size:11pt; color:#c0392f; flex:none; line-height:1.6}
   .psheet .lines{grid-column:1; grid-row:2; padding-left:6.6mm; display:flex; flex-direction:column; justify-content:space-between; gap:2.5mm}
-  .psheet .ln{display:flex; align-items:flex-end; gap:2mm; min-height:10mm}
+  .psheet .ln{display:flex; align-items:flex-end; gap:2mm; min-height:9mm}
   .psheet .ln .lbl{font-family:var(--f-round); font-size:10pt; color:#6f695d; flex:none; white-space:nowrap}
-  .psheet .ln .rule{flex:1; border-bottom:1pt solid #cfc8b8; min-height:9.5mm}
+  .psheet .ln .rule{flex:1; border-bottom:1pt solid #cfc8b8; min-height:8.5mm}
   .psheet .ln.ans .lbl{color:#23211d}
   .psheet .ln.ans .rule{border-bottom-width:1.4pt; border-bottom-color:#9c9587}
-  .psheet .hs{grid-column:2; grid-row:1 / 3; border:1pt dashed #cfc8b8; position:relative; min-height:36mm; padding:3.4mm 2mm 2mm}
+  .psheet .hs{grid-column:2; grid-row:1 / 3; border:1pt dashed #cfc8b8; position:relative; min-height:34mm; padding:3.4mm 2mm 2mm}
   .psheet .hs span{position:absolute; top:.8mm; left:1.6mm; font-family:var(--f-round); font-size:8pt; color:#9c9587}
   .psheet .akey{display:grid; grid-template-columns:1fr 1fr; gap:6mm 8mm; margin-top:6mm}
   .psheet .ak{border:.9pt solid #e7e1d3}
@@ -297,6 +297,9 @@
   .psheet .ak .cn{width:5mm; color:#c0392f; font-weight:700; font-family:var(--f-round)}
   .psheet .ak .cs{color:#6f695d}
   .psheet .ak .ca{font-family:var(--f-round); font-weight:700; text-align:right; white-space:nowrap}
+  .psheet .ak .cb{padding:1.4mm 3mm}
+  .psheet .ak .cb .ca{display:block; text-align:left; font-size:9.5pt; line-height:1.4}
+  .psheet .ak .cb .cs{display:block; font-size:7.8pt; line-height:1.4; margin-top:.3mm}
 
   @page{size:A4; margin:13mm 15mm 12mm}
   @media print{
@@ -1339,10 +1342,11 @@
         var ak = el('div', 'ak'); ak.appendChild(el('h4', null, set.no + '　' + set.title.replace(/^2年　文しょうだい　/, '')));
         var tb = el('table');
         set.items.forEach(function (it, k) {
-          var tr = el('tr');
+          var tr = el('tr'), cb = el('td', 'cb');
           tr.appendChild(el('td', 'cn', MARKS[k] || String(k + 1)));
-          tr.appendChild(el('td', 'cs', it.q.s.join('　→　')));
-          tr.appendChild(el('td', 'ca', answerText(it.q.ans)));
+          cb.appendChild(el('b', 'ca', answerText(it.q.ans)));
+          cb.appendChild(el('span', 'cs', 'しき　' + it.q.s.join('　→　')));
+          tr.appendChild(cb);
           tb.appendChild(tr);
         });
         ak.appendChild(tb); grid.appendChild(ak);
