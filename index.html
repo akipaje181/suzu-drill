@@ -206,6 +206,11 @@
   .krow{display:flex; align-items:center; gap:10px; font-family:var(--f-round); font-size:16px}
   .krow .rate{margin-left:auto; font-family:var(--f-kaku); font-size:13px; color:var(--ink-soft); white-space:nowrap}
   .krow .rate.weak{color:var(--shu-ink); font-weight:700}
+  .dots{display:flex; gap:6px; margin:6px 0 10px}
+  .dots i{width:14px; height:14px; border-radius:50%; background:var(--rule-soft); border:1.5px solid var(--rule)}
+  .dots i.some{background:var(--rule)}
+  .dots i.good{background:var(--ok-ink); border-color:var(--ok-ink)}
+  .dots i.weak{background:var(--shu); border-color:var(--shu)}
   .pill{display:inline-block; font-size:11px; font-weight:700; color:var(--shu-ink); border:1.5px solid var(--shu); border-radius:999px; padding:0 8px; line-height:18px}
 
   /* ---------- lessons ---------- */
@@ -1059,7 +1064,6 @@
   // ---------- problem cards ----------
   function makeCard(item, idx, padKey, showType) {
     var card = el('div', 'q'), q = item.q;
-    if (showType && TYPES[item.key]) card.appendChild(el('span', 'q-type', TYPES[item.key].name));
     var hd = el('div', 'q-hd');
     hd.appendChild(el('span', 'q-n', MARKS[idx] || String(idx + 1)));
     hd.appendChild(q.html ? html('p', 'q-t', q.html) : el('p', 'q-t', q.t));
@@ -1072,6 +1076,7 @@
   function decorate(item, ok) {
     var card = item.card, q = item.q;
     card.classList.add('graded', ok ? 'ok' : 'ng');
+    if (TYPES[item.key]) card.appendChild(el('span', 'q-type', TYPES[item.key].name));   // 型の名前は まるつけの後にだけ 見せる
     card.appendChild(el('span', 'mark ' + (ok ? 'o' : 'x'), ok ? '' : '✗'));
     if (ok) return;
     var fix = el('div', 'fix');
@@ -1177,14 +1182,13 @@
     if (td.n) { hello.appendChild(el('span', null, 'きょうは ')); hello.appendChild(el('b', null, td.n + '問')); hello.appendChild(el('span', null, ' といて、')); hello.appendChild(el('b', null, td.ok + '問')); hello.appendChild(el('span', null, ' せいかい。')); }
     else hello.textContent = 'きょうは どれから やる？';
 
-    var wk = weakKeys(), weakNames = wk.slice(0, 2).map(function (k) { return TYPES[k].name; }).join('・');
     var box = $('tiles'); box.innerHTML = '';
     [
       ['scan', 'テストを よみとる', '写真を とると、その子用の プリントが できる', true],
       ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問'],
       ['kanji', 'かんじ', '2年生の 漢字 160字　よみ・かき・なぞり書き'],
       ['solve', 'テストの プリント', '学校の テストから 作った プリント（' + allTests().length + 'セット）'],
-      ['weak', 'にがてを とく', weakNames + ' から 5問'],
+      ['weak', 'にがてを とく', 'にがてな 型から 5問（どれかは ひみつ）'],
       ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
       ['records', 'きろく', 'せいかいりつ・にがて・きょうの けっか'],
       ['print', 'いんさつ', '紙の プリントを 作る・PDF']
@@ -1262,19 +1266,9 @@
     box.innerHTML = '';
     var p = el('div', 'panel');
     p.appendChild(el('h3', null, fixedKey ? 'この 型を 5問' : 'いま にがてな 型'));
-    var rs = {}; rates().forEach(function (r) { rs[r.key] = r; });
-    var list = el('div', 'klist');
-    keys.forEach(function (k) {
-      var r = rs[k], row = el('div', 'krow');
-      row.appendChild(el('span', null, TYPES[k].name));
-      var rt = el('span', 'rate' + (isWeak(r) ? ' weak' : ''), r.n ? r.n + '回中 ' + r.ok + '回 せいかい' : 'まだ といて いない');
-      row.appendChild(rt);
-      list.appendChild(row);
-    });
-    p.appendChild(list);
     var hasRecords = rates().some(function (r) { return r.n >= 2; });
-    p.appendChild(el('p', 'muted', fixedKey ? 'まちがえたら せんせいの ワンポイントに もどれます。'
-      : hasRecords ? 'せいかいりつの ひくい 型から、ランダムに 5問 えらびます。' : 'まだ きろくが 少ないので、学校の テストで まちがえた 型から 出します。'));
+    p.appendChild(el('p', 'muted', fixedKey ? 'この 型の 5問。まちがえたら せんせいの ワンポイントに もどれます。'
+      : (hasRecords ? 'せいかいりつの ひくい ' + keys.length + 'つの 型から、ランダムに 5問。' : 'まだ きろくが 少ないので、学校の テストで まちがえた 型から 5問。') + ' どの 型かは ひみつ。文を 読んで しきを 考えよう。'));
     p.appendChild(btn('btn', '5問 スタート', function () { startWeak(keys); }));
     box.appendChild(p);
   }
@@ -1308,15 +1302,10 @@
     });
     p.appendChild(tabs);
     var rs = {}; rates().forEach(function (r) { rs[r.key] = r; });
-    var list = el('div', 'klist');
-    u.keys.forEach(function (k) {
-      var r = rs[k], row = el('div', 'krow');
-      row.appendChild(el('span', null, TYPES[k].name));
-      row.appendChild(el('span', 'rate' + (isWeak(r) ? ' weak' : ''), r.n ? r.n + '回中 ' + r.ok + '回 せいかい' : 'まだ'));
-      list.appendChild(row);
-    });
-    p.appendChild(list);
-    p.appendChild(el('p', 'muted', 'この たんげんの 型から、まいかい ちがう 5問を 作ります。'));
+    var dots = el('div', 'dots'), good = 0;
+    u.keys.forEach(function (k) { var r = rs[k], st = r.n >= 5 && r.rate >= 0.8 ? 'good' : isWeak(r) ? 'weak' : r.n ? 'some' : ''; if (st === 'good') good++; dots.appendChild(el('i', st)); });
+    p.appendChild(dots);
+    p.appendChild(el('p', 'muted', 'この たんげんには ' + u.keys.length + 'の 型が あります（とくい ' + good + '）。たし算か ひき算かは 文を 読んで きめてね。まいかい ちがう 5問を 作ります。'));
     p.appendChild(btn('btn', '5問 スタート', function () { startDaily(u.id); }));
     box.appendChild(p);
   }
