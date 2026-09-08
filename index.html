@@ -310,6 +310,9 @@
   .ccard{display:flex; align-items:center; gap:14px; margin:16px 0 6px; padding:12px 16px 12px 12px; border-radius:16px; background:var(--paper); border:1.5px solid var(--rule); text-align:left; width:100%; color:var(--ink)}
   .ccard .char{width:92px; height:92px; flex:none}
   .ccard.room{flex-direction:column; align-items:stretch; gap:10px; padding:10px}
+  .clabel{display:flex; justify-content:space-between; align-items:baseline; gap:8px; padding:2px 4px 0}
+  .clabel b{font-family:var(--f-round); font-size:16px; font-weight:700}
+  .clabel span{font-size:12px; color:var(--shu-ink); font-weight:700; flex:none}
   .room{display:block; width:100%; height:auto; border-radius:10px}
   .roomwrap{margin:8px 0 4px; border-radius:12px; overflow:hidden; border:1.5px solid var(--rule)}
   .ccard .goal, .gbig .goal, .panel .goal{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin-top:4px}
@@ -1231,6 +1234,7 @@
 
   // ---------- home ----------
   var ICONS = {
+    grow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v11h14V10"/><rect x="9.5" y="13.5" width="5" height="7.5" rx="1"/></svg>',
     scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
     daily: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/><path d="M9 15l2 2 4-4" stroke-linecap="round"/></svg>',
     kanji: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18" stroke-dasharray="2 2"/><path d="M8 9h8M12 7v10M9 17h6" stroke-linecap="round"/></svg>',
@@ -1261,6 +1265,7 @@
       ['solve', 'テストの プリント', '学校の テストから 作った プリント（' + allTests().length + 'セット）'],
       ['weak', 'にがてを とく', 'にがてな 型から 5問（どれかは ひみつ）'],
       ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
+      ['grow', 'マイルーム', 'ドリまる・なかま・かざり・もくひょう・メダル'],
       ['records', 'きろく', 'せいかいりつ・にがて・きょうの けっか'],
       ['print', 'いんさつ', '紙の プリントを 作る・PDF']
     ].forEach(function (d) {
@@ -2644,6 +2649,11 @@
     box.appendChild(ft);
     return box;
   }
+  function openQuestSettings() {   // おうちの人が 設定を さがさなくて いいように
+    renderGrow(); show('grow');
+    var h = $('qsec'); if (h) h.scrollIntoView();
+  }
+  function parentLink() { return btn('linkbtn', 'おうちの人へ：クエストを えらぶ・ふやす（マイルーム）→', openQuestSettings); }
   function questCard() {
     var k = todayKey(), qs = questState(k), f = fortune(k), checked = !!game.morning[k], card = el('div', 'qcard');
     var hd = el('div', 'qhead');
@@ -2670,7 +2680,7 @@
     var tt = el('div', 'qtitle'); tt.appendChild(el('span', null, 'きょうの クエスト'));
     tt.appendChild(el('small', null, qs.choosing ? questDefs().length + 'この 中から ' + pickN() + 'こ' : qs.done + ' / ' + qs.total + '　ぜんぶ クリアで +' + allXp()));
     card.appendChild(tt);
-    if (qs.choosing) { card.appendChild(pickPanel(k)); card.appendChild(bigLine()); card.appendChild(moodRow(k)); return card; }
+    if (qs.choosing) { card.appendChild(pickPanel(k)); card.appendChild(bigLine()); card.appendChild(moodRow(k)); card.appendChild(parentLink()); return card; }
     var ul = el('ul', 'qlist');
     qs.list.forEach(function (q) {
       var li = el('li'), learn = q.id === 'learn';
@@ -2689,6 +2699,7 @@
     }
     card.appendChild(bigLine());
     card.appendChild(moodRow(k));
+    card.appendChild(parentLink());
     return card;
   }
   function bigLine() {
@@ -2732,7 +2743,8 @@
   }
   function renderQuestSettings(box) {   // マイルーム: おうちの人が クエストを えらぶ・つくる
     var c = gameCtx(), onCount = questDefs().length;
-    box.appendChild(html('h2', 'sec', 'クエスト <small>学校・おうちの もくひょう（おうちの人が えらぶ）</small>'));
+    var qh = html('h2', 'sec', 'クエスト <small>学校・おうちの もくひょう（おうちの人が えらぶ）</small>'); qh.id = 'qsec';
+    box.appendChild(qh);
     var qp = el('div', 'panel');
     qp.appendChild(el('p', 'qstat', 'クリアした クエスト ' + c.quests + 'こ　／　ぜんぶクリアの 日 ' + c.allclears + '日　／　あいさつ ' + c.mornings + '日　／　おうちの人の ✓ ' + c.oks + '回'));
 
@@ -2853,6 +2865,8 @@
     if (!welcomeGone) { if (!welEl) welEl = welcomeCard(); box.appendChild(welEl); }   // 立ち上げのときだけ 出す
     var lv = levelOf(), card = btn('ccard room', null, function () { renderGrow(); show('grow'); });
     card.innerHTML = roomSVG();
+    var lab = el('div', 'clabel'); lab.appendChild(el('b', null, '🏠 マイルーム')); lab.appendChild(el('span', null, 'ひらく →'));
+    card.insertBefore(lab, card.firstChild);
     var info = el('div', 'cinfo');
     var nm = el('div', 'cname', game.name); nm.appendChild(el('small', null, 'Lv.' + lv.level + '　' + STAGES[stageOf(lv.level)][0] + '　なかま ' + Object.keys(game.mates).length + 'びき'));
     info.appendChild(nm);
