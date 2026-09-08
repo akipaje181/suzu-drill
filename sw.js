@@ -1,5 +1,5 @@
 /* すずドリル service worker — offline cache */
-const VERSION = 'suzu-drill-v8';
+const VERSION = 'suzu-drill-v9';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', (e) => {
@@ -14,7 +14,7 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-const isFont = (url) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
+const isFont = (url) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com' || url.hostname === 'cdn.jsdelivr.net';
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;

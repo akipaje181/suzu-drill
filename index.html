@@ -301,6 +301,27 @@
   .psheet .ak .cb .ca{display:block; text-align:left; font-size:9.5pt; line-height:1.4}
   .psheet .ak .cb .cs{display:block; font-size:7.8pt; line-height:1.4; margin-top:.3mm}
 
+  /* ---------- scan ---------- */
+  .keyrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px}
+  .keyrow input{flex:1; min-width:200px; height:46px; border:1.5px solid var(--field-line); border-radius:8px; padding:0 10px; background:var(--field); color:var(--ink); font-size:15px}
+  .mask-wrap{position:relative; margin:10px 0; border-radius:8px; overflow:hidden; background:#111}
+  .mask-cv{display:block; width:100%; height:auto; touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+  .spin{display:inline-block; width:18px; height:18px; border:3px solid var(--rule); border-top-color:var(--shu); border-radius:50%; animation:spin 1s linear infinite; vertical-align:middle; margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .prow{display:grid; grid-template-columns:34px 1fr; gap:4px 10px; padding:12px 0; border-bottom:1px solid var(--rule-soft); align-items:start}
+  .prow .pn{font-family:var(--f-round); font-weight:700; color:var(--shu-ink); font-size:17px; padding-top:8px}
+  .prow select{width:100%; min-height:46px; font:inherit; font-size:15px; border:1.5px solid var(--field-line); border-radius:8px; background:var(--field); color:var(--ink); padding:0 8px}
+  .prow .sm{font-size:13px; color:var(--ink-soft); line-height:1.6}
+  .prow .res{display:flex; gap:6px; margin-top:6px; align-items:center; flex-wrap:wrap}
+  .prow .res .tool{min-width:52px}
+  .prow .res .o[aria-pressed="true"]{background:var(--ok-ink); border-color:var(--ok-ink); color:#fff}
+  .prow .res .x[aria-pressed="true"]{background:var(--shu); border-color:var(--shu); color:#fff}
+  .prow .res .q[aria-pressed="true"]{background:var(--ink-soft); border-color:var(--ink-soft); color:#fff}
+  .ttl-in{width:100%; height:48px; font:inherit; font-size:16px; border:1.5px solid var(--field-line); border-radius:8px; padding:0 10px; background:var(--field); color:var(--ink)}
+  .conf-low{color:var(--shu-ink); font-size:12px; font-weight:700; margin-left:6px}
+  .steps{display:flex; gap:6px; margin:14px 0 4px; font-size:12px; color:var(--ink-faint)}
+  .steps b{color:var(--shu-ink)}
+
   @page{size:A4; margin:13mm 15mm 12mm}
   @media print{
     body{background:#fff; padding:0}
@@ -342,6 +363,7 @@
       <div id="result"></div>
       <div id="qs"></div>
       <p class="note" id="note"></p>
+      <p class="note"><button type="button" class="linkbtn shu" id="delTest" hidden>この テストの ページを けす</button></p>
     </div>
   </section>
 
@@ -351,6 +373,10 @@
       <div id="wresult"></div>
       <div id="wqs"></div>
     </div>
+  </section>
+
+  <section id="v-scan" hidden>
+    <div class="wrap" id="scan"></div>
   </section>
 
   <section id="v-daily" hidden>
@@ -579,19 +605,37 @@
     return shuffle(pick);
   }
 
+  // ---------- テストのページ（写真から作ったもの）→ 10まいのプリント ----------
+  var testCache = {};
+  function pageToTest(page) {
+    if (testCache[page.id]) return testCache[page.id];
+    var r = rng(page.seed), wrong = [], right = [];
+    (page.problems || []).forEach(function (p) { if (!TYPES[p.key]) return; (p.ok === false ? wrong : right).push(p.key); });
+    var pool = wrong.concat(wrong, right);              // まちがえた型は 2倍の重み
+    if (!pool.length) pool = DEFAULT_WEAK.slice();
+    var sheets = [];
+    for (var n = 1; n <= 10; n++) {
+      var items = makeSet(pool, 5, r);
+      sheets.push({ n: n, qs: items.map(function (it) { return it.q; }), keys: items.map(function (it) { return it.key; }) });
+    }
+    return (testCache[page.id] = { id: page.id, label: page.label, note: 'テストの 写真から 作った れんしゅう', sheets: sheets, page: page });
+  }
+  function allTests() { return DATA.tests.concat((recs._pages || []).map(pageToTest)); }
+
   // ---------- storage ----------
   var LS = 'suzu.bunsho.v1', LOGMAX = 500;
   function fresh() {
-    var r = { _types: {}, _log: [], _migrated: false };
+    var r = { _types: {}, _log: [], _pages: [], _migrated: false };
     DATA.tests.forEach(function (t) { r[t.id] = { test: t.id, sheets: {}, types: {}, updatedAt: null }; });
     return r;
   }
   function load() {
     var r = fresh(), l = {};
     try { l = JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch (e) {}
-    for (var k in l) if (k in r) r[k] = l[k];
+    for (var k in l) if (k in r || k.indexOf('p_') === 0) r[k] = l[k];
     if (!r._types) r._types = {};
     if (!r._log) r._log = [];
+    if (!r._pages) r._pages = [];
     if (!r._migrated) {                       // fold the v1 per-test counters into the global type stats
       DATA.tests.forEach(function (t) {
         var pt = (r[t.id] && r[t.id].types) || {};
@@ -607,6 +651,7 @@
   }
   var recs = load();
   function save() { try { localStorage.setItem(LS, JSON.stringify(recs)); } catch (e) {} }
+  function recFor(id) { return recs[id] || (recs[id] = { test: id, sheets: {}, types: {}, updatedAt: null }); }
   function bump(key, ok) { var g = recs._types[key] || (recs._types[key] = { ok: 0, ng: 0 }); g[ok ? 'ok' : 'ng']++; }
   function logAttempt(e) { recs._log.push(e); if (recs._log.length > LOGMAX) recs._log.splice(0, recs._log.length - LOGMAX); }
   function rates() {
@@ -913,11 +958,11 @@
     });
     var now = new Date().toISOString();
     if (o.mode === 'sheet') {
-      var t = DATA.tests[o.ti], sh = t.sheets[o.si], rec = recs[t.id];
+      var t = o.test, sh = o.sheet, rec = recFor(t.id);
       var prev = rec.sheets[sh.n] || { tries: 0, best: 0 };
       rec.sheets[sh.n] = { tries: prev.tries + 1, best: Math.max(prev.best, score), last: score, lastAt: now };
       rec.updatedAt = now;
-      logAttempt({ at: now, mode: 'sheet', test: t.id, sheet: sh.n, score: score, total: o.items.length, wrong: wrong });
+      logAttempt({ at: now, mode: 'sheet', test: t.id, label: t.label, sheet: sh.n, score: score, total: o.items.length, wrong: wrong });
     } else {
       logAttempt({ at: now, mode: o.mode, keys: o.keys, unit: o.unit || null, score: score, total: o.items.length, wrong: wrong });
     }
@@ -941,8 +986,8 @@
   $('btnAgain').addEventListener('click', function () { if (cur) cur.again(); });
 
   // ---------- views ----------
-  var VIEWS = ['home', 'daily', 'solve', 'weak', 'lessons', 'records', 'print'];
-  var TITLES = { home: 'すずドリル', daily: 'きょうの 5問', solve: 'テストの プリント', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
+  var VIEWS = ['home', 'scan', 'daily', 'solve', 'weak', 'lessons', 'records', 'print'];
+  var TITLES = { home: 'すずドリル', scan: 'テストを よみとる', daily: 'きょうの 5問', solve: 'テストの プリント', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -977,8 +1022,9 @@
     var wk = weakKeys(), weakNames = wk.slice(0, 2).map(function (k) { return TYPES[k].name; }).join('・');
     var box = $('tiles'); box.innerHTML = '';
     [
-      ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問', true],
-      ['solve', 'テストの プリント', '学校の テストから　1-⑤〜1-⑦ 各10まい'],
+      ['scan', 'テストを よみとる', '写真を とると、その子用の プリントが できる', true],
+      ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問'],
+      ['solve', 'テストの プリント', '学校の テストから 作った プリント（' + allTests().length + 'セット）'],
       ['weak', 'にがてを とく', weakNames + ' から 5問'],
       ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
       ['records', 'きろく', 'せいかいりつ・にがて・きょうの けっか'],
@@ -992,6 +1038,7 @@
     });
   }
   function open(v) {
+    if (v === 'scan') renderScan();
     if (v === 'daily') { if (!(cur && cur.view === 'daily')) renderDailyIntro(); }
     if (v === 'solve') { if (!(cur && cur.view === 'solve')) startSheet(); renderTabs(); }
     if (v === 'weak') { if (!(cur && cur.view === 'weak')) renderWeakIntro(); }
@@ -1005,7 +1052,7 @@
   var st = { t: 0, s: 0 };
   function renderTabs() {
     var box = $('tabs'); box.innerHTML = '';
-    DATA.tests.forEach(function (t, i) {
+    allTests().forEach(function (t, i) {
       var b = btn('tab', t.label, function () { st.t = i; st.s = 0; startSheet(); });
       b.setAttribute('aria-pressed', String(i === st.t));
       box.appendChild(b);
@@ -1013,7 +1060,7 @@
   }
   function renderChips() {
     var box = $('chips'); box.innerHTML = '';
-    var t = DATA.tests[st.t], rec = recs[t.id];
+    var t = allTests()[st.t], rec = recFor(t.id);
     t.sheets.forEach(function (sh, i) {
       var r = rec.sheets[sh.n], b = btn('chip', null, function () { st.s = i; startSheet(); });
       b.setAttribute('aria-pressed', String(i === st.s));
@@ -1024,13 +1071,20 @@
     });
   }
   function startSheet() {
-    var t = DATA.tests[st.t], sh = t.sheets[st.s];
-    var items = sh.qs.map(function (q, i) { return { q: q, key: t.typeKeys[i], ref: t.id + '/' + sh.n + '/' + i }; });
+    var tests = allTests(); if (st.t >= tests.length) st.t = 0;
+    var t = tests[st.t], sh = t.sheets[st.s];
+    var items = sh.qs.map(function (q, i) { return { q: q, key: sh.keys ? sh.keys[i] : t.typeKeys[i], ref: t.id + '/' + sh.n + '/' + i }; });
     renderTabs(); renderChips();
     $('sheetTitle').textContent = t.label + '　No.' + sh.n;
     $('note').textContent = t.note || '';
+    var del = $('delTest'); del.hidden = !t.page;
+    del.onclick = function () {
+      if (!confirm('「' + t.label + '」の ページを けします。きろくは のこります。よろしいですか？')) return;
+      recs._pages = recs._pages.filter(function (p) { return p.id !== t.id; }); delete testCache[t.id]; save();
+      st.t = 0; st.s = 0; startSheet();
+    };
     startSet({
-      view: 'solve', mode: 'sheet', items: items, box: $('qs'), result: $('result'), tag: t.id + '/' + sh.n, ti: st.t, si: st.s,
+      view: 'solve', mode: 'sheet', items: items, box: $('qs'), result: $('result'), tag: t.id + '/' + sh.n, test: t, sheet: sh,
       nextLabel: function () { return st.s < t.sheets.length - 1 ? 'つぎの プリント →' : 'さいしょに もどる'; },
       next: function () { st.s = st.s < t.sheets.length - 1 ? st.s + 1 : 0; startSheet(); window.scrollTo(0, 0); },
       again: function () { dropPads('sheet/' + t.id + '/' + sh.n + '/'); startSheet(); }
@@ -1210,11 +1264,11 @@
     });
 
     box.appendChild(html('h2', 'sec', 'プリントべつ <small>いちばん よかった てん</small>'));
-    DATA.tests.forEach(function (t) {
+    allTests().forEach(function (t) {
       box.appendChild(el('p', 'muted', t.label));
       var g = el('div', 'grid5');
       t.sheets.forEach(function (sh) {
-        var r = recs[t.id].sheets[sh.n], c = el('div', 'cell' + (r ? (r.best === 5 ? ' full' : '') : ' none'));
+        var r = recFor(t.id).sheets[sh.n], c = el('div', 'cell' + (r ? (r.best === 5 ? ' full' : '') : ' none'));
         c.appendChild(el('span', null, 'No.' + sh.n)); c.appendChild(el('b', null, r ? r.best + '/5' : '—'));
         g.appendChild(c);
       });
@@ -1230,7 +1284,7 @@
       days[k].forEach(function (e) {
         var row = el('div', 'lg');
         row.appendChild(el('span', 'tm', fmtTime(e.at)));
-        row.appendChild(el('span', 'wh', e.mode === 'sheet' ? e.test + '　No.' + e.sheet : e.mode === 'weak' ? 'にがて' : e.mode === 'daily' ? 'きょうの5問' + (e.unit ? '（' + unitById(e.unit).name + '）' : '') : 'ワンポイント'));
+        row.appendChild(el('span', 'wh', e.mode === 'sheet' ? (e.label || e.test) + '　No.' + e.sheet : e.mode === 'weak' ? 'にがて' : e.mode === 'daily' ? 'きょうの5問' + (e.unit ? '（' + unitById(e.unit).name + '）' : '') : e.mode === 'test' ? 'テスト「' + (e.label || '') + '」' : 'ワンポイント'));
         if (e.wrong && e.wrong.length) row.appendChild(el('span', 'wr', '✗ ' + e.wrong.map(function (k2) { return TYPES[k2] ? TYPES[k2].name : k2; }).join('・')));
         row.appendChild(el('span', 'sc' + (e.score === e.total ? ' all' : ''), e.score + '/' + e.total));
         d.appendChild(row);
@@ -1275,10 +1329,11 @@
 
     if (pst.src === 'sheet') {
       var tabs = el('div', 'tabs inpage'); tabs.style.margin = '12px 0 0';
-      DATA.tests.forEach(function (t, i) { var b = btn('tab', t.label, function () { pst.t = i; pst.s = 0; renderPrint(); }); b.setAttribute('aria-pressed', String(i === pst.t)); tabs.appendChild(b); });
+      allTests().forEach(function (t, i) { var b = btn('tab', t.label, function () { pst.t = i; pst.s = 0; renderPrint(); }); b.setAttribute('aria-pressed', String(i === pst.t)); tabs.appendChild(b); });
       c.appendChild(tabs);
       var row = el('div', 'pick-row'); row.style.marginTop = '10px';
-      DATA.tests[pst.t].sheets.forEach(function (sh, i) { var b = btn('chip', null, function () { pst.s = i; renderPrint(); }); b.setAttribute('aria-pressed', String(i === pst.s)); b.appendChild(el('span', null, 'No.' + sh.n)); row.appendChild(b); });
+      if (pst.t >= allTests().length) pst.t = 0;
+      allTests()[pst.t].sheets.forEach(function (sh, i) { var b = btn('chip', null, function () { pst.s = i; renderPrint(); }); b.setAttribute('aria-pressed', String(i === pst.s)); b.appendChild(el('span', null, 'No.' + sh.n)); row.appendChild(b); });
       c.appendChild(row);
     }
     if (pst.src === 'gen') {
@@ -1359,7 +1414,7 @@
     if (pst.src === 'weak' && lastWeakItems) return [{ title: 'にがて れんしゅう', no: 'にがて', items: lastWeakItems }];
     if (pst.src === 'daily' && lastDailyItems) return [{ title: '2年　文しょうだい　きょうの 5問', no: unitById(dst.unit).name, items: lastDailyItems }];
     if (pst.src === 'gen') return genSets || [];
-    var t = DATA.tests[pst.t], sh = t.sheets[pst.s];
+    var t = allTests()[Math.min(pst.t, allTests().length - 1)], sh = t.sheets[pst.s];
     return [{ title: '2年　文しょうだい　れんしゅう（' + t.label + '）', no: 'No.' + sh.n, items: sh.qs.map(function (q) { return { q: q }; }) }];
   }
   function buildPreview() {
@@ -1397,12 +1452,259 @@
     pst.src = 'gen'; pst.unit = QS.gen; pst.n = gn; pst.ans = QS.ans === '1';
   }
 
+  // ---------- scan: テストの 写真 → 読み取り（Claude）→ ページ ----------
+  var KEY_LS = 'suzu.apikey';
+  function apiKey() { try { return localStorage.getItem(KEY_LS) || ''; } catch (e) { return ''; } }
+  var scan = { step: 'pick', img: null, rects: [], result: null, err: null, drag: null };
+  var HINTS = {
+    awasete: '2つの数を合わせる', fueru: 'はじめの数に増えた分を足す', nokori: '使った分を引いた残り', chigai: '2つの数が両方わかっていて、どちらがいくつ多いか',
+    mittsu: '3つの数を足す', hajime: 'はじめの数を求める（逆思考）', ikutsu_tsukatta: '使った数・もらった数を求める（逆思考）',
+    kago: '○かごと△こ買った。1かご□こ入り。家族が1人◇こずつ食べた残り', sorezore: '朝と昼にそれぞれ○こずつ（2回引く）',
+    dochira: '合わせて○、そのうちAは△。AとBでどちらがどれだけ多いか（引き算2回）',
+    ookii_hou: 'AはBより○多い。Bがわかっていて Aを求める', chiisai_hou: 'AはBより○多い。Aがわかっていて Bを求める', toshi: '去年○さいだった。△さい上の人は今何さい',
+    nanbanme: '前から○番目で、後ろに△人。みんなで何人', ryougawa: '前から○番目・後ろから△番目。全部で何人', mae_ushiro: '前に○人・後ろに△人いる。全部で何人（自分を足す）',
+    aida: '一列に並んだ人の間に1人ずつ入る（人数−1）', wa: '輪（円）になった人の間に1人ずつ入る（人数と同じ）',
+    nagasa_tashi: 'cmとmmの足し算', nagasa_hiki: 'cmとmmの引き算', nagasa_chigai: 'どちらが何cm長いか', m_cm_tashi: 'mとcmの足し算', m_cm_hiki: 'mとcmの引き算',
+    kasa_tashi: 'LとdLの足し算', kasa_hiki: 'LとdLの引き算',
+    jikoku_ato: '○分後の時刻', jikoku_mae: '○分前の時刻', jikan: 'かかった時間（何分・何時間）',
+    kakezan: '1つ分×いくつ分', bai: '○倍', kakezan_tashi: 'かけ算してから足す・引く',
+    okane: 'おつり', hyaku: '100円玉○こ・10円玉△こで何円', hanbun: '半分（1/2）'
+  };
+  function typeListText() { return TYPE_ORDER.map(function (k) { return '- ' + k + '：' + TYPES[k].name + (HINTS[k] ? '（' + HINTS[k] + '）' : ''); }).join('\n'); }
+  var SCHEMA = {
+    type: 'object', additionalProperties: false, required: ['test_title', 'problems'],
+    properties: {
+      test_title: { type: 'string' },
+      problems: { type: 'array', items: {
+        type: 'object', additionalProperties: false,
+        required: ['no', 'type_key', 'summary', 'numbers', 'correct_answer', 'child_answer', 'result', 'confidence'],
+        properties: {
+          no: { type: 'integer' },
+          type_key: { type: 'string', enum: TYPE_ORDER.concat(['unknown']) },
+          summary: { type: 'string' },
+          numbers: { type: 'string' },
+          correct_answer: { type: 'string' },
+          child_answer: { type: 'string' },
+          result: { type: 'string', enum: ['correct', 'wrong', 'unclear'] },
+          confidence: { type: 'string', enum: ['high', 'medium', 'low'] }
+        } } }
+    }
+  };
+  function systemPrompt() {
+    return 'あなたは小学校2年生の算数（文章題）の採点補助です。写真は学校で返却された小テストで、児童の手書きの答えと先生の赤ペン（○・✓・✗・△・訂正）が写っています。\n' +
+      '問題ごとに次を出力します。\n' +
+      '1. type_key：問題の「型」を下のリストから1つ選ぶ。どれにも当てはまらなければ "unknown"。\n' +
+      '2. summary：問題の内容を40字以内で要約する。原文をそのまま書き写さない。\n' +
+      '3. numbers：問題に出てくる数と単位（例 "120ぴき, 40ぴき"）。\n' +
+      '4. correct_answer：正しい答え。自分で計算して確かめる。\n' +
+      '5. child_answer：児童が書いた答え。読めなければ ""。\n' +
+      '6. result：先生の採点。○や✓は correct、✗・△・赤で書き直されている場合は wrong、判断できなければ unclear。\n' +
+      '7. confidence：型の判定の自信。\n' +
+      '児童の名前・学校名などの個人情報は出力しない。問題番号は紙の①②③の順。複数ページが写っていればすべて読む。\n\n型リスト：\n' + typeListText();
+  }
+  function errText(e, A) {
+    if (e && e.message === 'refusal') return 'この 写真は 読み取れませんでした。写り方を かえて もう一度 ためしてください。';
+    if (e && e.message === 'sdk') return '読み取りの しくみを 読み込めませんでした。ネットに つないで やり直してください。';
+    if (A && e instanceof A.AuthenticationError) return 'APIキーが ちがいます。せっていを 見なおしてください。';
+    if (A && e instanceof A.RateLimitError) return 'こんで います。少し まってから もう一度 ためしてください。';
+    if (A && e instanceof A.APIConnectionError) return 'ネットに つながって いません。';
+    if (A && e instanceof A.APIError) return 'よみとりに しっぱいしました（' + e.status + '）。' + (e.message || '');
+    return 'よみとりに しっぱいしました。' + ((e && e.message) || '');
+  }
+  async function readTest(b64) {
+    var A = window.__Anthropic; if (!A) throw new Error('sdk');
+    var client = new A({ apiKey: apiKey(), dangerouslyAllowBrowser: true });
+    var params = {
+      model: 'claude-opus-5', max_tokens: 16000, system: systemPrompt(),
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+        { type: 'text', text: 'この テストを 読み取って ください。' } ] }],
+      output_config: { format: { type: 'json_schema', schema: SCHEMA }, effort: 'high' }
+    };
+    var res;
+    try {   // 安全分類器に止められたとき、サーバ側で別モデルにかけ直す（拒否のまま返さない）
+      res = await client.beta.messages.create(Object.assign({ betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' }, params));
+    } catch (e) {
+      if (e instanceof A.BadRequestError) res = await client.messages.create(params); else throw e;
+    }
+    if (res.stop_reason === 'refusal') throw new Error('refusal');
+    var txt = null; res.content.forEach(function (b) { if (b.type === 'text' && !txt) txt = b.text; });
+    if (!txt) throw new Error('empty');
+    return JSON.parse(txt);
+  }
+  function loadImage(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file), im = new Image();
+      im.onload = function () {
+        var MAX = 2000, w = im.naturalWidth, h = im.naturalHeight, sc = Math.min(1, MAX / Math.max(w, h));
+        var c = document.createElement('canvas'); c.width = Math.round(w * sc); c.height = Math.round(h * sc);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url); resolve(c);
+      };
+      im.onerror = function () { URL.revokeObjectURL(url); reject(new Error('image')); };
+      im.src = url;
+    });
+  }
+  function maskedJpeg() {
+    var c = document.createElement('canvas'); c.width = scan.img.width; c.height = scan.img.height;
+    var x = c.getContext('2d'); x.drawImage(scan.img, 0, 0); x.fillStyle = '#000';
+    scan.rects.forEach(function (r) { x.fillRect(r[0] * c.width, r[1] * c.height, r[2] * c.width, r[3] * c.height); });
+    return c.toDataURL('image/jpeg', 0.85).split(',')[1];
+  }
+  function renderScan() {
+    var box = $('scan'); box.innerHTML = ''; cur = null; $('bar').hidden = true;
+    var steps = el('div', 'steps');
+    ['① 写真', '② 名前を かくす', '③ 読み取り', '④ たしかめ'].forEach(function (t, i) {
+      var idx = { pick: 0, mask: 1, reading: 2, confirm: 3, error: 2 }[scan.step];
+      steps.appendChild(i === idx ? el('b', null, t) : el('span', null, t)); if (i < 3) steps.appendChild(el('span', null, '›'));
+    });
+    box.appendChild(steps);
+    var p = el('div', 'panel'); box.appendChild(p);
+
+    if (scan.step === 'pick') {
+      p.appendChild(el('h3', null, '返ってきた テストを 撮る'));
+      p.appendChild(el('p', 'muted', 'テストの 全体が 入るように、明るい ところで まっすぐ 撮ります。名前は つぎの 画面で 黒く ぬれます。'));
+      var inCam = el('input'); inCam.type = 'file'; inCam.accept = 'image/*'; inCam.setAttribute('capture', 'environment'); inCam.hidden = true;
+      var inLib = el('input'); inLib.type = 'file'; inLib.accept = 'image/*'; inLib.hidden = true;
+      function onFile(inp) {
+        if (!inp.files || !inp.files[0]) return;
+        loadImage(inp.files[0]).then(function (c) { scan.img = c; scan.rects = []; scan.step = 'mask'; renderScan(); })
+          .catch(function () { alert('写真を ひらけませんでした。'); });
+      }
+      inCam.addEventListener('change', function () { onFile(inCam); }); inLib.addEventListener('change', function () { onFile(inLib); });
+      var row = el('div', 'actions');
+      var hasKey = !!apiKey();
+      var b1 = btn('btn sm', 'カメラで とる', function () { inCam.click(); }), b2 = btn('btn sm ghost', '写真から えらぶ', function () { inLib.click(); });
+      b1.disabled = b2.disabled = !hasKey;
+      row.appendChild(b1); row.appendChild(b2); p.appendChild(row); p.appendChild(inCam); p.appendChild(inLib);
+      p.appendChild(el('p', 'muted', '読み取りには Claude（AI）を つかいます。1まい 約 ¥15〜40（Anthropic の API りょうきん）。写真は 読み取りが おわると のこりません。Anthropic は 送った 写真を 学習に つかいません。'));
+
+      var kp = el('div', 'panel'); box.appendChild(kp);
+      kp.appendChild(el('h3', null, hasKey ? 'APIキー：せってい済み' : 'さいしょに APIキーを 入れて ください'));
+      if (!hasKey) kp.appendChild(html('p', 'muted', 'Anthropic の <b>console.anthropic.com</b> で 作った APIキー（sk-ant-… で はじまる 文字）を 入れます。キーは この iPad の 中にだけ 保存されます。'));
+      var kr = el('div', 'keyrow'), ki = el('input'); ki.type = 'password'; ki.placeholder = 'sk-ant-…'; ki.autocomplete = 'off'; ki.setAttribute('autocapitalize', 'off');
+      kr.appendChild(ki);
+      kr.appendChild(btn('btn sm', hasKey ? 'かえる' : 'ほぞん', function () {
+        var v = ki.value.trim(); if (!v) return;
+        try { localStorage.setItem(KEY_LS, v); } catch (e) {} renderScan();
+      }));
+      if (hasKey) kr.appendChild(btn('linkbtn shu', 'けす', function () { try { localStorage.removeItem(KEY_LS); } catch (e) {} renderScan(); }));
+      kp.appendChild(kr);
+    }
+
+    if (scan.step === 'mask') {
+      p.appendChild(el('h3', null, '名前や 学校名を 黒く ぬる'));
+      p.appendChild(el('p', 'muted', 'かくしたい ところを 指で なぞると 黒く なります。'));
+      var wrap = el('div', 'mask-wrap'), cv = el('canvas', 'mask-cv');
+      cv.width = scan.img.width; cv.height = scan.img.height; wrap.appendChild(cv); p.appendChild(wrap);
+      var ctx = cv.getContext('2d');
+      function draw() {
+        ctx.drawImage(scan.img, 0, 0); ctx.fillStyle = '#000';
+        scan.rects.concat(scan.drag ? [scan.drag] : []).forEach(function (r) { ctx.fillRect(r[0] * cv.width, r[1] * cv.height, r[2] * cv.width, r[3] * cv.height); });
+      }
+      function norm(e) { var r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height]; }
+      var start = null;
+      cv.addEventListener('pointerdown', function (e) { e.preventDefault(); start = norm(e); scan.drag = [start[0], start[1], 0, 0]; try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
+      cv.addEventListener('pointermove', function (e) { if (!start) return; var q = norm(e); scan.drag = [Math.min(start[0], q[0]), Math.min(start[1], q[1]), Math.abs(q[0] - start[0]), Math.abs(q[1] - start[1])]; draw(); });
+      function up() { if (scan.drag && scan.drag[2] > 0.005 && scan.drag[3] > 0.005) scan.rects.push(scan.drag); scan.drag = null; start = null; draw(); }
+      cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+      ['touchstart', 'touchmove'].forEach(function (t) { cv.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+      draw();
+      var acts = el('div', 'actions');
+      acts.appendChild(btn('tool', 'もどす', function () { scan.rects.pop(); draw(); }));
+      acts.appendChild(btn('tool', 'ぜんぶ もどす', function () { scan.rects = []; draw(); }));
+      acts.appendChild(btn('btn sm ghost', '写真を えらびなおす', function () { scan.step = 'pick'; renderScan(); }));
+      acts.appendChild(btn('btn sm', '読み取る →', function () { startReading(); }));
+      p.appendChild(acts);
+    }
+
+    if (scan.step === 'reading') {
+      p.appendChild(el('h3', null, '読み取って います'));
+      var m = el('p', null); m.appendChild(el('span', 'spin')); m.appendChild(el('span', null, 'Claude が テストを 読んで います（10〜40秒）…'));
+      p.appendChild(m);
+    }
+
+    if (scan.step === 'error') {
+      p.appendChild(el('h3', null, '読み取れませんでした'));
+      p.appendChild(el('p', null, scan.err || ''));
+      var a2 = el('div', 'actions');
+      a2.appendChild(btn('btn sm', 'もう一度', function () { scan.step = scan.img ? 'mask' : 'pick'; renderScan(); }));
+      a2.appendChild(btn('btn sm ghost', 'さいしょから', function () { scan.step = 'pick'; scan.img = null; renderScan(); }));
+      p.appendChild(a2);
+    }
+
+    if (scan.step === 'confirm') renderConfirm(p, box);
+  }
+  function startReading() {
+    if (!apiKey()) { scan.err = 'APIキーが ありません。さいしょの 画面で 入れて ください。'; scan.step = 'error'; renderScan(); return; }
+    scan.step = 'reading'; renderScan();
+    var b64;
+    try { b64 = maskedJpeg(); } catch (e) { scan.err = '写真を 用意できませんでした。'; scan.step = 'error'; renderScan(); return; }
+    readTest(b64).then(function (r) {
+      r.problems = (r.problems || []).map(function (q, i) { return { no: q.no || (i + 1), key: TYPES[q.type_key] ? q.type_key : 'unknown', summary: q.summary || '', numbers: q.numbers || '', correct: q.correct_answer || '', child: q.child_answer || '', ok: q.result === 'correct' ? true : q.result === 'wrong' ? false : null, conf: q.confidence || 'medium' }; });
+      scan.result = r; scan.step = 'confirm'; renderScan();
+    }).catch(function (e) { scan.err = errText(e, window.__Anthropic); scan.step = 'error'; renderScan(); });
+  }
+  function renderConfirm(p, box) {
+    var r = scan.result, d = new Date();
+    p.appendChild(el('h3', null, '読み取った ないようを たしかめる'));
+    p.appendChild(el('p', 'muted', '型や ○✗が ちがって いたら、ここで 直せます。「？」は きろくに 入れません。'));
+    var ti = el('input', 'ttl-in'); ti.value = r.test_title && r.test_title.trim() ? r.test_title.trim().slice(0, 30) : (d.getMonth() + 1) + '/' + d.getDate() + ' テスト';
+    ti.placeholder = 'テストの 名前'; p.appendChild(ti);
+    r.problems.forEach(function (q, i) {
+      var row = el('div', 'prow');
+      row.appendChild(el('div', 'pn', MARKS[q.no - 1] || String(q.no)));
+      var body = el('div');
+      var sel = el('select');
+      UNITS.forEach(function (u) { var g = el('optgroup'); g.label = u.name; u.keys.forEach(function (k) { var o = el('option', null, TYPES[k].name); o.value = k; g.appendChild(o); }); sel.appendChild(g); });
+      var ou = el('option', null, 'わからない（この 問題は 入れない）'); ou.value = 'unknown'; sel.appendChild(ou);
+      sel.value = q.key; sel.addEventListener('change', function () { q.key = sel.value; });
+      body.appendChild(sel);
+      var sm = el('div', 'sm'); sm.textContent = q.summary + (q.numbers ? '　［' + q.numbers + '］' : '');
+      if (q.conf === 'low') sm.appendChild(el('span', 'conf-low', '型に 自信なし'));
+      body.appendChild(sm);
+      body.appendChild(el('div', 'sm', '本人の こたえ：' + (q.child || '（読めず）') + '　／　正しい こたえ：' + (q.correct || '—')));
+      var res = el('div', 'res');
+      [['o', '○', true], ['x', '✗', false], ['q', '？', null]].forEach(function (t) {
+        var b = btn('tool ' + t[0], t[1], function () { q.ok = t[2]; Array.prototype.forEach.call(res.children, function (c) { c.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); });
+        b.setAttribute('aria-pressed', String(q.ok === t[2])); res.appendChild(b);
+      });
+      body.appendChild(res); row.appendChild(body); p.appendChild(row);
+    });
+    var acts = el('div', 'actions');
+    acts.appendChild(btn('btn sm', 'この テストで ページを 作る', function () {
+      var probs = r.problems.filter(function (q) { return q.key !== 'unknown'; }).map(function (q) { return { no: q.no, key: q.key, ok: q.ok, summary: q.summary }; });
+      if (!probs.length) { alert('型が わかった 問題が ありません。'); return; }
+      var page = createPage(ti.value.trim() || 'テスト', probs);
+      scan.step = 'pick'; scan.img = null; scan.result = null;
+      st.t = allTests().length - 1; st.s = 0; startSheet(); show('solve');
+      alert('「' + page.label + '」の ページが できました。まちがえた 型を 多めに 入れた プリント 10まいです。');
+    }));
+    acts.appendChild(btn('btn sm ghost', 'やりなおす', function () { scan.step = 'mask'; renderScan(); }));
+    p.appendChild(acts);
+  }
+  function createPage(label, problems) {
+    var now = new Date().toISOString(), id = 'p_' + Date.now().toString(36);
+    var page = { id: id, label: label, at: now, seed: (Date.now() & 0x7fffffff) || 1, problems: problems };
+    recs._pages.push(page); recFor(id);
+    var wrong = [], score = 0, total = 0;
+    problems.forEach(function (q) { if (!TYPES[q.key] || q.ok === null) return; total++; bump(q.key, q.ok); if (q.ok) score++; else wrong.push(q.key); });
+    if (total) logAttempt({ at: now, mode: 'test', test: id, label: label, score: score, total: total, wrong: wrong });
+    save(); delete testCache[id];
+    return page;
+  }
+  window.__suzuDev = { createPage: createPage, confirm: function (r) { scan.result = r; scan.step = 'confirm'; show('scan'); renderScan(); } };
+
   // ---------- boot ----------
   if (QS.gen) { renderPrint(); show('print'); document.body.classList.add('print-mode'); }
   else { renderHome(); show('home'); }
 })();
 </script>
 
+<script type="module">
+  import Anthropic from 'https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.124.0/+esm';
+  window.__Anthropic = Anthropic;
+</script>
 <script>
 (function () {
   if ('serviceWorker' in navigator) {

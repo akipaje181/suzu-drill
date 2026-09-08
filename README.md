@@ -20,6 +20,16 @@ iPadのSafariで開き「ホーム画面に追加」で使います。ログイ�
 2. **`sw.js` の `VERSION` を上げる**（例: v2 → v3）。上げないと端末側が古いキャッシュを使い続けることがある
 3. `git commit` → `git push origin main` で自動公開（数十秒〜数分）
 
+## テストの読み取り（AI）
+- ホームの「テストを よみとる」：写真 → 名前を黒塗り → Claude で型・○✗を読み取り → 確認 → その子用の10まいページ。
+- ブラウザから直接 Anthropic API を呼ぶ（`@anthropic-ai/sdk@0.124.0` を jsDelivr の ESM で読み込み、`dangerouslyAllowBrowser`）。
+  APIキーは端末の `localStorage`（`suzu.apikey`）にだけ保存。サーバは無い。
+- モデル `claude-opus-5`、画像は長辺2000pxのJPEG、`output_config.format` の JSONスキーマで構造化出力。
+  安全分類器の拒否に備えて `fallbacks: "default"`（beta `server-side-fallback-2026-07-01`）を付け、400なら通常エンドポイントで再試行。
+- 読み取り結果は「型・要約・数・正答・本人の答え・○✗・自信」。問題文の原文は保存しない（要約のみ）。
+- 作ったページは `recs._pages`（seed付き）。プリント10まいは生成器から seed で再現。○✗は型別の記録に即反映。
+- 費用の目安: 1枚 ¥15〜40（利用者のAPIアカウントに課金）。
+
 ## 記録
 各端末の `localStorage`（キー `suzu.bunsho.v1`）にだけ保存。
 `_types`（型別の正誤）、`_log`（1回ごとの結果）、テストIDごとの `sheets`（プリント別ベスト）。
