@@ -301,6 +301,60 @@
   .psheet .ak .cb .ca{display:block; text-align:left; font-size:9.5pt; line-height:1.4}
   .psheet .ak .cb .cs{display:block; font-size:7.8pt; line-height:1.4; margin-top:.3mm}
 
+  /* ---------- game: character / stamps / medals ---------- */
+  .ccard{display:flex; align-items:center; gap:14px; margin:16px 0 6px; padding:12px 16px 12px 12px; border-radius:16px; background:var(--paper); border:1.5px solid var(--rule); text-align:left; width:100%; color:var(--ink)}
+  .ccard .char{width:92px; height:92px; flex:none}
+  .ccard .cinfo{flex:1; min-width:0}
+  .ccard .cname{font-family:var(--f-round); font-size:18px; font-weight:700}
+  .ccard .cname small{font-family:var(--f-kaku); font-size:12px; color:var(--shu-ink); margin-left:8px; font-weight:700}
+  .ccard .bubble{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin:2px 0 6px}
+  .xpbar{height:10px; border-radius:5px; background:var(--rule-soft); overflow:hidden}
+  .xpbar i{display:block; height:100%; background:var(--shu); border-radius:5px; transition:width .6s ease}
+  .xptxt{font-size:12px; color:var(--ink-faint); margin-top:3px; font-variant-numeric:tabular-nums; display:flex; justify-content:space-between}
+  .xptxt b{color:var(--ok-ink)}
+  .char{overflow:visible; transform-origin:50% 100%; animation:breathe 3.2s ease-in-out infinite}
+  .char .eye{transform-origin:center; animation:blink 4.5s infinite}
+  @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(.985,1.03)}}
+  @keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+
+  .gres{margin:0 0 12px; padding:12px 16px; border-radius:12px; background:var(--paper); border:1px solid var(--rule); display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+  .gres .char{width:64px; height:64px}
+  .gres .gx{font-family:var(--f-round); font-size:17px; font-weight:700}
+  .gres .gx small{display:block; font-family:var(--f-kaku); font-size:12.5px; color:var(--ink-soft); font-weight:500}
+  .gres .badge{display:inline-flex; align-items:center; gap:6px; background:var(--shu-wash); color:var(--shu-ink); border-radius:999px; padding:3px 12px 3px 6px; font-family:var(--f-round); font-size:13px; font-weight:700}
+  .gres.up{background:linear-gradient(135deg, var(--shu-wash), var(--paper)); border-color:var(--shu); position:relative; overflow:hidden}
+  .gres.up .gx{color:var(--shu-ink); font-size:20px}
+  .confetti{position:absolute; top:-10px; width:8px; height:12px; border-radius:2px; opacity:.9; animation:fall 1.8s ease-in forwards}
+  @keyframes fall{to{transform:translateY(140px) rotate(300deg); opacity:0}}
+  .toast{position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:40; background:var(--ink); color:var(--paper); font-family:var(--f-round); font-size:15px; padding:10px 18px; border-radius:999px; box-shadow:0 6px 20px rgba(0,0,0,.25); max-width:90vw}
+
+  .gbig{display:flex; flex-direction:column; align-items:center; text-align:center; padding:8px 0 4px}
+  .gbig .char{width:180px; height:180px}
+  .gbig .bubble{font-family:var(--f-round); font-size:15px; background:var(--paper); border:1.5px solid var(--rule); border-radius:14px; padding:8px 14px; margin-bottom:8px; position:relative}
+  .gbig .bubble::after{content:''; position:absolute; left:50%; bottom:-8px; width:12px; height:12px; background:var(--paper); border-right:1.5px solid var(--rule); border-bottom:1.5px solid var(--rule); transform:translateX(-50%) rotate(45deg)}
+  .gbig .cname{font-family:var(--f-round); font-size:22px; font-weight:700; margin-top:8px}
+  .gbig .stage{font-size:13px; color:var(--ink-soft)}
+  .swatches{display:flex; gap:10px; flex-wrap:wrap}
+  .sw{width:40px; height:40px; border-radius:50%; border:3px solid transparent; padding:0}
+  .sw[aria-pressed="true"]{border-color:var(--ink)}
+  .accs{display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:8px}
+  .acc{border:1.5px solid var(--rule); border-radius:12px; padding:10px 8px; text-align:center; background:var(--paper); font-family:var(--f-round); font-size:14px; color:var(--ink)}
+  .acc[aria-pressed="true"]{border-color:var(--shu); background:var(--shu-wash)}
+  .acc.lock{opacity:.55}
+  .acc small{display:block; font-family:var(--f-kaku); font-size:11px; color:var(--ink-soft); margin-top:2px}
+  .card{display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin:8px 0 4px}
+  .slot{aspect-ratio:1; border-radius:50%; border:2px dashed var(--rule); display:flex; align-items:center; justify-content:center; font-family:var(--f-round); font-size:11px; color:var(--ink-faint); background:var(--field)}
+  .slot.on{border:2.5px solid var(--shu); color:var(--shu-ink); font-weight:700; font-size:13px; background:var(--shu-wash); transform:rotate(-8deg); box-shadow:inset 0 0 0 2px var(--paper)}
+  .medals{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px}
+  .medal{border:1.5px solid var(--rule); border-radius:12px; padding:12px 10px; text-align:center; background:var(--paper)}
+  .medal .ic{width:52px; height:52px; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:26px; background:var(--shu-wash); border:2.5px solid var(--shu)}
+  .medal b{font-family:var(--f-round); font-size:14px; display:block}
+  .medal small{font-size:11px; color:var(--ink-soft); display:block; line-height:1.5}
+  .medal.lock .ic{background:var(--rule-soft); border-color:var(--rule); filter:grayscale(1); opacity:.6}
+  .medal.lock{opacity:.75}
+  .streak{font-family:var(--f-round); font-size:15px; margin:4px 0 0}
+  .streak b{color:var(--shu-ink); font-size:20px}
+
   /* ---------- scan ---------- */
   .keyrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px}
   .keyrow input{flex:1; min-width:200px; height:46px; border:1.5px solid var(--field-line); border-radius:8px; padding:0 10px; background:var(--field); color:var(--ink); font-size:15px}
@@ -348,6 +402,7 @@
 
   <section id="v-home">
     <div class="wrap">
+      <div id="charCard"></div>
       <p class="hello" id="hello"></p>
       <div class="tiles" id="tiles"></div>
       <p class="note">2年生 文しょうだい　1-⑤・1-⑥・1-⑦　ぜんぶで 150問</p>
@@ -373,6 +428,10 @@
       <div id="wresult"></div>
       <div id="wqs"></div>
     </div>
+  </section>
+
+  <section id="v-grow" hidden>
+    <div class="wrap" id="grow"></div>
   </section>
 
   <section id="v-scan" hidden>
@@ -625,7 +684,7 @@
   // ---------- storage ----------
   var LS = 'suzu.bunsho.v1', LOGMAX = 500;
   function fresh() {
-    var r = { _types: {}, _log: [], _pages: [], _migrated: false };
+    var r = { _types: {}, _log: [], _pages: [], _game: null, _migrated: false };
     DATA.tests.forEach(function (t) { r[t.id] = { test: t.id, sheets: {}, types: {}, updatedAt: null }; });
     return r;
   }
@@ -650,6 +709,7 @@
     return r;
   }
   var recs = load();
+  var game = null;   // set by initGame() once the helpers below exist
   function save() { try { localStorage.setItem(LS, JSON.stringify(recs)); } catch (e) {} }
   function recFor(id) { return recs[id] || (recs[id] = { test: id, sheets: {}, types: {}, updatedAt: null }); }
   function bump(key, ok) { var g = recs._types[key] || (recs._types[key] = { ok: 0, ng: 0 }); g[ok ? 'ok' : 'ng']++; }
@@ -951,7 +1011,7 @@
     var o = cur, score = 0, blank = 0, wrong = [];
     o.items.forEach(function (it) {
       var v = judgeItem(it), ok = v === true;
-      it.graded = true;
+      it.graded = true; it.answered = v !== null; it.ok = ok;
       if (v === null) blank++;
       if (ok) score++; else wrong.push(it.key);
       decorate(it, ok); bump(it.key, ok);
@@ -966,6 +1026,7 @@
     } else {
       logAttempt({ at: now, mode: o.mode, keys: o.keys, unit: o.unit || null, score: score, total: o.items.length, wrong: wrong });
     }
+    var gev = gameAfterSet(o, score);
     save();
 
     var res = el('div', 'score' + (score === o.items.length ? ' all' : ''));
@@ -977,6 +1038,7 @@
       : score >= 3 ? 'おしい！ ✗の しきを 見て、もういちど やってみよう。'
       : '✗の しきを 見て、かんがえ方を たしかめよう。'));
     o.result.appendChild(res);
+    o.result.appendChild(gameResultPanel(gev));
     o.graded = true;
     setBar(o.nextLabel(), true);
     if (o.mode === 'sheet') renderChips();
@@ -986,8 +1048,8 @@
   $('btnAgain').addEventListener('click', function () { if (cur) cur.again(); });
 
   // ---------- views ----------
-  var VIEWS = ['home', 'scan', 'daily', 'solve', 'weak', 'lessons', 'records', 'print'];
-  var TITLES = { home: 'すずドリル', scan: 'テストを よみとる', daily: 'きょうの 5問', solve: 'テストの プリント', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
+  var VIEWS = ['home', 'grow', 'scan', 'daily', 'solve', 'weak', 'lessons', 'records', 'print'];
+  var TITLES = { home: 'すずドリル', grow: 'そだてる', scan: 'テストを よみとる', daily: 'きょうの 5問', solve: 'テストの プリント', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -1014,6 +1076,7 @@
     return { n: n, ok: ok };
   }
   function renderHome() {
+    renderCharCard();
     var td = todaySummary(), hello = $('hello');
     hello.innerHTML = '';
     if (td.n) { hello.appendChild(el('span', null, 'きょうは ')); hello.appendChild(el('b', null, td.n + '問')); hello.appendChild(el('span', null, ' といて、')); hello.appendChild(el('b', null, td.ok + '問')); hello.appendChild(el('span', null, ' せいかい。')); }
@@ -1038,6 +1101,7 @@
     });
   }
   function open(v) {
+    if (v === 'grow') renderGrow();
     if (v === 'scan') renderScan();
     if (v === 'daily') { if (!(cur && cur.view === 'daily')) renderDailyIntro(); }
     if (v === 'solve') { if (!(cur && cur.view === 'solve')) startSheet(); renderTabs(); }
@@ -1197,6 +1261,7 @@
     var L = LESSONS[key], d = $('ldetail');
     $('llist').hidden = true; d.hidden = false; d.innerHTML = '';
     cur = null; $('bar').hidden = true;
+    if (game) { game.lessonsRead[key] = true; }
     d.appendChild(el('span', 'eyebrow', 'せんせいの ワンポイント'));
     d.appendChild(el('h2', null, L.title));
     d.appendChild(el('p', 'why', L.why));
@@ -1220,7 +1285,9 @@
       var ok = v === true;
       item.graded = true; decorate(item, ok); bump(key, ok);
       logAttempt({ at: new Date().toISOString(), mode: 'lesson', keys: [key], score: ok ? 1 : 0, total: 1, wrong: ok ? [] : [key] });
+      var gev = gameEvent(ok ? XP.lesson : XP.attempt, { lesson: key });
       save();
+      d.insertBefore(gameResultPanel(gev), tr.nextSibling);
       check.hidden = true;
       acts.appendChild(btn('btn sm', 'この 型を 5問 れんしゅう', function () { renderWeakIntro(key); show('weak'); }));
       acts.appendChild(btn('btn sm ghost', 'もういちど', function () { openLesson(key); }));
@@ -1690,10 +1757,270 @@
     var wrong = [], score = 0, total = 0;
     problems.forEach(function (q) { if (!TYPES[q.key] || q.ok === null) return; total++; bump(q.key, q.ok); if (q.ok) score++; else wrong.push(q.key); });
     if (total) logAttempt({ at: now, mode: 'test', test: id, label: label, score: score, total: total, wrong: wrong });
+    var gev = gameEvent(XP.scan, { scan: true }); showToast(gev);
     save(); delete testCache[id];
     return page;
   }
-  window.__suzuDev = { createPage: createPage, confirm: function (r) { scan.result = r; scan.step = 'confirm'; show('scan'); renderScan(); } };
+  window.__suzuDev = { createPage: createPage, confirm: function (r) { scan.result = r; scan.step = 'confirm'; show('scan'); renderScan(); },
+    charSVG: function (o) { return charSVG(o); }, game: function () { return game; }, addXp: function (n) { var ev = gameEvent(n, {}); save(); return ev; } };
+
+  // ---------- game: ポイント・レベル・スタンプ・メダル・ドリまる ----------
+  var XP = { attempt: 1, correct: 2, perfect: 5, weakBonus: 1, lesson: 2, scan: 10 };
+  var COLORS = ['#f4c14d', '#7ec8e3', '#f49ac1', '#8fd18f', '#c9a3ff', '#ffb27a'];
+  var STAGES = [['たまご', 1], ['あかちゃん', 3], ['こども', 6], ['おとな', 10], ['マスター', 15]];
+  var ACCS = [
+    { id: 'ribbon', name: 'リボン', need: 'Lv.3', ok: function () { return levelOf().level >= 3; } },
+    { id: 'hat', name: 'ぼうし', need: 'Lv.5', ok: function () { return levelOf().level >= 5; } },
+    { id: 'glasses', name: 'めがね', need: 'メダル「型マスター」', ok: function () { return !!game.badges.master1; } },
+    { id: 'cape', name: 'マント', need: '7日 つづける', ok: function () { return !!game.badges.streak7; } },
+    { id: 'star', name: 'ほしバッジ', need: 'パーフェクト ×10', ok: function () { return !!game.badges.perfect10; } },
+    { id: 'crown', name: 'かんむり', need: 'Lv.10', ok: function () { return levelOf().level >= 10; } }
+  ];
+  var BADGES = [
+    { id: 'first', ic: '🌱', name: 'はじめの いっぽ', desc: 'はじめて まるつけした', ok: function (c) { return c.sets >= 1; } },
+    { id: 'perfect1', ic: '💮', name: 'パーフェクト', desc: '5問 ぜんぶ せいかい', ok: function (c) { return c.perfects >= 1; } },
+    { id: 'perfect10', ic: '🏆', name: 'パーフェクト ×10', desc: '5/5 を 10回', ok: function (c) { return c.perfects >= 10; } },
+    { id: 'streak3', ic: '🔥', name: '3日 つづけた', desc: '3日 れんぞくで れんしゅう', ok: function (c) { return c.streak >= 3; } },
+    { id: 'streak7', ic: '⭐', name: '7日 つづけた', desc: '1しゅうかん れんぞく', ok: function (c) { return c.streak >= 7; } },
+    { id: 'streak30', ic: '👑', name: '30日 つづけた', desc: '1か月 れんぞく', ok: function (c) { return c.streak >= 30; } },
+    { id: 'card1', ic: '📮', name: 'スタンプカード 1まい', desc: '30日 れんしゅうした', ok: function (c) { return c.stamps >= 30; } },
+    { id: 'p100', ic: '💯', name: '100問', desc: '100問 といた', ok: function (c) { return c.problems >= 100; } },
+    { id: 'p500', ic: '🎉', name: '500問', desc: '500問 といた', ok: function (c) { return c.problems >= 500; } },
+    { id: 'master1', ic: '🎓', name: '型マスター', desc: '1つの 型で 5回 以上 といて 8わり せいかい', ok: function (c) { return c.masters >= 1; } },
+    { id: 'master5', ic: '🧠', name: '型マスター ×5', desc: '5つの 型を マスター', ok: function (c) { return c.masters >= 5; } },
+    { id: 'master10', ic: '🚀', name: '型マスター ×10', desc: '10の 型を マスター', ok: function (c) { return c.masters >= 10; } },
+    { id: 'weakwin', ic: '💪', name: 'にがて こくふく', desc: 'にがてだった 型が とくいに なった', ok: function (c) { return c.weakwin; } },
+    { id: 'weak10', ic: '🎯', name: 'にがて れんしゅう ×10', desc: 'にがてモードを 10回', ok: function (c) { return c.weakSets >= 10; } },
+    { id: 'scan1', ic: '📷', name: 'テストを もってきた', desc: 'テストの 写真から ページを 作った', ok: function (c) { return c.scans >= 1; } },
+    { id: 'lessons5', ic: '📖', name: 'せんせいの はなし ×5', desc: 'ワンポイントを 5つ 読んだ', ok: function (c) { return c.lessons >= 5; } }
+  ];
+  function needFor(level) { return 20 + 8 * (level - 1); }
+  function levelOf() {
+    var xp = game ? game.xp : 0, lv = 1, need = needFor(1), acc = 0;
+    while (xp >= acc + need && lv < 99) { acc += need; lv++; need = needFor(lv); }
+    return { level: lv, into: xp - acc, need: need };
+  }
+  function stageOf(level) { var st = 0; STAGES.forEach(function (x, i) { if (level >= x[1]) st = i; }); return st; }
+  function initGame() {
+    if (recs._game && typeof recs._game.xp === 'number') { game = recs._game; }
+    else {
+      game = recs._game = { xp: 0, name: 'ドリまる', color: COLORS[0], wear: {}, stamps: {}, badges: {}, lessonsRead: {}, wasWeak: {}, sound: true, perfects: 0, sets: 0, weakSets: 0, scans: 0 };
+      recs._log.forEach(function (e) {           // これまでの がんばりも かぞえる
+        var atm = e.total || 0, ok = e.score || 0;
+        game.xp += atm * XP.attempt + ok * XP.correct + (atm >= 5 && ok === atm ? XP.perfect : 0);
+        game.stamps[dayKey(e.at)] = true;
+        if (e.mode !== 'lesson') game.sets++;
+        if (e.mode === 'weak') game.weakSets++;
+        if (e.mode === 'test') game.scans++;
+        if (atm >= 5 && ok === atm) game.perfects++;
+      });
+      checkBadges();
+    }
+    if (!game.wear) game.wear = {}; if (!game.lessonsRead) game.lessonsRead = {}; if (!game.wasWeak) game.wasWeak = {};
+    rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
+  }
+  function streak() {
+    var n = 0, d = new Date(), k = dayKey(d.toISOString());
+    if (!game.stamps[k]) { d.setDate(d.getDate() - 1); k = dayKey(d.toISOString()); if (!game.stamps[k]) return 0; }
+    while (game.stamps[k]) { n++; d.setDate(d.getDate() - 1); k = dayKey(d.toISOString()); }
+    return n;
+  }
+  function gameCtx() {
+    var rs = rates(), masters = 0, weakwin = false, problems = 0;
+    rs.forEach(function (r) { if (r.n >= 5 && r.rate >= 0.8) masters++; if (game.wasWeak[r.key] && r.n >= 5 && r.rate >= 0.7) weakwin = true; });
+    recs._log.forEach(function (e) { problems += e.total || 0; });
+    return { sets: game.sets, perfects: game.perfects, streak: streak(), stamps: Object.keys(game.stamps).length, problems: problems, masters: masters, weakwin: weakwin, weakSets: game.weakSets, scans: game.scans, lessons: Object.keys(game.lessonsRead).length };
+  }
+  function checkBadges() {
+    var c = gameCtx(), got = [];
+    BADGES.forEach(function (b) { if (!game.badges[b.id] && b.ok(c)) { game.badges[b.id] = new Date().toISOString(); got.push(b); } });
+    return got;
+  }
+  // 1回の まるつけ／できごと の あとに よぶ。ふえた ポイント・レベルアップ・スタンプ・メダル を まとめて かえす
+  function gameEvent(xp, meta) {
+    if (!game) initGame();
+    var before = levelOf().level;
+    game.xp += xp;
+    var k = dayKey(new Date().toISOString()), newStamp = false;
+    if (meta && meta.stamp && !game.stamps[k]) { game.stamps[k] = true; newStamp = true; }
+    if (meta && meta.scan) game.scans++;
+    var lv = levelOf(), badges = checkBadges();
+    rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
+    var ev = { xp: xp, level: lv.level, up: lv.level > before ? lv.level : 0, stamp: newStamp, badges: badges, stampCount: Object.keys(game.stamps).length };
+    if (ev.up || badges.length) chime(ev.up ? 'up' : 'badge');
+    return ev;
+  }
+  function gameAfterSet(o, score) {
+    var xp = 0;
+    o.items.forEach(function (it) { if (it.answered) xp += XP.attempt; if (it.ok) xp += XP.correct + (o.mode === 'weak' ? XP.weakBonus : 0); });
+    var perfect = o.items.length >= 5 && score === o.items.length;
+    if (perfect) { xp += XP.perfect; game.perfects++; }
+    game.sets++; if (o.mode === 'weak') game.weakSets++;
+    return gameEvent(xp, { stamp: true });
+  }
+  function gameResultPanel(ev) {
+    var p = el('div', 'gres' + (ev.up ? ' up' : ''));
+    var mood = ev.up ? 'excited' : 'happy';
+    p.appendChild(html('div', null, charSVG({ stage: stageOf(ev.level), color: game.color, wear: game.wear, mood: mood })));
+    var gx = el('div', 'gx');
+    if (ev.up) {
+      gx.textContent = 'レベルアップ！ Lv.' + ev.up;
+      var st = stageOf(ev.level), nx = STAGES[st + 1];
+      gx.appendChild(el('small', null, st > stageOf(ev.level - 1) ? game.name + 'が ' + STAGES[st][0] + 'に なった！' : '+' + ev.xp + 'ポイント' + (nx ? '　Lv.' + nx[1] + 'で ' + nx[0] + 'に なるよ' : '')));
+    }
+    else { gx.textContent = '+' + ev.xp + ' ポイント'; var lv = levelOf(); gx.appendChild(el('small', null, 'Lv.' + lv.level + '　つぎまで あと ' + (lv.need - lv.into))); }
+    p.appendChild(gx);
+    if (ev.stamp) p.appendChild(html('span', 'badge', '📮 きょうの スタンプ ゲット！（' + ev.stampCount + 'こめ）'));
+    ev.badges.forEach(function (b) { p.appendChild(html('span', 'badge', b.ic + ' メダル「' + b.name + '」')); });
+    var go = btn('linkbtn', game.name + 'を 見る →', function () { renderGrow(); show('grow'); }); p.appendChild(go);
+    if (ev.up) for (var i = 0; i < 18; i++) { var c = el('i', 'confetti'); c.style.left = (5 + Math.random() * 90) + '%'; c.style.background = COLORS[i % COLORS.length]; c.style.animationDelay = (Math.random() * .6) + 's'; p.appendChild(c); }
+    return p;
+  }
+  function showToast(ev) {
+    var parts = [];
+    if (ev.xp) parts.push('+' + ev.xp + ' ポイント');
+    if (ev.up) parts.push('レベルアップ！ Lv.' + ev.up);
+    ev.badges.forEach(function (b) { parts.push(b.ic + ' メダル「' + b.name + '」'); });
+    if (!parts.length) return;
+    var t = el('div', 'toast', parts.join('　')); document.body.appendChild(t);
+    setTimeout(function () { t.remove(); }, 3200);
+  }
+  var actx = null;
+  function chime(kind) {
+    if (!game || game.sound === false) return;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      actx = actx || new AC(); var now = actx.currentTime;
+      var notes = kind === 'up' ? [523, 659, 784, 1047] : [784, 1047];
+      notes.forEach(function (f, i) {
+        var o = actx.createOscillator(), g = actx.createGain(); o.type = 'triangle'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, now + i * .12); g.gain.exponentialRampToValueAtTime(0.25, now + i * .12 + .02); g.gain.exponentialRampToValueAtTime(0.0001, now + i * .12 + .3);
+        o.connect(g); g.connect(actx.destination); o.start(now + i * .12); o.stop(now + i * .12 + .32);
+      });
+    } catch (e) {}
+  }
+  function shade(hex, amt) {
+    var n = parseInt(hex.slice(1), 16), r = (n >> 16) + amt, g = ((n >> 8) & 255) + amt, b = (n & 255) + amt;
+    var cl = function (v) { return Math.max(0, Math.min(255, v)); };
+    return '#' + ((cl(r) << 16) | (cl(g) << 8) | cl(b)).toString(16).padStart(6, '0');
+  }
+  function mood() {
+    var k = dayKey(new Date().toISOString()); if (game.stamps[k]) return 'happy';
+    var d = new Date(); d.setDate(d.getDate() - 1); if (game.stamps[dayKey(d.toISOString())]) return 'normal';
+    return Object.keys(game.stamps).length ? 'hungry' : 'normal';
+  }
+  var LINES = {
+    happy: ['きょうも がんばったね！', 'おいしかった！ もっと ちょうだい', 'つぎも いっしょに やろう'],
+    normal: ['きょうも いっしょに がんばろう！', 'もんだい ちょうだい！', '1もんだけでも やってみよう'],
+    hungry: ['おなか すいた…', 'ひさしぶり！ まってたよ', 'もんだいを 食べたいな'],
+    excited: ['レベルアップ！ やったー！', 'つよく なった！']
+  };
+  function line(m) { var a = LINES[m] || LINES.normal; return a[Math.floor(Math.random() * a.length)]; }
+  // ドリまる の 絵。stage 0..4, mood normal|happy|hungry|excited, wear {ribbon,hat,glasses,cape,star,crown}
+  function charSVG(o) {
+    var c = o.color || COLORS[0], dk = shade(c, -40), w = o.wear || {}, st = o.stage || 0, m = o.mood || 'normal';
+    var r = [0, 50, 58, 64, 70][st], cx = 100, cy = st ? 188 - r : 112, top = st ? cy - r : 42, ey = st ? cy - 8 : 104, ex = st ? 19 : 14;
+    var out = '';
+    if (w.cape && st) out += '<path d="M' + (cx - r * .9) + ' ' + (cy - r * .2) + ' L' + (cx - r * 1.25) + ' ' + (cy + r) + ' L' + (cx + r * 1.25) + ' ' + (cy + r) + ' L' + (cx + r * .9) + ' ' + (cy - r * .2) + ' Z" fill="#c0392f"/>';
+    if (!st) {
+      out += '<ellipse cx="100" cy="112" rx="56" ry="70" fill="' + c + '"/><ellipse cx="82" cy="75" rx="9" ry="6" fill="' + shade(c, 40) + '" opacity=".7"/><circle cx="125" cy="150" r="7" fill="' + dk + '" opacity=".35"/><circle cx="70" cy="135" r="5" fill="' + dk + '" opacity=".35"/>';
+      out += '<path d="M118 52 l7 10 -8 6 9 9 -6 8" fill="none" stroke="' + dk + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>';
+    } else {
+      out += '<ellipse cx="' + (cx - r * .45) + '" cy="' + (cy + r - 2) + '" rx="14" ry="7" fill="' + dk + '"/><ellipse cx="' + (cx + r * .45) + '" cy="' + (cy + r - 2) + '" rx="14" ry="7" fill="' + dk + '"/>';
+      if (st >= 3) out += '<ellipse cx="' + (cx - r * .8) + '" cy="' + (cy - r * .55) + '" rx="12" ry="22" fill="' + c + '" transform="rotate(-25 ' + (cx - r * .8) + ' ' + (cy - r * .55) + ')"/><ellipse cx="' + (cx + r * .8) + '" cy="' + (cy - r * .55) + '" rx="12" ry="22" fill="' + c + '" transform="rotate(25 ' + (cx + r * .8) + ' ' + (cy - r * .55) + ')"/>';
+      out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + c + '"/>';
+      if (st >= 2) out += '<circle cx="' + (cx - r * .95) + '" cy="' + (cy + r * .25) + '" r="11" fill="' + c + '"/><circle cx="' + (cx + r * .95) + '" cy="' + (cy + r * .25) + '" r="11" fill="' + c + '"/>';
+      if (st === 1) out += '<path d="M' + cx + ' ' + top + ' q2 -14 12 -18 q-2 12 -12 18 q-2 -14 -12 -18 q2 12 12 18" fill="#5fae5f"/>';
+      if (st === 4) out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 8) + '" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="6 9" opacity=".8"/>';
+      out += '<circle cx="' + (cx - r * .55) + '" cy="' + (cy + 8) + '" r="7" fill="#f4a0a0" opacity=".55"/><circle cx="' + (cx + r * .55) + '" cy="' + (cy + 8) + '" r="7" fill="#f4a0a0" opacity=".55"/>';
+    }
+    var eye = function (x) {
+      if (m === 'happy') return '<path d="M' + (x - 8) + ' ' + ey + ' q8 -11 16 0" fill="none" stroke="#2b2620" stroke-width="3.5" stroke-linecap="round"/>';
+      if (m === 'hungry') return '<ellipse class="eye" cx="' + x + '" cy="' + ey + '" rx="7" ry="4" fill="#2b2620"/>';
+      if (m === 'excited') return '<path d="M' + x + ' ' + (ey - 9) + ' l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#e6a100"/>';
+      return '<g class="eye"><circle cx="' + x + '" cy="' + ey + '" r="7" fill="#2b2620"/><circle cx="' + (x + 2.5) + '" cy="' + (ey - 2.5) + '" r="2.4" fill="#fff"/></g>';
+    };
+    out += eye(cx - ex) + eye(cx + ex);
+    var my = ey + 14;
+    if (m === 'happy') out += '<path d="M' + (cx - 10) + ' ' + my + ' q10 12 20 0" fill="none" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/>';
+    else if (m === 'hungry') out += '<path d="M' + (cx - 9) + ' ' + (my + 3) + ' q4 -4 9 0 q5 4 9 0" fill="none" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/>';
+    else if (m === 'excited') out += '<ellipse cx="' + cx + '" cy="' + (my + 2) + '" rx="7" ry="9" fill="#2b2620"/><ellipse cx="' + cx + '" cy="' + (my + 5) + '" rx="4" ry="4" fill="#e8776f"/>';
+    else out += '<path d="M' + (cx - 6) + ' ' + my + ' q6 6 12 0" fill="none" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/>';
+    if (w.glasses) out += '<circle cx="' + (cx - ex) + '" cy="' + ey + '" r="12" fill="none" stroke="#333" stroke-width="2.5"/><circle cx="' + (cx + ex) + '" cy="' + ey + '" r="12" fill="none" stroke="#333" stroke-width="2.5"/><path d="M' + (cx - ex + 12) + ' ' + ey + ' h' + (2 * ex - 24) + '" stroke="#333" stroke-width="2.5"/>';
+    if (w.star && st) out += '<path transform="translate(' + cx + ' ' + (cy + r * .45) + ') scale(1.3)" d="M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>';
+    if (w.ribbon) out += '<g transform="translate(' + (cx + (st ? r * .68 : 40)) + ' ' + (top + 10) + ')"><path d="M0 0 l-16 -10 v20z M0 0 l16 -10 v20z" fill="#f06b8a"/><circle r="4" fill="#d94b6b"/></g>';
+    if (w.hat) out += '<path d="M' + (cx - 30) + ' ' + (top + 6) + ' L' + cx + ' ' + (top - 44) + ' L' + (cx + 30) + ' ' + (top + 6) + ' Z" fill="#e2574c"/><ellipse cx="' + cx + '" cy="' + (top + 6) + '" rx="34" ry="7" fill="#fff"/><circle cx="' + cx + '" cy="' + (top - 44) + '" r="7" fill="#fff"/>';
+    if (w.crown) out += '<path d="M' + (cx - 26) + ' ' + (top + 4) + ' l0 -22 12 10 14 -18 14 18 12 -10 0 22z" fill="#ffd166" stroke="#e6a100" stroke-width="2" stroke-linejoin="round"/>';
+    return '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + out + '</svg>';
+  }
+  function renderCharCard() {
+    var box = $('charCard'); if (!box) return; box.innerHTML = '';
+    if (!game) initGame();
+    var lv = levelOf(), m = mood(), card = btn('ccard', null, function () { renderGrow(); show('grow'); });
+    card.innerHTML = charSVG({ stage: stageOf(lv.level), color: game.color, wear: game.wear, mood: m });
+    var info = el('div', 'cinfo');
+    var nm = el('div', 'cname', game.name); nm.appendChild(el('small', null, 'Lv.' + lv.level + '　' + STAGES[stageOf(lv.level)][0]));
+    info.appendChild(nm);
+    info.appendChild(el('div', 'bubble', '「' + line(m) + '」'));
+    var bar = el('div', 'xpbar'), fill = el('i'); fill.style.width = Math.round(lv.into / lv.need * 100) + '%'; bar.appendChild(fill); info.appendChild(bar);
+    var tx = el('div', 'xptxt'); tx.appendChild(el('span', null, lv.into + ' / ' + lv.need + ' ポイント'));
+    tx.appendChild(html('span', null, game.stamps[dayKey(new Date().toISOString())] ? '<b>きょうの スタンプ ✓</b>' : 'きょうの スタンプ まだ　れんぞく ' + streak() + '日'));
+    info.appendChild(tx); card.appendChild(info);
+    box.appendChild(card);
+  }
+  function renderGrow() {
+    var box = $('grow'); box.innerHTML = ''; cur = null; $('bar').hidden = true;
+    if (!game) initGame();
+    var lv = levelOf(), st = stageOf(lv.level), m = mood();
+    var big = el('div', 'gbig');
+    big.appendChild(el('div', 'bubble', line(m)));
+    big.appendChild(html('div', null, charSVG({ stage: st, color: game.color, wear: game.wear, mood: m })));
+    var nm = btn('cname', game.name + ' ✎', function () { var v = prompt('なまえを つけよう', game.name); if (v && v.trim()) { game.name = v.trim().slice(0, 10); save(); renderGrow(); } });
+    nm.style.cssText = 'background:none;border:0;color:inherit'; big.appendChild(nm);
+    var next = STAGES[st + 1];
+    big.appendChild(el('div', 'stage', 'Lv.' + lv.level + '　' + STAGES[st][0] + (next ? '　→ Lv.' + next[1] + 'で ' + next[0] + 'に' : '　（さいこう）')));
+    var bar = el('div', 'xpbar'); bar.style.cssText = 'width:min(320px,90%);margin-top:8px'; var fill = el('i'); fill.style.width = Math.round(lv.into / lv.need * 100) + '%'; bar.appendChild(fill); big.appendChild(bar);
+    big.appendChild(el('div', 'xptxt', 'つぎの レベルまで あと ' + (lv.need - lv.into) + ' ポイント（ぜんぶで ' + game.xp + '）'));
+    box.appendChild(big);
+
+    box.appendChild(html('h2', 'sec', 'いろを えらぶ'));
+    var sws = el('div', 'swatches');
+    COLORS.forEach(function (c) { var b = btn('sw', null, function () { game.color = c; save(); renderGrow(); }); b.style.background = c; b.setAttribute('aria-pressed', String(c === game.color)); b.setAttribute('aria-label', 'いろ'); sws.appendChild(b); });
+    box.appendChild(sws);
+
+    box.appendChild(html('h2', 'sec', 'アクセサリー <small>メダルや レベルで ふえる</small>'));
+    var ag = el('div', 'accs');
+    ACCS.forEach(function (a) {
+      var un = a.ok(), b = btn('acc' + (un ? '' : ' lock'), null, function () { if (!un) return; game.wear[a.id] = !game.wear[a.id]; save(); renderGrow(); });
+      b.setAttribute('aria-pressed', String(!!game.wear[a.id] && un));
+      b.appendChild(el('span', null, (un ? '' : '🔒 ') + a.name)); b.appendChild(el('small', null, un ? (game.wear[a.id] ? 'つけている' : 'タップで つける') : a.need + ' で ひらく'));
+      ag.appendChild(b);
+    });
+    box.appendChild(ag);
+
+    var cnt = Object.keys(game.stamps).length, cardNo = Math.floor((cnt - (cnt && cnt % 30 === 0 ? 1 : 0)) / 30) + 1, filled = cnt - (cardNo - 1) * 30;
+    box.appendChild(html('h2', 'sec', 'スタンプカード <small>' + cardNo + 'まいめ　' + filled + ' / 30</small>'));
+    box.appendChild(html('p', 'streak', 'れんぞく <b>' + streak() + '</b> 日　／　ぜんぶで ' + cnt + ' こ'));
+    var days = Object.keys(game.stamps).sort(), cardDays = days.slice((cardNo - 1) * 30, cardNo * 30), grid = el('div', 'card');
+    for (var i = 0; i < 30; i++) { var k = cardDays[i], sl = el('div', 'slot' + (k ? ' on' : '')); if (k) { var p = k.split('-'); sl.textContent = (+p[1]) + '/' + (+p[2]); } else sl.textContent = String(i + 1); grid.appendChild(sl); }
+    box.appendChild(grid);
+
+    var earned = Object.keys(game.badges).length;
+    box.appendChild(html('h2', 'sec', 'メダル <small>' + earned + ' / ' + BADGES.length + '</small>'));
+    var mg = el('div', 'medals');
+    BADGES.forEach(function (b) {
+      var got = game.badges[b.id], d = el('div', 'medal' + (got ? '' : ' lock'));
+      d.appendChild(el('div', 'ic', got ? b.ic : '？')); d.appendChild(el('b', null, b.name));
+      d.appendChild(el('small', null, got ? fmtDay(dayKey(got)) + ' ゲット' : b.desc));
+      mg.appendChild(d);
+    });
+    box.appendChild(mg);
+
+    var sr = el('div', 'rec-actions');
+    sr.appendChild(btn('linkbtn', game.sound === false ? '音：オフ（タップで オン）' : '音：オン（タップで オフ）', function () { game.sound = game.sound === false; save(); renderGrow(); }));
+    box.appendChild(sr);
+  }
+  initGame(); save();
 
   // ---------- boot ----------
   if (QS.gen) { renderPrint(); show('print'); document.body.classList.add('print-mode'); }
