@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Klee+One:wght@400;600&display=swap">
 
 <style>
   html{color-scheme:light dark}
@@ -368,6 +368,38 @@
   .streak{font-family:var(--f-round); font-size:15px; margin:4px 0 0}
   .streak b{color:var(--shu-ink); font-size:20px}
 
+  /* ---------- kanji ---------- */
+  .hl{color:var(--shu-ink); font-weight:700; border-bottom:2.5px solid var(--shu)}
+  .kq{display:block; font-size:14px; color:var(--ink-soft); margin-top:6px; font-family:var(--f-kaku)}
+  .kbig{display:block; font-family:'Klee One','Klee','Hiragino Mincho ProN',serif; font-size:64px; line-height:1.15; font-weight:600}
+  .kread{display:block; font-size:15px; color:var(--ink-soft)}
+  .kex{display:block; font-size:15px; margin-top:4px}
+  .kdetail{text-align:center} .kdetail .kbig{font-size:96px} .kdetail .kex{font-family:var(--f-round); font-size:16px; text-align:left; margin:8px 0 0}
+  .ktiles{display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin:6px 0 10px}
+  .ktile{border:1.5px solid var(--rule); border-radius:12px; background:var(--field); padding:8px 4px 6px; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--ink)}
+  .ktile .kt{font-family:'Klee One','Klee','Hiragino Mincho ProN',serif; font-size:34px; line-height:1.1; font-weight:600}
+  .ktile .kt-y{font-size:10.5px; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%}
+  .ktile.ok{border-color:var(--ok-ink); background:var(--ok-wash)} .ktile.ng{border-color:var(--shu); background:var(--shu-wash)}
+  .opt.big{font-family:'Klee One','Klee','Hiragino Mincho ProN',serif; font-size:22px; font-weight:600; min-width:80px}
+  .opt.o[aria-pressed="true"]{background:var(--ok-ink); border-color:var(--ok-ink); color:#fff}
+  .opt.x[aria-pressed="true"]{background:var(--shu); border-color:var(--shu); color:#fff}
+  .reveal{width:100%; text-align:center; padding:8px 0}
+  .pad-area.kanji{height:auto; min-height:110px}
+  .pad-guide.kg{position:static; display:flex; gap:10px; padding:10px; justify-content:center}
+  .ksq{position:relative; width:min(150px, calc((100% - 30px) / 4)); aspect-ratio:1; border:1.5px solid var(--field-line); background-color:var(--field);
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size:50% 50%; background-position:-1px -1px}
+  .ksq .model{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Klee One','Klee','Hiragino Mincho ProN',serif; font-size:clamp(40px, 15vw, 108px); line-height:1; color:var(--ink); pointer-events:none}
+  .ksq .model.trace{opacity:.35} .ksq .model.faint{opacity:.16}
+  @media (max-width:560px){ .ktiles{grid-template-columns:repeat(5, 1fr)} .ktile .kt{font-size:26px} }
+  /* 漢字ノート（印刷） */
+  .psheet .krows{margin-top:4mm}
+  .psheet .krow{display:grid; grid-template-columns:19mm 1fr repeat(4, 19mm); gap:2.5mm; align-items:center; padding:1.6mm 0; border-bottom:.6pt solid #e7e1d3}
+  .psheet .ksqp{width:19mm; height:19mm; border:.9pt solid #9c9587; display:flex; align-items:center; justify-content:center; font-family:'Klee One','Klee','Hiragino Mincho ProN',serif; font-size:14mm; line-height:1; font-weight:600; color:#23211d;
+    background-image:linear-gradient(#e7e1d3 1px, transparent 1px), linear-gradient(90deg, #e7e1d3 1px, transparent 1px); background-size:50% 50%; background-position:-1px -1px}
+  .psheet .ksqp.faint{color:#d5cfc0}
+  .psheet .kinfo b{display:block; font-family:var(--f-round); font-size:9pt; color:#23211d}
+  .psheet .kinfo span{display:block; font-size:8pt; color:#6f695d; line-height:1.5}
+
   /* ---------- scan ---------- */
   .keyrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px}
   .keyrow input{flex:1; min-width:200px; height:46px; border:1.5px solid var(--field-line); border-radius:8px; padding:0 10px; background:var(--field); color:var(--ink); font-size:15px}
@@ -449,6 +481,14 @@
 
   <section id="v-scan" hidden>
     <div class="wrap" id="scan"></div>
+  </section>
+
+  <section id="v-kanji" hidden>
+    <div class="wrap">
+      <div id="kintro"></div>
+      <div id="kresult"></div>
+      <div id="kqs"></div>
+    </div>
   </section>
 
   <section id="v-daily" hidden>
@@ -775,6 +815,36 @@
       var n = numField(''); n.dataset.f = 'n';
       row.appendChild(n);
       row.appendChild(el('span', 'unit', a.u + ' ' + (a.tail || '多い')));
+    } else if (a.k === 'choice') {
+      row.innerHTML = ''; row.appendChild(el('span', 'lbl', 'こたえ'));
+      var cb = el('div', 'opts');
+      a.opts.forEach(function (o) {
+        var b = el('button', 'opt' + (a.big ? ' big' : ''), o);
+        b.type = 'button'; b.setAttribute('aria-pressed', 'false'); b.dataset.opt = o;
+        b.addEventListener('click', function () {
+          if (item.graded) return;
+          item.pick = o;
+          Array.prototype.forEach.call(cb.children, function (c) { c.setAttribute('aria-pressed', String(c.dataset.opt === o)); });
+        });
+        cb.appendChild(b);
+      });
+      row.appendChild(cb);
+    } else if (a.k === 'self') {
+      row.innerHTML = '';
+      if (a.trace) {
+        var dn = el('button', 'opt', 'かけた！'); dn.type = 'button'; dn.setAttribute('aria-pressed', 'false');
+        dn.addEventListener('click', function () { if (item.graded) return; item.pick = 'ok'; dn.setAttribute('aria-pressed', 'true'); });
+        row.appendChild(el('span', 'lbl', 'なぞって、あいた ますにも 書こう')); row.appendChild(dn);
+      } else {
+        var rv = html('div', 'reveal', a.reveal || a.answer); rv.hidden = true;
+        var okb = el('button', 'opt o', '○ あっていた'), ngb = el('button', 'opt x', '✗ ちがった');
+        okb.type = ngb.type = 'button'; okb.hidden = ngb.hidden = true; okb.setAttribute('aria-pressed', 'false'); ngb.setAttribute('aria-pressed', 'false');
+        var see = el('button', 'opt', 'こたえを 見る'); see.type = 'button';
+        see.addEventListener('click', function () { rv.hidden = false; see.hidden = true; okb.hidden = ngb.hidden = false; });
+        okb.addEventListener('click', function () { if (item.graded) return; item.pick = 'ok'; okb.setAttribute('aria-pressed', 'true'); ngb.setAttribute('aria-pressed', 'false'); });
+        ngb.addEventListener('click', function () { if (item.graded) return; item.pick = 'ng'; ngb.setAttribute('aria-pressed', 'true'); okb.setAttribute('aria-pressed', 'false'); });
+        row.appendChild(el('span', 'lbl', '書いたら')); row.appendChild(see); row.appendChild(rv); row.appendChild(okb); row.appendChild(ngb);
+      }
     } else {
       var v = numField(''); v.dataset.f = 'n';
       row.appendChild(v);
@@ -788,6 +858,8 @@
   }
   function judgeItem(item) {
     var a = item.q.ans, card = item.card;
+    if (a.k === 'choice') return item.pick ? item.pick === a.pick : null;
+    if (a.k === 'self') return item.pick === 'ok' ? true : item.pick === 'ng' ? false : null;
     if (a.k === 'pair') {
       var x = val(card, 'a'), y = val(card, 'b');
       if (x === null) return null;
@@ -803,6 +875,8 @@
     return v === a.v;
   }
   function answerText(a) {
+    if (a.k === 'choice') return a.pick;
+    if (a.k === 'self') return a.answer;
     if (a.k === 'pair') return a.a + a.u1 + (a.b ? a.b + a.u2 : '');
     if (a.k === 'pick') return a.pick + 'が ' + a.v + a.u + ' ' + (a.tail || '多い');
     return a.v + a.u;
@@ -831,10 +905,16 @@
     sizePads.forEach(function (f) { f.sync(); });
   }
   function inkColor() { return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#23211d'; }
-  function makePad(key) {
+  function makePad(key, kind, model) {
     var strokes = pads[key] || (pads[key] = []);
     var wrap = el('div', 'pad'), bar = el('div', 'pad-bar'), area = el('div', 'pad-area'), guide = el('div', 'pad-guide'), cv = el('canvas', 'pad-cv');
-    guide.innerHTML = '<div class="g-left"><div class="g-line"><span>（しき）</span></div><div class="g-line ans"><span>こたえ</span></div></div><div class="g-right"><span>（ひっさん・図）</span></div>';
+    if (kind === 'kanji') {
+      guide.className = 'pad-guide kg'; area.className = 'pad-area kanji';
+      var m = model ? '<span class="model trace">' + model + '</span>' : '', m2 = model ? '<span class="model faint">' + model + '</span>' : '';
+      guide.innerHTML = '<div class="ksq">' + m + '</div><div class="ksq">' + m2 + '</div><div class="ksq"></div><div class="ksq"></div>';
+    } else {
+      guide.innerHTML = '<div class="g-left"><div class="g-line"><span>（しき）</span></div><div class="g-line ans"><span>こたえ</span></div></div><div class="g-right"><span>（ひっさん・図）</span></div>';
+    }
     area.appendChild(guide); area.appendChild(cv);
     var ctx = cv.getContext('2d', { desynchronized: true }) || cv.getContext('2d');
     var tool = 'pen', active = {}, rect = null, finger = false;
@@ -976,13 +1056,13 @@
 
   // ---------- problem cards ----------
   function makeCard(item, idx, padKey, showType) {
-    var card = el('div', 'q');
-    if (showType) card.appendChild(el('span', 'q-type', TYPES[item.key].name));
+    var card = el('div', 'q'), q = item.q;
+    if (showType && TYPES[item.key]) card.appendChild(el('span', 'q-type', TYPES[item.key].name));
     var hd = el('div', 'q-hd');
     hd.appendChild(el('span', 'q-n', MARKS[idx] || String(idx + 1)));
-    hd.appendChild(el('p', 'q-t', item.q.t));
+    hd.appendChild(q.html ? html('p', 'q-t', q.html) : el('p', 'q-t', q.t));
     card.appendChild(hd);
-    card.appendChild(makePad(padKey));
+    if (q.pad !== 'none') card.appendChild(makePad(padKey, q.pad || 'math', q.model || null));
     card.appendChild(buildFields(item));
     item.card = card; item.pick = null; item.graded = false;
     return card;
@@ -999,8 +1079,7 @@
     st2.appendChild(el('span', null, 'しき　'));
     q.s.forEach(function (f, k) { if (k) st2.appendChild(el('span', null, '　→　')); st2.appendChild(el('em', null, f)); });
     fix.appendChild(st2);
-    var go = btn('linkbtn shu go', '→ せんせいの ワンポイント「' + TYPES[item.key].name + '」', function () { openLesson(item.key); });
-    fix.appendChild(go);
+    if (TYPES[item.key]) fix.appendChild(btn('linkbtn shu go', '→ せんせいの ワンポイント「' + TYPES[item.key].name + '」', function () { openLesson(item.key); }));
     card.appendChild(fix);
   }
 
@@ -1061,8 +1140,8 @@
   $('btnAgain').addEventListener('click', function () { if (cur) cur.again(); });
 
   // ---------- views ----------
-  var VIEWS = ['home', 'grow', 'scan', 'daily', 'solve', 'weak', 'lessons', 'records', 'print'];
-  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', daily: 'きょうの 5問', solve: 'テストの プリント', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
+  var VIEWS = ['home', 'grow', 'scan', 'daily', 'kanji', 'solve', 'weak', 'lessons', 'records', 'print'];
+  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', solve: 'テストの プリント', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -1100,6 +1179,7 @@
     [
       ['scan', 'テストを よみとる', '写真を とると、その子用の プリントが できる', true],
       ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問'],
+      ['kanji', 'かんじ', '2年生の 漢字 160字　よみ・かき・なぞり書き'],
       ['solve', 'テストの プリント', '学校の テストから 作った プリント（' + allTests().length + 'セット）'],
       ['weak', 'にがてを とく', weakNames + ' から 5問'],
       ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
@@ -1115,6 +1195,7 @@
   }
   function open(v) {
     if (v === 'grow') renderGrow();
+    if (v === 'kanji') { if (!(cur && cur.view === 'kanji')) renderKanji(); }
     if (v === 'scan') renderScan();
     if (v === 'daily') { if (!(cur && cur.view === 'daily')) renderDailyIntro(); }
     if (v === 'solve') { if (!(cur && cur.view === 'solve')) startSheet(); renderTabs(); }
@@ -1343,6 +1424,15 @@
       });
     });
 
+    box.appendChild(html('h2', 'sec', 'かんじ <small>おぼえた 字と にがてな 字</small>'));
+    KANJI.forEach(function (g) {
+      var ks = g.rows.map(function (r) { return r[0]; }), done = ks.filter(kmastered).length, weak = ks.filter(function (k) { var st = kstat(k); return st.ng > 0 && st.ng >= st.ok; });
+      var row = btn('trow', null, function () { kst.g = g.id; renderKanji(); show('kanji'); });
+      row.appendChild(el('span', 'nm', g.name)); row.appendChild(el('span', 'rt', 'おぼえた ' + done + ' / 10' + (weak.length ? '　にがて：' + weak.join(' ') : '')));
+      var bg = el('div', 'bar-bg'), fg = el('div', 'bar-fg'); fg.style.width = (done * 10) + '%'; bg.appendChild(fg); row.appendChild(bg);
+      box.appendChild(row);
+    });
+
     box.appendChild(html('h2', 'sec', 'プリントべつ <small>いちばん よかった てん</small>'));
     allTests().forEach(function (t) {
       box.appendChild(el('p', 'muted', t.label));
@@ -1399,7 +1489,7 @@
   function renderPrint() {
     var c = $('pctl'); c.innerHTML = '';
     var src = el('div', 'tabs inpage src');
-    [['sheet', 'テストの プリント'], ['gen', '型から 作る'], ['weak', 'さっきの にがて 5問'], ['daily', 'さっきの きょうの5問']].forEach(function (o) {
+    [['sheet', 'テストの プリント'], ['gen', '型から 作る'], ['kanji', 'かんじ ノート'], ['weak', 'さっきの にがて 5問'], ['daily', 'さっきの きょうの5問']].forEach(function (o) {
       if (o[0] === 'weak' && !lastWeakItems) return;
       if (o[0] === 'daily' && !lastDailyItems) return;
       var b = btn('tab', o[1], function () { pst.src = o[0]; renderPrint(); });
@@ -1426,6 +1516,12 @@
       [1, 3, 5, 10].forEach(function (n) { var b = btn('tab', n + 'まい', function () { pst.n = n; genSets = null; renderPrint(); }); b.setAttribute('aria-pressed', String(pst.n === n)); nrow.appendChild(b); });
       nrow.appendChild(btn('btn sm', genSets ? 'べつの もんだいで 作りなおす' : '作る', function () { genSets = buildGenSets(u, pst.n, rng((Date.now() & 0x7fffffff))); renderPrint(); }));
       c.appendChild(nrow);
+    }
+    if (pst.src === 'kanji') {
+      var ktabs = el('div', 'tabs inpage'); ktabs.style.cssText = 'margin:12px 0 0; flex-wrap:wrap';
+      var allb = btn('tab', 'ぜんぶ（16まい）', function () { pst.kg = 'all'; renderPrint(); }); allb.setAttribute('aria-pressed', String(pst.kg === 'all')); ktabs.appendChild(allb);
+      KANJI.forEach(function (g) { var b = btn('tab', g.name, function () { pst.kg = g.id; renderPrint(); }); b.setAttribute('aria-pressed', String((pst.kg || kgroup().id) === g.id)); ktabs.appendChild(b); });
+      c.appendChild(ktabs);
     }
     var opt = el('div', 'opt-row');
     var lab = el('label'); var cb = el('input'); cb.type = 'checkbox'; cb.checked = pst.ans;
@@ -1494,6 +1590,7 @@
     if (pst.src === 'weak' && lastWeakItems) return [{ title: 'にがて れんしゅう', no: 'にがて', items: lastWeakItems }];
     if (pst.src === 'daily' && lastDailyItems) return [{ title: '2年　文しょうだい　きょうの 5問', no: unitById(dst.unit).name, items: lastDailyItems }];
     if (pst.src === 'gen') return genSets || [];
+    if (pst.src === 'kanji') return (pst.kg === 'all' ? KANJI : [KANJI.filter(function (g) { return g.id === (pst.kg || kgroup().id); })[0] || KANJI[0]]).map(function (g) { return { kind: 'kanji', g: g }; });
     var t = allTests()[Math.min(pst.t, allTests().length - 1)], sh = t.sheets[pst.s];
     return [{ title: '2年　文しょうだい　れんしゅう（' + t.label + '）', no: 'No.' + sh.n, items: sh.qs.map(function (q) { return { q: q }; }) }];
   }
@@ -1501,8 +1598,8 @@
     var a = $('printArea'), sets = currentPrintSets();
     a.innerHTML = '';
     if (!sets.length) { a.appendChild(el('p', 'muted', '「作る」を おすと、ここに プリントが 出ます。')); return; }
-    sets.forEach(function (set) { a.appendChild(buildPSheet(set.title, set.no, set.items)); });
-    if (pst.ans) buildAnswerSheets(sets).forEach(function (pg) { a.appendChild(pg); });
+    sets.forEach(function (set) { a.appendChild(set.kind === 'kanji' ? buildKanjiSheet(set.g) : buildPSheet(set.title, set.no, set.items)); });
+    if (pst.ans) buildAnswerSheets(sets.filter(function (x) { return !x.kind; })).forEach(function (pg) { a.appendChild(pg); });
     fitPreview();
   }
   function fitPreview() {
@@ -1523,13 +1620,17 @@
   var QS = (location.search || '').replace(/^\?/, '').split('&').reduce(function (m, kv) { var i = kv.indexOf('='); if (i > 0) m[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); return m; }, {});
   if (QS.gen) {
     var gr = rng(parseInt(QS.seed, 10) || 12345), gn = Math.max(1, Math.min(20, parseInt(QS.n, 10) || 10));
-    if (QS.gen.indexOf('keys:') === 0) {
+    if (QS.gen.indexOf('kanji') === 0) {
+      var kg = QS.gen.split(':')[1] || 'all';
+      pst.src = 'kanji'; pst.kg = kg === 'all' ? 'all' : kg; genSets = null;
+    } else if (QS.gen.indexOf('keys:') === 0) {
       var ks = QS.gen.slice(5).split(',').filter(function (k) { return GEN[k]; });
       genSets = []; for (var gi = 0; gi < gn; gi++) genSets.push({ title: '2年　文しょうだい　れんしゅう', no: 'No.' + (gi + 1), items: makeSet(ks, 5, gr) });
     } else {
       genSets = buildGenSets(unitById(QS.gen), gn, gr);
     }
-    pst.src = 'gen'; pst.unit = QS.gen; pst.n = gn; pst.ans = QS.ans === '1';
+    if (pst.src !== 'kanji') { pst.src = 'gen'; pst.unit = QS.gen; pst.n = gn; }
+    pst.ans = QS.ans === '1';
   }
 
   // ---------- scan: テストの 写真 → 読み取り（Claude）→ ページ ----------
@@ -1777,6 +1878,119 @@
   window.__suzuDev = { createPage: createPage, confirm: function (r) { scan.result = r; scan.step = 'confirm'; show('scan'); renderScan(); },
     charSVG: function (o) { return charSVG(o); }, game: function () { return game; }, addXp: function (n) { var ev = gameEvent(n, {}); save(); return ev; } };
 
+  // ---------- かんじ（2年 160字） ----------
+  var KANJI = [{"id":"g1","name":"かず と とき","rows":[["何","なに・なん／カ","何","なに","何を 食べる？","何人","なんにん","何人 いますか。"],["回","カイ／まわ（る）","三回","さんかい","三回 まわる。","回る","まわる","こまが 回る。"],["間","カン／あいだ・ま","時間","じかん","時間を はかる。","間","あいだ","木と 木の 間。"],["今","コン／いま","今","いま","今 なん時？","今日","きょう","今日は 晴れ。"],["週","シュウ","一週間","いっしゅうかん","一週間 まつ。","来週","らいしゅう","来週 あそぼう。"],["時","ジ／とき","三時","さんじ","三時に おやつ。","時","とき","その 時 ベルが なった。"],["分","フン・ブン／わ（ける）","五分","ごふん","五分 まつ。","分ける","わける","二つに 分ける。"],["半","ハン","半分","はんぶん","半分に 切る。","三時半","さんじはん","三時半に かえる。"],["毎","マイ","毎日","まいにち","毎日 あるく。","毎朝","まいあさ","毎朝 牛にゅうを のむ。"],["曜","ヨウ","日曜日","にちようび","日曜日は おやすみ。","月曜日","げつようび","月曜日に 学校へ 行く。"]]},{"id":"g2","name":"かぞく と ひと","rows":[["父","フ／ちち","父","ちち","父と つりに 行く。","お父さん","おとうさん","お父さんの くつ。"],["母","ボ／はは","母","はは","母の 手。","お母さん","おかあさん","お母さんと 買いもの。"],["兄","ケイ／あに","兄","あに","兄は 五年生。","お兄さん","おにいさん","お兄さんは 足が はやい。"],["姉","シ／あね","姉","あね","姉と ケーキを 作る。","お姉さん","おねえさん","お姉さんの ピアノ。"],["弟","テイ／おとうと","弟","おとうと","弟と あそぶ。","兄弟","きょうだい","三人 兄弟です。"],["妹","マイ／いもうと","妹","いもうと","妹は 一年生。","姉妹","しまい","なかよし 姉妹。"],["友","ユウ／とも","友だち","ともだち","友だちと 帰る。","親友","しんゆう","たいせつな 親友。"],["親","シン／おや","親","おや","親に 話す。","親切","しんせつ","親切な 人。"],["自","ジ／みずか（ら）","自分","じぶん","自分で やる。","自てん車","じてんしゃ","自てん車に のる。"],["家","カ／いえ・や","家","いえ","家に 帰る。","家ぞく","かぞく","家ぞくで 出かける。"]]},{"id":"g3","name":"がっこう","rows":[["教","キョウ／おし（える）","教える","おしえる","道を 教える。","教室","きょうしつ","教室に 入る。"],["室","シツ","図書室","としょしつ","図書室で 本を よむ。","室内","しつない","室内で あそぶ。"],["図","ズ・ト","図","ず","図を かく。","図書","としょ","図書の 時間。"],["書","ショ／か（く）","書く","かく","字を 書く。","読書","どくしょ","読書が すき。"],["読","ドク／よ（む）","読む","よむ","本を 読む。","音読","おんどく","音読の しゅくだい。"],["記","キ","日記","にっき","日記を 書く。","記ろく","きろく","記ろくを とる。"],["計","ケイ／はか（る）","時計","とけい","時計を 見る。","計算","けいさん","計算する。"],["算","サン","算数","さんすう","算数の じゅぎょう。","足し算","たしざん","足し算を する。"],["数","スウ／かず・かぞ（える）","数","かず","数を かぞえる。","数える","かぞえる","はこを 数える。"],["答","トウ／こた（える）","答え","こたえ","答えを 書く。","答える","こたえる","大きな 声で 答える。"]]},{"id":"g4","name":"からだ と こころ","rows":[["体","タイ／からだ","体","からだ","体を あらう。","体いく","たいいく","体いくの 時間。"],["頭","トウ／あたま","頭","あたま","頭を さげる。","先頭","せんとう","れつの 先頭。"],["顔","ガン／かお","顔","かお","顔を あらう。","顔色","かおいろ","顔色が いい。"],["首","シュ／くび","首","くび","首を ふる。","手首","てくび","手首を まわす。"],["毛","モウ／け","毛","け","ねこの 毛。","毛糸","けいと","毛糸の ぼうし。"],["声","セイ／こえ","声","こえ","大きな 声。","歌声","うたごえ","きれいな 歌声。"],["心","シン／こころ","心","こころ","心を こめる。","あん心","あんしん","これで あん心。"],["思","シ／おも（う）","思う","おもう","うれしいと 思う。","思い出","おもいで","夏の 思い出。"],["知","チ／し（る）","知る","しる","答えを 知る。","知らせ","しらせ","うれしい 知らせ。"],["考","コウ／かんが（える）","考える","かんがえる","よく 考える。","考え","かんがえ","いい 考え。"]]},{"id":"g5","name":"そら と てんき","rows":[["雲","ウン／くも","雲","くも","白い 雲。","雨雲","あまぐも","雨雲が 出る。"],["雪","セツ／ゆき","雪","ゆき","雪が ふる。","大雪","おおゆき","大雪に なる。"],["風","フウ／かぜ","風","かぜ","風が ふく。","台風","たいふう","台風が 来る。"],["星","セイ／ほし","星","ほし","星が 光る。","星空","ほしぞら","きれいな 星空。"],["晴","セイ／は（れる）","晴れ","はれ","今日は 晴れ。","晴天","せいてん","晴天が つづく。"],["光","コウ／ひかり・ひか（る）","光","ひかり","日の 光。","光る","ひかる","星が 光る。"],["海","カイ／うみ","海","うみ","海で およぐ。","海水","かいすい","海水は しょっぱい。"],["池","チ／いけ","池","いけ","池の こい。","電池","でんち","電池を 入れる。"],["谷","コク／たに","谷","たに","谷を 下る。","谷川","たにがわ","谷川の 水。"],["岩","ガン／いわ","岩","いわ","大きな 岩。","岩山","いわやま","岩山に のぼる。"]]},{"id":"g6","name":"きせつ と いきもの","rows":[["春","シュン／はる","春","はる","春が 来た。","春休み","はるやすみ","春休みの よてい。"],["夏","カ／なつ","夏","なつ","夏は あつい。","夏休み","なつやすみ","夏休みに 海へ 行く。"],["秋","シュウ／あき","秋","あき","秋の 空。","秋風","あきかぜ","秋風が ふく。"],["冬","トウ／ふゆ","冬","ふゆ","冬は さむい。","冬休み","ふゆやすみ","冬休みに 雪あそび。"],["朝","チョウ／あさ","朝","あさ","朝 おきる。","朝食","ちょうしょく","朝食を 食べる。"],["昼","チュウ／ひる","昼","ひる","昼に なる。","昼休み","ひるやすみ","昼休みに あそぶ。"],["夜","ヤ／よる・よ","夜","よる","夜は くらい。","夜中","よなか","夜中に 目が さめる。"],["鳥","チョウ／とり","鳥","とり","鳥が とぶ。","小鳥","ことり","小鳥が なく。"],["魚","ギョ／さかな","魚","さかな","魚を つる。","金魚","きんぎょ","金魚を かう。"],["馬","バ／うま","馬","うま","馬が はしる。","馬車","ばしゃ","馬車に のる。"]]},{"id":"g7","name":"いろ と かたち","rows":[["黄","オウ／き","黄色","きいろ","黄色の クレヨン。","黄色い","きいろい","黄色い 花が さく。"],["黒","コク／くろ","黒い","くろい","黒い ねこ。","黒ばん","こくばん","黒ばんに 書く。"],["色","ショク／いろ","色","いろ","すきな 色。","色紙","いろがみ","色紙を おる。"],["丸","ガン／まる（い）","丸","まる","丸を つける。","丸い","まるい","丸い ボール。"],["形","ケイ／かたち","形","かたち","ほしの 形。","人形","にんぎょう","人形で あそぶ。"],["角","カク／かど・つの","角","かど","道の 角を まがる。","三角","さんかく","三角の 形。"],["線","セン","線","せん","線を ひく。","直線","ちょくせん","直線を かく。"],["点","テン","点","てん","点を つなぐ。","百点","ひゃくてん","テストで 百点。"],["太","タイ／ふと（い）","太い","ふとい","太い 木。","太る","ふとる","ねこが 太る。"],["細","サイ／ほそ（い）・こま（かい）","細い","ほそい","細い 道。","細かい","こまかい","細かい すな。"]]},{"id":"g8","name":"ほうこう","rows":[["東","トウ／ひがし","東","ひがし","東から 日が のぼる。","東京","とうきょう","東京に 行く。"],["西","セイ／にし","西","にし","西に 日が しずむ。","西日","にしび","西日が あたる。"],["南","ナン／みなみ","南","みなみ","南の 国。","南風","みなみかぜ","あたたかい 南風。"],["北","ホク／きた","北","きた","北を 見る。","北風","きたかぜ","北風が つめたい。"],["前","ゼン／まえ","前","まえ","前を 見る。","午前","ごぜん","午前中に あそぶ。"],["後","ゴ／あと・うし（ろ）","後ろ","うしろ","後ろを ふりむく。","午後","ごご","午後から 雨。"],["内","ナイ／うち","内がわ","うちがわ","はこの 内がわ。","校内","こうない","校内を あるく。"],["外","ガイ／そと","外","そと","外で あそぶ。","外国","がいこく","外国の 人。"],["高","コウ／たか（い）","高い","たかい","高い 山。","高学年","こうがくねん","高学年の お兄さん。"],["広","コウ／ひろ（い）","広い","ひろい","広い こうえん。","広場","ひろば","広場に あつまる。"]]},{"id":"g9","name":"まち","rows":[["市","シ／いち","市","し","わたしの 市。","市場","いちば","市場で 魚を 買う。"],["京","キョウ・ケイ","東京","とうきょう","東京の タワー。","京風","きょうふう","京風の あじ。"],["園","エン／その","公園","こうえん","公園で あそぶ。","花園","はなぞの","きれいな 花園。"],["寺","ジ／てら","寺","てら","古い 寺。","山寺","やまでら","山寺に のぼる。"],["店","テン／みせ","店","みせ","店で 買う。","書店","しょてん","書店で 本を 買う。"],["社","シャ／やしろ","会社","かいしゃ","父の 会社。","じん社","じんじゃ","じん社に おまいり。"],["場","ジョウ／ば","場しょ","ばしょ","あつまる 場しょ。","会場","かいじょう","会場に 入る。"],["道","ドウ／みち","道","みち","道を あるく。","車道","しゃどう","車道に 出ない。"],["通","ツウ／とお（る）・かよ（う）","通る","とおる","トンネルを 通る。","通学","つうがく","通学の 道。"],["門","モン／かど","門","もん","学校の 門。","正門","せいもん","正門から 入る。"]]},{"id":"g10","name":"たべもの と かいもの","rows":[["米","ベイ／こめ","米","こめ","米を とぐ。","白米","はくまい","白米を たく。"],["麦","バク／むぎ","麦","むぎ","麦の はたけ。","麦茶","むぎちゃ","麦茶を のむ。"],["肉","ニク","肉","にく","肉を やく。","牛肉","ぎゅうにく","牛肉の カレー。"],["茶","チャ・サ","お茶","おちゃ","お茶を 入れる。","茶色","ちゃいろ","茶色の いぬ。"],["食","ショク／た（べる）","食べる","たべる","ごはんを 食べる。","食じ","しょくじ","食じの じかん。"],["買","バイ／か（う）","買う","かう","パンを 買う。","買いもの","かいもの","買いものに 行く。"],["売","バイ／う（る）","売る","うる","やさいを 売る。","売り場","うりば","おもちゃ 売り場。"],["万","マン","一万円","いちまんえん","一万円 さつ。","百万","ひゃくまん","百万の 星。"],["戸","コ／と","戸","と","戸を しめる。","雨戸","あまど","雨戸を あける。"],["番","バン","一番","いちばん","一番 はやい。","番ごう","ばんごう","番ごうを よぶ。"]]},{"id":"g11","name":"うごき ①","rows":[["行","コウ・ギョウ／い（く）","行く","いく","学校へ 行く。","りょ行","りょこう","りょ行に 出かける。"],["来","ライ／く（る）","来る","くる","バスが 来る。","来年","らいねん","来年 三年生。"],["帰","キ／かえ（る）","帰る","かえる","家に 帰る。","帰り道","かえりみち","学校の 帰り道。"],["歩","ホ／ある（く）","歩く","あるく","道を 歩く。","歩道","ほどう","歩道を わたる。"],["走","ソウ／はし（る）","走る","はしる","校ていを 走る。","走り高とび","はしりたかとび","走り高とびの れんしゅう。"],["止","シ／と（まる）","止まる","とまる","車が 止まる。","中止","ちゅうし","雨で 中止。"],["引","イン／ひ（く）","引く","ひく","つなを 引く。","引き算","ひきざん","引き算を する。"],["切","セツ／き（る）","切る","きる","紙を 切る。","大切","たいせつ","大切な 本。"],["作","サク／つく（る）","作る","つくる","ケーキを 作る。","作文","さくぶん","作文を 書く。"],["交","コウ／まじ（わる）","交わる","まじわる","道が 交わる。","交通","こうつう","交通ルール。"]]},{"id":"g12","name":"うごき ②","rows":[["会","カイ／あ（う）","会う","あう","友だちに 会う。","会話","かいわ","たのしい 会話。"],["合","ゴウ／あ（う）","合わせる","あわせる","手を 合わせる。","合計","ごうけい","合計を 出す。"],["当","トウ／あ（たる）","当たる","あたる","ボールが 当たる。","当番","とうばん","そうじ当番。"],["活","カツ","生活","せいかつ","生活の きまり。","活やく","かつやく","しあいで 活やく。"],["楽","ガク・ラク／たの（しい）","楽しい","たのしい","楽しい 一日。","音楽","おんがく","音楽の 時間。"],["歌","カ／うた","歌","うた","歌を うたう。","歌う","うたう","みんなで 歌う。"],["鳴","メイ／な（く）","鳴く","なく","鳥が 鳴く。","鳴る","なる","ベルが 鳴る。"],["聞","ブン／き（く）","聞く","きく","話を 聞く。","新聞","しんぶん","新聞を 読む。"],["言","ゲン／い（う）","言う","いう","ありがとうと 言う。","一言","ひとこと","一言 話す。"],["話","ワ／はな（す）","話す","はなす","先生と 話す。","電話","でんわ","電話を かける。"]]},{"id":"g13","name":"どうぐ と のりもの","rows":[["汽","キ","汽車","きしゃ","汽車に のる。","汽てき","きてき","汽てきが 鳴る。"],["船","セン／ふね","船","ふね","船に のる。","風船","ふうせん","風船が とぶ。"],["電","デン","電気","でんき","電気を つける。","電車","でんしゃ","電車で 行く。"],["弓","キュウ／ゆみ","弓","ゆみ","弓を ひく。","弓矢","ゆみや","弓矢で まとを ねらう。"],["矢","シ／や","矢","や","矢が とぶ。","矢じるし","やじるし","矢じるしの ほうこう。"],["刀","トウ／かたな","刀","かたな","むかしの 刀。","小刀","こがたな","小刀で けずる。"],["紙","シ／かみ","紙","かみ","紙を おる。","手紙","てがみ","手紙を 書く。"],["絵","カイ・エ","絵","え","絵を かく。","絵本","えほん","絵本を 読む。"],["画","ガ・カク","画用紙","がようし","画用紙に かく。","計画","けいかく","計画を たてる。"],["台","ダイ・タイ","台","だい","台に のる。","台どころ","だいどころ","台どころで りょうり。"]]},{"id":"g14","name":"くに と とち","rows":[["国","コク／くに","国","くに","日本の 国。","国語","こくご","国語の じゅぎょう。"],["里","リ／さと","里","さと","山の 里。","里いも","さといも","里いもの にもの。"],["野","ヤ／の","野原","のはら","野原を 走る。","野さい","やさい","野さいを 食べる。"],["原","ゲン／はら","原っぱ","はらっぱ","原っぱで あそぶ。","高原","こうげん","高原の 空気。"],["地","チ・ジ","地めん","じめん","地めんに すわる。","地図","ちず","地図を 見る。"],["方","ホウ／かた","方","ほう","右の 方。","夕方","ゆうがた","夕方に 帰る。"],["元","ゲン・ガン／もと","元気","げんき","元気に あいさつ。","元","もと","元の 場しょ。"],["公","コウ","公園","こうえん","公園の ベンチ。","公立","こうりつ","公立の 学校。"],["工","コウ・ク","工作","こうさく","工作の 時間。","工場","こうじょう","工場を 見学。"],["理","リ","理科","りか","理科の じっけん。","りょう理","りょうり","りょう理を 作る。"]]},{"id":"g15","name":"ようす","rows":[["強","キョウ／つよ（い）","強い","つよい","強い 風。","強弱","きょうじゃく","音の 強弱。"],["弱","ジャク／よわ（い）","弱い","よわい","弱い 火。","弱点","じゃくてん","弱点を なおす。"],["明","メイ／あか（るい）","明るい","あかるい","明るい へや。","明日","あした","明日は 遠足。"],["新","シン／あたら（しい）","新しい","あたらしい","新しい くつ。","新年","しんねん","新年の あいさつ。"],["古","コ／ふる（い）","古い","ふるい","古い 本。","中古","ちゅうこ","中古の 自てん車。"],["直","チョク／なお（す）","直す","なおす","まちがいを 直す。","正直","しょうじき","正直に 言う。"],["同","ドウ／おな（じ）","同じ","おなじ","同じ 色。","同時","どうじ","同時に 走る。"],["多","タ／おお（い）","多い","おおい","人が 多い。","多数","たすう","多数の 手が あがる。"],["少","ショウ／すく（ない）・すこ（し）","少ない","すくない","水が 少ない。","少し","すこし","少し まつ。"],["長","チョウ／なが（い）","長い","ながい","長い ひも。","校長","こうちょう","校長先生の 話。"]]},{"id":"g16","name":"そのほか","rows":[["遠","エン／とお（い）","遠い","とおい","遠い 町。","遠足","えんそく","遠足に 行く。"],["近","キン／ちか（い）","近い","ちかい","家から 近い。","近じょ","きんじょ","近じょの 人。"],["科","カ","科学","かがく","科学の 本。","教科書","きょうかしょ","教科書を ひらく。"],["午","ゴ","午前","ごぜん","午前 十時。","正午","しょうご","正午の チャイム。"],["語","ゴ／かた（る）","語る","かたる","むかし話を 語る。","日本語","にほんご","日本語で 話す。"],["牛","ギュウ／うし","牛","うし","牛が 草を 食べる。","牛にゅう","ぎゅうにゅう","牛にゅうを のむ。"],["羽","ウ／はね・は","羽","はね","鳥の 羽。","一羽","いちわ","一羽の すずめ。"],["組","ソ／くみ","組","くみ","二年一組。","組む","くむ","うでを 組む。"],["用","ヨウ／もち（いる）","用","よう","用が ある。","用紙","ようし","用紙に 名前を 書く。"],["才","サイ","八才","はっさい","八才に なる。","天才","てんさい","天才だね！"]]}];
+  var KMAP = {}; KANJI.forEach(function (g) { g.rows.forEach(function (r) { KMAP[r[0]] = { k: r[0], y: r[1], words: [[r[2], r[3], r[4]], [r[5], r[6], r[7]]], g: g.id }; }); });
+  var KALL = Object.keys(KMAP);
+  var kst = { g: null }; try { kst.g = localStorage.getItem('suzu.kg'); } catch (e) {}
+  function kgroup() { return KANJI.filter(function (g) { return g.id === kst.g; })[0] || KANJI[0]; }
+  function kstat(k) { return recs._types['k_' + k] || { ok: 0, ng: 0 }; }
+  function kmastered(k) { var st = kstat(k); return st.ok >= 3 && st.ok / (st.ok + st.ng) >= 0.8; }
+  function kweakList() { return KALL.filter(function (k) { var st = kstat(k); return st.ng > 0 && st.ng >= st.ok; }).sort(function (a, b) { var x = kstat(a), y = kstat(b); return (y.ng - y.ok) - (x.ng - x.ok); }); }
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function hl(sent, word, repl) { return esc(sent).replace(esc(word), '<b class="hl">' + esc(repl || word) + '</b>'); }
+  function uniq(a) { var seen = {}, o = []; a.forEach(function (x) { if (!seen[x]) { seen[x] = 1; o.push(x); } }); return o; }
+  function kItem(k, kind, r) {
+    r = r || R; var e = KMAP[k], w = ch(r, e.words), q;
+    if (kind === 'yomi') {
+      var pool = []; KANJI.forEach(function (g) { g.rows.forEach(function (row) { [[row[2], row[3]], [row[5], row[6]]].forEach(function (x) { if (x[1] !== w[1]) pool.push(x[1]); }); }); });
+      var near = pool.filter(function (y) { return Math.abs(y.length - w[1].length) <= 1; });
+      var opts = uniq(shuffle(near.length >= 3 ? near : pool)).slice(0, 3).concat([w[1]]);
+      q = { html: hl(w[2], w[0]) + '<span class="kq">「' + esc(w[0]) + '」の よみかたは？</span>', pad: 'none', s: [e.k + '　' + e.y], ans: { k: 'choice', opts: shuffle(opts), pick: w[1] } };
+    } else if (kind === 'kaki') {
+      var pool2 = [], near2 = [], grp = KANJI.filter(function (g) { return g.id === e.g; })[0];
+      KANJI.forEach(function (g) { g.rows.forEach(function (row) { [row[2], row[5]].forEach(function (x) { if (x !== w[0]) pool2.push(x); }); }); });
+      grp.rows.forEach(function (row) { [row[2], row[5]].forEach(function (x) { if (x !== w[0] && Math.abs(x.length - w[0].length) <= 1) near2.push(x); }); });
+      var opts2 = uniq(shuffle(near2.length >= 3 ? near2 : pool2)).slice(0, 3).concat([w[0]]);
+      q = { html: hl(w[2], w[0], w[1]) + '<span class="kq">「' + esc(w[1]) + '」を 漢字で 書くと？　先に ますに 書いてみよう</span>', pad: 'kanji', s: [e.k + '　' + e.y], ans: { k: 'choice', big: true, opts: shuffle(opts2), pick: w[0] } };
+    } else if (kind === 'trace') {
+      q = { html: '<span class="kbig">' + esc(e.k) + '</span><span class="kread">' + esc(e.y) + '</span><span class="kex">' + esc(w[0]) + '（' + esc(w[1]) + '）　' + esc(w[2]) + '</span>', pad: 'kanji', model: e.k, s: [e.k + '　' + e.y], ans: { k: 'self', trace: true, answer: e.k } };
+    } else {
+      q = { html: hl(w[2], w[0], w[1]) + '<span class="kq">「' + esc(w[1]) + '」を 漢字で 書こう</span>', pad: 'kanji', s: [e.k + '　' + e.y], ans: { k: 'self', answer: w[0], reveal: '<span class="kbig">' + esc(w[0]) + '</span><span class="kread">' + esc(w[1]) + '</span>' } };
+    }
+    q.t = w[2];
+    return { q: q, key: 'k_' + k, ref: 'k/' + k + '/' + kind + '/' + Math.floor(r() * 1e9) };
+  }
+  var KINDS = [['yomi', 'よみ（4たく）', '読みかたを えらぶ'], ['kaki', 'かき（4たく）', '漢字を えらぶ'], ['trace', 'なぞり書き', 'うすい 字を なぞって、あいた ますに 書く'], ['kakitori', 'かきとり', '手で 書いて、こたえを 見て じぶんで ○✗']];
+  function renderKanji() {
+    var box = $('kintro'); box.hidden = false; box.innerHTML = ''; $('kqs').innerHTML = ''; $('kresult').innerHTML = '';
+    cur = null; $('bar').hidden = true;
+    var g = kgroup(), p = el('div', 'panel');
+    p.appendChild(el('h3', null, 'どの グループを やる？'));
+    var tabs = el('div', 'tabs inpage'); tabs.style.cssText = 'flex-wrap:wrap; margin:0 0 12px';
+    KANJI.forEach(function (gg, i) {
+      var done = gg.rows.filter(function (r) { return kmastered(r[0]); }).length;
+      var b = btn('tab', (i + 1) + ' ' + gg.name + (done ? '　' + done + '/10' : ''), function () { kst.g = gg.id; try { localStorage.setItem('suzu.kg', gg.id); } catch (e) {} renderKanji(); });
+      b.setAttribute('aria-pressed', String(gg.id === g.id)); tabs.appendChild(b);
+    });
+    p.appendChild(tabs);
+    var tiles = el('div', 'ktiles');
+    g.rows.forEach(function (r) {
+      var st = kstat(r[0]), t = btn('ktile' + (kmastered(r[0]) ? ' ok' : st.ng > 0 && st.ng >= st.ok ? ' ng' : ''), null, function () { openKanji(r[0]); });
+      t.appendChild(el('span', 'kt', r[0])); t.appendChild(el('span', 'kt-y', r[1].split('／')[1] || r[1].split('／')[0]));
+      tiles.appendChild(t);
+    });
+    p.appendChild(tiles);
+    p.appendChild(el('p', 'muted', '字を タップすると、よみ・ことば・なぞり書きが 出ます。'));
+    box.appendChild(p);
+
+    var mp = el('div', 'panel');
+    mp.appendChild(el('h3', null, 'れんしゅうの しかた'));
+    var acts = el('div', 'accs');
+    KINDS.forEach(function (kd) {
+      var b = btn('acc', null, function () { startKanji(kd[0]); });
+      b.appendChild(el('span', null, kd[1])); b.appendChild(el('small', null, kd[2])); acts.appendChild(b);
+    });
+    var wk = kweakList();
+    var wb = btn('acc' + (wk.length ? '' : ' lock'), null, function () { if (wk.length) startKanji('weak'); });
+    wb.appendChild(el('span', null, 'にがてな 漢字')); wb.appendChild(el('small', null, wk.length ? wk.length + '字　' + wk.slice(0, 8).join(' ') : 'まちがえた 字が ここに たまる'));
+    acts.appendChild(wb);
+    mp.appendChild(acts);
+    box.appendChild(mp);
+  }
+  function openKanji(k) {
+    var e = KMAP[k], box = $('kintro'); box.innerHTML = '';
+    var p = el('div', 'panel kdetail');
+    p.appendChild(html('div', 'kbig', esc(e.k)));
+    p.appendChild(el('div', 'kread', e.y));
+    var st = kstat(k); p.appendChild(el('p', 'muted', st.ok + st.ng ? 'これまで ' + (st.ok + st.ng) + '回中 ' + st.ok + '回 せいかい' + (kmastered(k) ? '　✓ おぼえた' : '') : 'まだ れんしゅうして いない'));
+    e.words.forEach(function (w) { p.appendChild(html('p', 'kex', '<b>' + esc(w[0]) + '</b>（' + esc(w[1]) + '）　' + hl(w[2], w[0]))); });
+    var acts = el('div', 'actions');
+    acts.appendChild(btn('btn sm', 'この 字を なぞる', function () { startKanji('trace', [k]); }));
+    acts.appendChild(btn('btn sm ghost', 'もどる', function () { renderKanji(); }));
+    p.appendChild(acts); box.appendChild(p); window.scrollTo(0, 0);
+  }
+  function startKanji(kind, keys, items) {
+    var g = kgroup();
+    if (!keys) {
+      if (kind === 'weak') { keys = kweakList().slice(0, 10); while (keys.length < 5) { var extra = ch(R, KALL); if (keys.indexOf(extra) < 0) keys.push(extra); } }
+      else keys = g.rows.map(function (r) { return r[0]; });
+    }
+    items = items || shuffle(keys.slice()).map(function (k) { return kItem(k, kind === 'weak' ? ch(R, ['yomi', 'kaki']) : kind); });
+    $('kintro').hidden = true;
+    var tag = String(Date.now());
+    startSet({
+      view: 'kanji', mode: 'kanji', unit: g.id, keys: keys.map(function (k) { return 'k_' + k; }), items: items, box: $('kqs'), result: $('kresult'), tag: tag,
+      nextLabel: function () { return kind === 'weak' ? 'にがてを もう一度 →' : 'べつの ことばで もう一度 →'; },
+      next: function () { startKanji(kind, kind === 'weak' ? null : keys); },
+      again: function () { dropPads('kanji/' + tag + '/'); startKanji(kind, keys, items.map(function (it) { return { q: it.q, key: it.key, ref: it.ref }; })); }
+    });
+    show('kanji');
+  }
+  function buildKanjiSheet(g) {
+    var sh = el('div', 'psheet kanji'), idx = KANJI.indexOf(g) + 1;
+    var head = el('div', 'head'); head.appendChild(el('h2', 'ttl', '2年　かんじ　れんしゅう（' + g.name + '）')); head.appendChild(el('div', 'no', 'No.' + idx)); sh.appendChild(head);
+    sh.appendChild(html('div', 'meta', '日づけ　<span class="fill d">&nbsp;</span>月<span class="fill d">&nbsp;</span>日<span style="flex:1;display:flex;align-items:baseline;gap:2mm">なまえ　<span class="fill nm">&nbsp;</span></span>'));
+    var rows = el('div', 'krows');
+    g.rows.forEach(function (r) {
+      var row = el('div', 'krow');
+      row.innerHTML = '<div class="ksqp model">' + esc(r[0]) + '</div><div class="kinfo"><b>' + esc(r[1]) + '</b><span>' + esc(r[2]) + '（' + esc(r[3]) + '）' + esc(r[4]) + '</span><span>' + esc(r[5]) + '（' + esc(r[6]) + '）' + esc(r[7]) + '</span></div><div class="ksqp faint">' + esc(r[0]) + '</div><div class="ksqp"></div><div class="ksqp"></div><div class="ksqp"></div>';
+      rows.appendChild(row);
+    });
+    sh.appendChild(rows);
+    return sh;
+  }
+
   // ---------- game: ポイント・レベル・もくひょう・スタンプ・メダル・なかま・マイルーム ----------
   var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20 };
   var LEVEL_NEED = 100;
@@ -1832,7 +2046,7 @@
   ];
   function levelOf() { var xp = game ? game.xp : 0, lv = Math.min(99, Math.floor(xp / LEVEL_NEED) + 1); return { level: lv, into: xp - (lv - 1) * LEVEL_NEED, need: LEVEL_NEED }; }
   function stageOf(level) { var st = 0; STAGES.forEach(function (x, i) { if (level >= x[1]) st = i; }); return st; }
-  function isSetLog(e) { return (e.mode === 'sheet' || e.mode === 'daily' || e.mode === 'weak') && (e.total || 0) >= 5; }
+  function isSetLog(e) { return (e.mode === 'sheet' || e.mode === 'daily' || e.mode === 'weak' || e.mode === 'kanji') && (e.total || 0) >= 5; }
   function weekKey(d) { var x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return dayKey(x.toISOString()); }
   function sheetsOnDay(k) { var n = 0; recs._log.forEach(function (e) { if (isSetLog(e) && dayKey(e.at) === k) n++; }); return n; }
   function weekStats(d) {
@@ -1904,8 +2118,9 @@
   function gameAfterSet(o, score) {
     var lines = [], answered = 0, correct = 0;
     o.items.forEach(function (it) { if (it.answered) answered++; if (it.ok) correct++; });
-    lines.push(['こたえた ' + answered + '問', answered * XP.attempt]);
-    if (correct) lines.push(['せいかい ' + correct + '問', correct * (XP.correct + (o.mode === 'weak' ? XP.weakBonus : 0))]);
+    var wA = o.mode === 'kanji' ? 1 : XP.attempt, wC = o.mode === 'kanji' ? 2 : XP.correct + (o.mode === 'weak' ? XP.weakBonus : 0);
+    lines.push(['こたえた ' + answered + '問', answered * wA]);
+    if (correct) lines.push(['せいかい ' + correct + '問', correct * wC]);
     var perfect = o.items.length >= 5 && score === o.items.length;
     if (perfect) { lines.push(['パーフェクト！', XP.perfect]); game.perfects++; }
     game.sets++; if (o.mode === 'weak') game.weakSets++;
