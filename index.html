@@ -318,7 +318,8 @@
   .glines b{color:var(--ok-ink); font-variant-numeric:tabular-nums}
   .gtags{display:flex; flex-wrap:wrap; gap:6px; width:100%}
   .stp{display:flex; align-items:center; gap:10px; margin:8px 0}
-  .stp .lbl{font-family:var(--f-round); width:110px}
+  .stp{flex-wrap:wrap}
+  .stp .lbl{font-family:var(--f-round); width:152px; flex:none}
   .stp b{font-family:var(--f-round); font-size:18px; min-width:64px; text-align:center}
   .medal .mate{width:64px; height:64px; margin:0 auto 4px}
   .medal .mate .char{width:64px; height:64px}
@@ -492,6 +493,18 @@
     .welbody{gap:10px}
     .wel .char{width:64px; height:64px}
   }
+
+  /* クエストを えらぶ・親の設定 */
+  .qpick{margin:8px 0 2px; padding:10px 10px 12px; border-radius:14px; background:var(--ok-wash); border:1.5px dashed var(--ok-ink)}
+  .qpickhd{font-family:var(--f-round); font-size:15.5px; font-weight:700}
+  .qpickhd small{font-family:var(--f-kaku); font-weight:500; font-size:12px; color:var(--ink-soft); margin-left:6px}
+  .qpickgrid{display:grid; grid-template-columns:repeat(auto-fill, minmax(142px,1fr)); gap:8px; margin-top:8px}
+  .pk{display:flex; align-items:center; gap:8px; min-height:54px; padding:8px 10px; border:2px solid var(--rule); border-radius:12px; background:var(--paper); font-family:var(--f-round); font-size:14px; line-height:1.35; color:var(--ink); text-align:left}
+  .pk[aria-pressed="true"]{border-color:var(--shu); background:var(--shu-wash)}
+  .pk .pkic{font-size:21px; flex:none}
+  .qpickft{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:10px}
+  .grph{display:flex; justify-content:space-between; align-items:center; gap:10px; width:100%; padding:11px 2px 9px; background:none; border:0; border-top:1px solid var(--rule-soft); font-family:var(--f-round); font-size:16px; font-weight:700; color:var(--ink); text-align:left}
+  .grph small{font-family:var(--f-kaku); font-weight:500; font-size:12px; color:var(--ink-soft); flex:none}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -2200,9 +2213,10 @@
     ['wear', 'lessonsRead', 'wasWeak', 'mates', 'decor', 'goalsDone'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     if (!game.bonus) game.bonus = { days: {}, weeks: {} };
     if (!game.goals) goals();
-    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear'].forEach(function (k) { if (!game[k]) game[k] = {}; });
+    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear', 'qpick'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     if (!game.quests) { game.quests = { on: {}, custom: [] }; QUEST_DEFAULT.forEach(function (id) { game.quests.on[id] = 1; }); }
     if (!game.quests.custom) game.quests.custom = [];
+    game.quests.custom.forEach(function (cq) { if (!cq.grp) cq.grp = cq.cat === 'school' ? 'life' : 'help'; });   // v16までの じぶんで書いた ぶん
     bigGoal();
     if (typeof game.streakMax !== 'number') game.streakMax = streakFrom(game.stamps);
     rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
@@ -2432,26 +2446,77 @@
   }
 
   // ---------- クエスト: 学校・おうちの もくひょう、あいさつ＆おみくじ、ふりかえり、おおきな もくひょう ----------
+  var QGRPS = [
+    { id: 'study', ic: '📗', name: 'じゅぎょう', short: 'じゅぎょう', wd: 1 },
+    { id: 'life', ic: '🎒', name: '学校の せいかつ', short: '学校', wd: 1 },
+    { id: 'friend', ic: '🤝', name: 'ともだち', short: 'ともだち' },
+    { id: 'morning', ic: '🌅', name: 'あさ', short: 'あさ' },
+    { id: 'night', ic: '🌙', name: 'よる', short: 'よる' },
+    { id: 'help', ic: '🧹', name: 'おてつだい', short: 'おてつだい' },
+    { id: 'heart', ic: '💛', name: 'こころと からだ', short: 'こころ' }
+  ];
+  var QGRP = {}; QGRPS.forEach(function (g) { QGRP[g.id] = g; });
   var QUEST_PRESETS = [
-    { id: 's_hand', cat: 'school', ic: '🙋', text: '「はい」と 手を あげる' },
-    { id: 's_greet', cat: 'school', ic: '👋', text: '先生や ともだちに あいさつする' },
-    { id: 's_forget', cat: 'school', ic: '🎒', text: 'わすれものを しない' },
-    { id: 's_kind', cat: 'school', ic: '🤝', text: 'ともだちに やさしくする' },
-    { id: 's_lunch', cat: 'school', ic: '🍚', text: 'きゅうしょくを のこさず たべる' },
-    { id: 's_sit', cat: 'school', ic: '🪑', text: 'しせいよく すわる' },
-    { id: 's_listen', cat: 'school', ic: '👂', text: '先生の はなしを さいごまで きく' },
-    { id: 's_shoes', cat: 'school', ic: '👟', text: 'くつを そろえる' },
-    { id: 'h_ready', cat: 'home', ic: '🎽', text: 'じぶんで あさの したくを する' },
-    { id: 'h_help', cat: 'home', ic: '🍽️', text: 'おてつだいを する' },
-    { id: 'h_bed', cat: 'home', ic: '🌙', text: '9時までに ねる' },
-    { id: 'h_pack', cat: 'home', ic: '📚', text: 'あしたの じゅんびを する' },
-    { id: 'h_read', cat: 'home', ic: '📖', text: '本を 10ぷん よむ' },
-    { id: 'h_teeth', cat: 'home', ic: '🪥', text: 'はを みがく' },
-    { id: 'h_thanks', cat: 'home', ic: '💛', text: '「ありがとう」を いう' },
-    { id: 'h_tidy', cat: 'home', ic: '🧸', text: 'おもちゃを かたづける' }
+    { id: 's_hand', grp: 'study', ic: '🙋', text: '「はい」と 手を あげる' },
+    { id: 's_listen', grp: 'study', ic: '👂', text: '先生の はなしを さいごまで きく' },
+    { id: 's_sit', grp: 'study', ic: '🪑', text: 'しせいよく すわる' },
+    { id: 'q_write', grp: 'study', ic: '✏️', text: '字を ていねいに 書く' },
+    { id: 'q_ask', grp: 'study', ic: '❓', text: 'わからない ことを きく' },
+    { id: 'q_read', grp: 'study', ic: '📢', text: '音読を はっきり 読む' },
+    { id: 'q_check', grp: 'study', ic: '🔍', text: 'まちがいを 見なおす' },
+    { id: 'q_hw', grp: 'study', ic: '📝', text: 'しゅくだいを 出す' },
+    { id: 'q_note', grp: 'study', ic: '✒️', text: 'ノートを ていねいに 書く' },
+    { id: 's_greet', grp: 'life', ic: '👋', text: '先生や ともだちに あいさつする' },
+    { id: 's_forget', grp: 'life', ic: '🎒', text: 'わすれものを しない' },
+    { id: 's_lunch', grp: 'life', ic: '🍚', text: 'きゅうしょくを のこさず たべる' },
+    { id: 's_shoes', grp: 'life', ic: '👟', text: 'くつを そろえる' },
+    { id: 'q_clean', grp: 'life', ic: '🧽', text: 'そうじを がんばる' },
+    { id: 'q_time', grp: 'life', ic: '⏰', text: 'じかんを まもる' },
+    { id: 'q_walk', grp: 'life', ic: '🚶', text: 'ろうかは 歩く' },
+    { id: 'q_desk', grp: 'life', ic: '🗂', text: 'つくえの 中を きれいに' },
+    { id: 'q_hanky', grp: 'life', ic: '👝', text: 'ハンカチを もっていく' },
+    { id: 's_kind', grp: 'friend', ic: '🤝', text: 'ともだちに やさしくする' },
+    { id: 'q_help2', grp: 'friend', ic: '🙌', text: 'こまっている子を てつだう' },
+    { id: 'q_sorry', grp: 'friend', ic: '🙇', text: '「ごめんね」が いえる' },
+    { id: 'q_invite', grp: 'friend', ic: '🎈', text: '「いっしょに あそぼう」と いう' },
+    { id: 'q_turn', grp: 'friend', ic: '🔄', text: 'じゅんばんを まつ' },
+    { id: 'q_hear', grp: 'friend', ic: '🗣', text: 'ともだちの はなしを きく' },
+    { id: 'q_smile', grp: 'friend', ic: '😊', text: 'えがおで あいさつする' },
+    { id: 'h_ready', grp: 'morning', ic: '🎽', text: 'じぶんで あさの したくを する' },
+    { id: 'q_wake', grp: 'morning', ic: '⏰', text: 'じぶんで おきる' },
+    { id: 'q_bfast', grp: 'morning', ic: '🍞', text: 'あさごはんを ぜんぶ たべる' },
+    { id: 'q_face', grp: 'morning', ic: '🧼', text: 'かおを あらう' },
+    { id: 'q_hair', grp: 'morning', ic: '💁', text: 'かみを とかす' },
+    { id: 'q_bye', grp: 'morning', ic: '🚪', text: '「いってきます」と いう' },
+    { id: 'q_early', grp: 'morning', ic: '🕗', text: 'はやめに 家を 出る' },
+    { id: 'h_bed', grp: 'night', ic: '🌙', text: '9時までに ねる' },
+    { id: 'h_pack', grp: 'night', ic: '📚', text: 'あしたの じゅんびを する' },
+    { id: 'h_teeth', grp: 'night', ic: '🪥', text: 'はを みがく' },
+    { id: 'q_bath', grp: 'night', ic: '🛁', text: 'じぶんで からだを あらう' },
+    { id: 'q_bag', grp: 'night', ic: '🎒', text: 'ランドセルを かたづける' },
+    { id: 'q_talk', grp: 'night', ic: '💬', text: 'きょうの できごとを はなす' },
+    { id: 'q_cloth', grp: 'night', ic: '👕', text: 'ぬいだ ふくを かごに 入れる' },
+    { id: 'h_help', grp: 'help', ic: '🍽️', text: 'おてつだいを する' },
+    { id: 'h_tidy', grp: 'help', ic: '🧸', text: 'おもちゃを かたづける' },
+    { id: 'q_dish', grp: 'help', ic: '🍴', text: '食きを はこぶ' },
+    { id: 'q_table', grp: 'help', ic: '🧴', text: 'テーブルを ふく' },
+    { id: 'q_laundry', grp: 'help', ic: '👚', text: 'せんたくものを たたむ' },
+    { id: 'q_trash', grp: 'help', ic: '🗑', text: 'ゴミを 出す' },
+    { id: 'q_gshoes', grp: 'help', ic: '👞', text: 'げんかんの くつを そろえる' },
+    { id: 'q_pet', grp: 'help', ic: '🐾', text: 'ペットの おせわを する' },
+    { id: 'q_plant', grp: 'help', ic: '🌱', text: '花に 水を やる' },
+    { id: 'h_read', grp: 'heart', ic: '📖', text: '本を 10ぷん よむ' },
+    { id: 'h_thanks', grp: 'heart', ic: '💛', text: '「ありがとう」を いう' },
+    { id: 'q_play', grp: 'heart', ic: '🏃', text: '外で 30ぷん あそぶ' },
+    { id: 'q_drink', grp: 'heart', ic: '💧', text: '水を たくさん のむ' },
+    { id: 'q_stretch', grp: 'heart', ic: '🤸', text: 'ストレッチを する' },
+    { id: 'q_diary', grp: 'heart', ic: '🖊', text: '日きを 1行 書く' },
+    { id: 'q_music', grp: 'heart', ic: '🎹', text: 'ならいごとの れんしゅう' },
+    { id: 'q_kuku', grp: 'heart', ic: '🔢', text: '九九を となえる' },
+    { id: 'q_calm', grp: 'heart', ic: '😌', text: 'ゆっくり しんこきゅう' }
   ];
   var QUEST_DEFAULT = ['s_hand', 's_greet', 'h_ready', 'h_help'];   // さいしょから 出ている クエスト
-  var QCAT = { learn: 'ドリル', school: '学校', home: 'おうち' };
+  var QCAT = { learn: 'ドリル' }; QGRPS.forEach(function (g) { QCAT[g.id] = g.short; });
   var LUCKS = [['大吉', 3], ['中吉', 3], ['小吉', 2], ['吉', 2]];   // うんせい と 出やすさ（わるいのは 出ない）
   var LUCKY_COLORS = [['あか', '#e2574c'], ['あお', '#4d8fd6'], ['きいろ', '#f2c94c'], ['みどり', '#6cbf6c'], ['ピンク', '#f49ac1'], ['むらさき', '#c9a3ff'], ['オレンジ', '#ffb27a'], ['みずいろ', '#7ec8e3']];
   var LUCKY_ITEMS = ['えんぴつ', 'けしゴム', 'ハンカチ', 'くつした', 'ぼうし', 'ノート', 'コップ', 'ものさし', 'おりがみ', 'ふでばこ', 'すいとう', 'ティッシュ'];
@@ -2467,18 +2532,33 @@
   }
   function greet() { var h = new Date().getHours(); return h < 11 ? 'おはよう！' : h < 17 ? 'こんにちは！' : 'こんばんは！'; }
   function qday(map, k) { return map[k] || (map[k] = {}); }
-  function questDefs() {   // いま 出している クエスト（学校は 月〜金だけ）
+  function qxp() { return typeof game.qxp === 'number' ? game.qxp : XP.quest; }         // クエスト1つの ポイント（親が かえられる）
+  function allXp() { return typeof game.allXp === 'number' ? game.allXp : XP.allClear; }  // ぜんぶ クリアの ポイント
+  function okOn() { return game.okOn !== false; }                                          // 「おうちの人の ✓」を つかうか
+  function pickN() { return typeof game.pickN === 'number' ? game.pickN : 4; }             // 1日に 出す かず（0=ぜんぶ）
+  function questDefs() {   // いま 出している クエスト（学校の ものは 月〜金だけ）
     var q = game.quests, wd = new Date().getDay(), weekday = wd >= 1 && wd <= 5, out = [];
     QUEST_PRESETS.forEach(function (p) { if (q.on[p.id]) out.push(p); });
     q.custom.forEach(function (c) { out.push(c); });
-    return out.filter(function (d) { return d.cat !== 'school' || weekday; });
+    return out.filter(function (d) { var g = QGRP[d.grp]; return !(g && g.wd) || weekday || !!game.schoolAll; });
   }
+  function pickMode() { var n = pickN(); return n > 0 && questDefs().length > n; }   // えらぶ ほうしきに なるか
+  function pickIds(k) {   // その日 えらんだ もの（けされた ものは のぞく）
+    var pool = questDefs();
+    return (game.qpick[k] || []).filter(function (id) { return pool.some(function (d) { return d.id === id; }); });
+  }
+  function needPick(k) { return pickMode() && pickIds(k).length === 0; }
   function questState(k) {
-    var g = goals(), n = sheetsOnDay(k), done = game.qdone[k] || {}, ok = game.qok[k] || {};
-    var list = [{ id: 'learn', cat: 'learn', ic: '📘', text: 'ドリルを ' + g.day + 'まい とく', prog: Math.min(n, g.day) + ' / ' + g.day + 'まい', done: n >= g.day }];
-    questDefs().forEach(function (d) { list.push({ id: d.id, cat: d.cat, ic: d.ic, text: d.text, done: !!done[d.id], ok: !!ok[d.id] }); });
+    var g = goals(), n = sheetsOnDay(k), done = game.qdone[k] || {}, ok = game.qok[k] || {}, pool = questDefs();
+    var list = [{ id: 'learn', grp: 'learn', ic: '📘', text: 'ドリルを ' + g.day + 'まい とく', prog: Math.min(n, g.day) + ' / ' + g.day + 'まい', done: n >= g.day }];
+    var defs = pool;
+    if (pickMode()) {
+      var ids = pickIds(k);
+      defs = ids.map(function (id) { var f = null; pool.forEach(function (d) { if (d.id === id) f = d; }); return f; }).filter(Boolean);
+    }
+    defs.forEach(function (d) { list.push({ id: d.id, grp: d.grp, ic: d.ic, text: d.text, done: !!done[d.id], ok: !!ok[d.id] }); });
     var c = 0; list.forEach(function (x) { if (x.done) c++; });
-    return { list: list, done: c, total: list.length, all: c === list.length };
+    return { list: list, done: c, total: list.length, all: c === list.length, choosing: needPick(k), pool: pool };
   }
   function bigGoal() { return game.big || (game.big = { need: 3, reward: '', done: {} }); }
   function bigProgress() { var wk = weekKey(new Date()), n = 0; for (var k in game.allclear) { if (weekKey(new Date(k + 'T00:00:00')) === wk) n++; } return { key: wk, n: n }; }
@@ -2486,7 +2566,7 @@
   function questBonusLines(k) {
     var lines = [], qs = questState(k);
     if (qs.all && qs.total > 1 && !game.allclear[k]) {
-      game.allclear[k] = 1; lines.push(['🌟 きょうの クエスト ぜんぶ クリア！', XP.allClear]);
+      game.allclear[k] = 1; lines.push(['🌟 きょうの クエスト ぜんぶ クリア！', allXp()]);
       var bg = bigGoal(), bp = bigProgress();
       if (bp.n >= bg.need && !bg.done[bp.key]) { bg.done[bp.key] = 1; lines.push(['🏅 おおきな もくひょう クリア！' + (bg.reward ? '　ごほうび「' + bg.reward + '」' : ''), XP.bigGoal]); }
     }
@@ -2504,7 +2584,7 @@
     if (dn[id]) { delete dn[id]; save(); renderCharCard(); return; }   // まちがえて おしたとき（ポイントは そのまま）
     dn[id] = new Date().toISOString();
     var d = null; questState(k).list.forEach(function (x) { if (x.id === id) d = x; });
-    if (!paid[id]) { paid[id] = 1; lines.push([(d ? d.ic + ' ' + d.text : 'クエスト') + '　クリア', XP.quest]); }
+    if (!paid[id]) { paid[id] = 1; lines.push([(d ? d.ic + ' ' + d.text : 'クエスト') + '　クリア', qxp()]); }
     questBonusLines(k).forEach(function (l) { lines.push(l); });
     finishQuestEvent(lines);
   }
@@ -2531,13 +2611,46 @@
     m.addEventListener('click', function (e) { if (e.target === m || (e.target.closest && e.target.closest('button.linkbtn'))) m.remove(); });
     m.appendChild(box); document.body.appendChild(m);
   }
+  var pickSel = {};
+  function pickPanel(k) {   // その日 やる クエストを 本人が えらぶ
+    var n = pickN(), pool = questDefs(), box = el('div', 'qpick'), sel = Object.keys(pickSel).length;
+    box.appendChild(html('div', 'qpickhd', 'きょうの クエストを えらぼう<small>' + n + 'こ　いま ' + sel + 'こ えらんだ</small>'));
+    var grid = el('div', 'qpickgrid');
+    pool.forEach(function (d) {
+      var on = !!pickSel[d.id], b = btn('pk', null, function () {
+        if (on) delete pickSel[d.id];
+        else if (Object.keys(pickSel).length >= n) { toastText('えらべるのは ' + n + 'こまで だよ'); return; }
+        else pickSel[d.id] = 1;
+        renderCharCard();
+      });
+      b.setAttribute('aria-pressed', String(on));
+      b.appendChild(el('span', 'pkic', d.ic)); b.appendChild(el('span', 'pktx', d.text));
+      grid.appendChild(b);
+    });
+    box.appendChild(grid);
+    var ft = el('div', 'qpickft');
+    ft.appendChild(btn('ohayo', 'これで きめる', function () {
+      var ids = Object.keys(pickSel);
+      if (!ids.length) { toastText('1つ いじょう えらんでね'); return; }
+      game.qpick[k] = ids; pickSel = {}; save(); renderCharCard();
+      toastText('きょうの クエストが きまった！ がんばろう');
+    }));
+    ft.appendChild(btn('qok', '🎲 おまかせで きめる', function () {
+      var ps = questDefs().slice(), ids = [];
+      while (ids.length < n && ps.length) ids.push(ps.splice(Math.floor(Math.random() * ps.length), 1)[0].id);
+      game.qpick[k] = ids; pickSel = {}; save(); renderCharCard();
+      toastText('ドリまるが えらんだよ！');
+    }));
+    box.appendChild(ft);
+    return box;
+  }
   function questCard() {
     var k = todayKey(), qs = questState(k), f = fortune(k), checked = !!game.morning[k], card = el('div', 'qcard');
     var hd = el('div', 'qhead');
     hd.appendChild(html('div', null, charSVG({ stage: stageOf(levelOf().level), color: game.color, wear: game.wear, mood: qs.all && checked ? 'excited' : checked ? 'happy' : 'normal' })));
     var say = el('div', 'say');
     if (checked) {
-      say.appendChild(el('span', null, qs.all ? 'きょうの クエスト ぜんぶ クリア！ すごい！' : qs.done > 1 ? 'いいちょうし！ のこり ' + (qs.total - qs.done) + 'こ' : 'きょうの クエスト、いっしょに がんばろう！'));
+      say.appendChild(el('span', null, qs.choosing ? 'きょう やる クエストを えらんでね！' : qs.all ? 'きょうの クエスト ぜんぶ クリア！ すごい！' : qs.done > 1 ? 'いいちょうし！ のこり ' + (qs.total - qs.done) + 'こ' : 'きょうの クエスト、いっしょに がんばろう！'));
       say.appendChild(el('small', null, 'あいさつ れんぞく ' + streakIn(game.morning) + '日'));
     } else {
       say.appendChild(el('span', null, greet() + '　' + game.name + 'に あいさつしよう'));
@@ -2554,8 +2667,10 @@
       om.appendChild(el('span', 'fl', f.line));
       card.appendChild(om);
     }
-    var tt = el('div', 'qtitle'); tt.appendChild(el('span', null, 'きょうの クエスト')); tt.appendChild(el('small', null, qs.done + ' / ' + qs.total + '　ぜんぶ クリアで +' + XP.allClear));
+    var tt = el('div', 'qtitle'); tt.appendChild(el('span', null, 'きょうの クエスト'));
+    tt.appendChild(el('small', null, qs.choosing ? questDefs().length + 'この 中から ' + pickN() + 'こ' : qs.done + ' / ' + qs.total + '　ぜんぶ クリアで +' + allXp()));
     card.appendChild(tt);
+    if (qs.choosing) { card.appendChild(pickPanel(k)); card.appendChild(bigLine()); card.appendChild(moodRow(k)); return card; }
     var ul = el('ul', 'qlist');
     qs.list.forEach(function (q) {
       var li = el('li'), learn = q.id === 'learn';
@@ -2563,49 +2678,106 @@
       cb.setAttribute('aria-label', q.text); cb.setAttribute('aria-pressed', String(q.done));
       li.appendChild(cb);
       var tx = el('div', 'qtxt', q.ic + ' ' + q.text);
-      tx.appendChild(el('small', null, QCAT[q.cat] + (q.prog ? '　' + q.prog : '') + (q.done && !learn ? '　+' + XP.quest : learn && !q.done ? '　タップで ドリルへ' : '')));
+      tx.appendChild(el('small', null, QCAT[q.grp] + (q.prog ? '　' + q.prog : '') + (q.done && !learn ? '　+' + qxp() : learn && !q.done ? '　タップで ドリルへ' : '')));
       li.appendChild(tx);
-      if (!learn && q.done) li.appendChild(btn('qok' + (q.ok ? ' on' : ''), q.ok ? '👪 ✓ もらった' : '👪 おうちの人の ✓', function () { parentOk(q.id); }));
+      if (!learn && q.done && okOn()) li.appendChild(btn('qok' + (q.ok ? ' on' : ''), q.ok ? '👪 ✓ もらった' : '👪 おうちの人の ✓', function () { parentOk(q.id); }));
       ul.appendChild(li);
     });
     card.appendChild(ul);
+    if (pickMode() && !Object.keys(game.qdone[k] || {}).length) {
+      card.appendChild(btn('linkbtn', 'クエストを えらびなおす', function () { delete game.qpick[k]; pickSel = {}; save(); renderCharCard(); }));
+    }
+    card.appendChild(bigLine());
+    card.appendChild(moodRow(k));
+    return card;
+  }
+  function bigLine() {
     var bg = bigGoal(), bp = bigProgress(), big = el('div', 'qbig');
     big.appendChild(html('span', null, '🏅 こんしゅうの おおきな もくひょう：ぜんぶクリアの 日を <b>' + bg.need + '日</b>　→ いま <b>' + Math.min(bp.n, bg.need) + '日</b>' + (bg.done[bp.key] ? '　クリア！🎉' : '')));
     big.appendChild(el('small', null, (bg.reward ? 'ごほうび：' + bg.reward + '　' : '') + 'クリアで 1レベル アップ' + (bg.reward ? '' : '（ごほうびは マイルームで きめられる）')));
-    card.appendChild(big);
+    return big;
+  }
+  function moodRow(k) {
     var ft = el('div', 'qfoot'), mv = game.evening[k], md = el('div', 'moods');
     ft.appendChild(el('span', null, mv === undefined ? 'きょうは どうだった？（ふりかえり +' + XP.evening + '）' : 'きょうは「' + MOODS[mv][1] + '」の 日'));
     MOODS.forEach(function (m, i) { var b = btn(null, m[0], function () { setMood(i); }); b.setAttribute('aria-pressed', String(mv === i)); b.setAttribute('aria-label', m[1]); md.appendChild(b); });
     ft.appendChild(md);
-    card.appendChild(ft);
-    return card;
+    return ft;
   }
-  function renderQuestSettings(box) {   // マイルーム: おうちの人が クエストを えらぶ
-    var c = gameCtx();
-    box.appendChild(html('h2', 'sec', 'クエスト <small>学校・おうちの もくひょう（おうちの人と きめる）</small>'));
+  var qOpen = {};
+  function toggleRow(label, get, set, on, off) {
+    var row = el('div', 'stp');
+    row.appendChild(el('span', 'lbl', label));
+    var b = btn('tool', get() ? on : off, function () { set(!get()); save(); renderGrow(); });
+    b.setAttribute('aria-pressed', String(!!get()));
+    row.appendChild(b);
+    return row;
+  }
+  function emoji1(t, fb) { var a = t ? Array.from(t.trim()) : []; return a.length ? a[0] : fb; }
+  function addCustom(g) {
+    var v = prompt('「' + g.name + '」の もくひょうを 書いてね', '');
+    if (!v || !v.trim()) return;
+    var ic = prompt('アイコン（えもじ）を 1つ。そのままで よければ OK', g.ic);
+    game.quests.custom.push({ id: 'c' + Date.now(), grp: g.id, ic: emoji1(ic, g.ic), text: v.trim().slice(0, 24) });
+    save(); renderGrow();
+  }
+  function editCustom(cq) {
+    var v = prompt('もくひょうを 直す（からっぽで OK を おすと けします）', cq.text);
+    if (v === null) return;
+    if (!v.trim()) { game.quests.custom = game.quests.custom.filter(function (x) { return x !== cq; }); save(); renderGrow(); return; }
+    cq.text = v.trim().slice(0, 24);
+    var ic = prompt('アイコン（えもじ）を 1つ。そのままで よければ OK', cq.ic);
+    if (ic !== null) cq.ic = emoji1(ic, cq.ic);
+    save(); renderGrow();
+  }
+  function renderQuestSettings(box) {   // マイルーム: おうちの人が クエストを えらぶ・つくる
+    var c = gameCtx(), onCount = questDefs().length;
+    box.appendChild(html('h2', 'sec', 'クエスト <small>学校・おうちの もくひょう（おうちの人が えらぶ）</small>'));
     var qp = el('div', 'panel');
     qp.appendChild(el('p', 'qstat', 'クリアした クエスト ' + c.quests + 'こ　／　ぜんぶクリアの 日 ' + c.allclears + '日　／　あいさつ ' + c.mornings + '日　／　おうちの人の ✓ ' + c.oks + '回'));
-    qp.appendChild(el('p', 'muted', 'ホームの「きょうの クエスト」に 出ます。学校の クエストは 月〜金だけ。1つ +' + XP.quest + '、おうちの人の ✓ +' + XP.parentOk + '、ぜんぶ クリア +' + XP.allClear + '、あいさつ +' + XP.morning + '（8時前 +' + XP.early + '）、ふりかえり +' + XP.evening + '。'));
-    ['school', 'home'].forEach(function (cat) {
-      qp.appendChild(el('h3', null, cat === 'school' ? '🏫 学校' : '🏠 おうち'));
+
+    qp.appendChild(el('h3', null, '⚙️ 出しかた'));
+    qp.appendChild(stepper('1日に 出す かず', pickN, function (v) { game.pickN = v; }, 0, 8, 'こ', function (v) { return v === 0 ? 'ぜんぶ' : v + 'こ'; }));
+    qp.appendChild(el('p', 'muted', 'いま 出している クエストは ' + onCount + 'こ。かずを きめると、その中から その日 やる ぶんを 本人が えらべます（「おまかせ」ボタンも あります）。「ぜんぶ」なら 出している ものが すべて 出ます。'));
+    qp.appendChild(stepper('1つの ポイント', qxp, function (v) { game.qxp = v; }, 5, 30, 'ポイント', null, 5));
+    qp.appendChild(stepper('ぜんぶ クリアで', allXp, function (v) { game.allXp = v; }, 10, 100, 'ポイント', null, 10));
+    qp.appendChild(toggleRow('おうちの人の ✓', okOn, function (v) { game.okOn = v; }, 'つかう（+' + XP.parentOk + '）', 'つかわない'));
+    qp.appendChild(toggleRow('学校の クエスト', function () { return !game.schoolAll; }, function (v) { game.schoolAll = !v; }, '月〜金だけ 出す', 'まいにち 出す'));
+    qp.appendChild(el('p', 'muted', 'あいさつ +' + XP.morning + '（8時前 +' + XP.early + '）、ふりかえり +' + XP.evening + '。ドリルの まい数は 上の「もくひょう」で きめます。'));
+
+    qp.appendChild(el('h3', null, '📋 クエストを えらぶ・つくる'));
+    QGRPS.forEach(function (g) {
+      var items = QUEST_PRESETS.filter(function (p) { return p.grp === g.id; });
+      var customs = game.quests.custom.filter(function (x) { return x.grp === g.id; });
+      var onN = items.filter(function (p) { return game.quests.on[p.id]; }).length + customs.length;
+      var head = btn('grph', null, function () { qOpen[g.id] = !qOpen[g.id]; renderGrow(); });
+      head.appendChild(el('span', null, (qOpen[g.id] ? '▾ ' : '▸ ') + g.ic + ' ' + g.name));
+      head.appendChild(el('small', null, (onN ? onN + 'こ 出している' : '出していない') + '　/　ぜんぶ ' + (items.length + customs.length) + 'こ'));
+      head.setAttribute('aria-expanded', String(!!qOpen[g.id]));
+      qp.appendChild(head);
+      if (!qOpen[g.id]) return;
       var grid = el('div', 'accs');
-      QUEST_PRESETS.forEach(function (p) {
-        if (p.cat !== cat) return;
+      items.forEach(function (p) {
         var on = !!game.quests.on[p.id], b = btn('acc', null, function () { if (on) delete game.quests.on[p.id]; else game.quests.on[p.id] = 1; save(); renderGrow(); });
-        b.setAttribute('aria-pressed', String(on)); b.appendChild(el('span', null, p.ic + ' ' + p.text)); b.appendChild(el('small', null, on ? '出している' : 'タップで 出す')); grid.appendChild(b);
+        b.setAttribute('aria-pressed', String(on));
+        b.appendChild(el('span', null, p.ic + ' ' + p.text));
+        b.appendChild(el('small', null, on ? '出している' : 'タップで 出す'));
+        grid.appendChild(b);
       });
-      game.quests.custom.forEach(function (cq) {
-        if (cq.cat !== cat) return;
-        var b = btn('acc', null, function () { if (confirm('「' + cq.text + '」を けしますか？')) { game.quests.custom = game.quests.custom.filter(function (x) { return x !== cq; }); save(); renderGrow(); } });
-        b.setAttribute('aria-pressed', 'true'); b.appendChild(el('span', null, cq.ic + ' ' + cq.text)); b.appendChild(el('small', null, 'じぶんで 書いた（タップで けす）')); grid.appendChild(b);
+      customs.forEach(function (cq) {
+        var b = btn('acc', null, function () { editCustom(cq); });
+        b.setAttribute('aria-pressed', 'true');
+        b.appendChild(el('span', null, cq.ic + ' ' + cq.text));
+        b.appendChild(el('small', null, 'じぶんで つくった（タップで 直す）'));
+        grid.appendChild(b);
       });
-      var add = btn('acc', null, function () {
-        var v = prompt((cat === 'school' ? '学校' : 'おうち') + 'の もくひょうを 書いてね（例：' + (cat === 'school' ? 'そうじを がんばる' : 'おふろを あらう') + '）');
-        if (v && v.trim()) { game.quests.custom.push({ id: 'c' + Date.now(), cat: cat, ic: cat === 'school' ? '🏫' : '🏠', text: v.trim().slice(0, 24) }); save(); renderGrow(); }
-      });
-      add.appendChild(el('span', null, '＋ じぶんで 書く')); grid.appendChild(add);
+      var add = btn('acc', null, function () { addCustom(g); });
+      add.appendChild(el('span', null, '＋ じぶんで つくる'));
+      add.appendChild(el('small', null, 'すきな もくひょうを 書く'));
+      grid.appendChild(add);
       qp.appendChild(grid);
     });
+
     qp.appendChild(el('h3', null, '🏅 こんしゅうの おおきな もくひょう'));
     var bg = bigGoal();
     qp.appendChild(stepper('ぜんぶクリアの日', function () { return bg.need; }, function (v) { bg.need = v; }, 1, 7, '日'));
@@ -2633,7 +2805,7 @@
   var WEL_MORNING = ['きょうも いい日に なるよ', 'あさの きみは とても かっこいい', 'きょうは なにか いいことが おきそう', 'あさ いちばんに あえて うれしいな'];
   var WEL_DAY = ['よく きたね！ まってたよ', 'きみが くると ぼく げんきに なる', 'さあ、いっしょに はじめよう', 'いま きたのは いい えらび だね'];
   var WEL_NIGHT = ['きょうも おつかれさま', 'ねる前の ひとくちでも りっぱだよ', 'きょうの じぶんを ほめて あげよう', 'よふかしせずに、むりの ない ぶんだけ'];
-  var welcomeGone = false;
+  var welcomeGone = false, welEl = null;
   function activeDays() {   // アプリを つかった 日（れんしゅう・あいさつ・クエスト）
     var m = {};
     [game.stamps, game.morning, game.qdone, game.evening].forEach(function (o) { for (var k in o) m[k] = 1; });
@@ -2671,14 +2843,14 @@
       c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
     });
     c.appendChild(body);
-    var x = btn('welx', '✕', function () { welcomeGone = true; c.remove(); }); x.setAttribute('aria-label', 'とじる');
+    var x = btn('welx', '✕', function () { welcomeGone = true; welEl = null; c.remove(); }); x.setAttribute('aria-label', 'とじる');
     c.appendChild(x);
     return c;
   }
   function renderCharCard() {
     var box = $('charCard'); if (!box) return; box.innerHTML = '';
     if (!game) initGame();
-    if (!welcomeGone) box.appendChild(welcomeCard());   // 立ち上げのときだけ 出す
+    if (!welcomeGone) { if (!welEl) welEl = welcomeCard(); box.appendChild(welEl); }   // 立ち上げのときだけ 出す
     var lv = levelOf(), card = btn('ccard room', null, function () { renderGrow(); show('grow'); });
     card.innerHTML = roomSVG();
     var info = el('div', 'cinfo');
@@ -2693,12 +2865,12 @@
     box.appendChild(card);
     box.appendChild(questCard());
   }
-  function stepper(label, get, set, min, max, unit) {
-    var row = el('div', 'stp');
+  function stepper(label, get, set, min, max, unit, fmt, step) {
+    var sp = step || 1, row = el('div', 'stp');
     row.appendChild(el('span', 'lbl', label));
-    row.appendChild(btn('tool', '−', function () { set(Math.max(min, get() - 1)); save(); renderGrow(); }));
-    row.appendChild(el('b', null, get() + unit));
-    row.appendChild(btn('tool', '＋', function () { set(Math.min(max, get() + 1)); save(); renderGrow(); }));
+    row.appendChild(btn('tool', '−', function () { set(Math.max(min, get() - sp)); save(); renderGrow(); }));
+    row.appendChild(el('b', null, fmt ? fmt(get()) : get() + unit));
+    row.appendChild(btn('tool', '＋', function () { set(Math.min(max, get() + sp)); save(); renderGrow(); }));
     return row;
   }
   function renderGrow() {
