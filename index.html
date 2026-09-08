@@ -59,6 +59,7 @@
   button{cursor:pointer}
   :focus-visible{outline:3px solid var(--shu); outline-offset:2px}
   .wrap{max-width:760px; margin:0 auto; padding:0 14px}
+  @media (min-width:900px){ .wrap{max-width:920px} }
   .linkbtn{background:none; border:0; padding:6px 10px; font:inherit; font-size:13px; color:var(--ink-soft); text-decoration:underline; cursor:pointer}
   .linkbtn.shu{color:var(--shu-ink)}
   h2.sec{font-family:var(--f-round); font-size:18px; font-weight:700; margin:22px 0 10px}
@@ -145,18 +146,18 @@
   .tool.sz{width:44px; padding:0; display:inline-flex; align-items:center; justify-content:center}
   .tool.sz i{display:block; border-radius:50%; background:currentColor}
   .tool.clear{color:var(--shu-ink); margin-left:auto}
-  .pad-area{position:relative; height:250px}
-  .pad-guide{position:absolute; inset:0; display:flex; gap:10px; padding:8px 10px 10px; pointer-events:none}
-  .g-left{flex:1 1 56%; display:flex; flex-direction:column; min-width:0}
+  .pad-area{position:relative; height:400px}
+  .pad-guide{position:absolute; inset:0; display:flex; gap:12px; padding:10px 12px 12px; pointer-events:none}
+  .g-left{flex:1 1 54%; display:flex; flex-direction:column; min-width:0; gap:6px}
   .g-line{flex:1.35; position:relative; border-bottom:1.5px solid var(--field-line)}
   .g-line.ans{flex:1; border-bottom-width:2px; border-bottom-color:var(--ink-faint)}
-  .g-line span{position:absolute; left:2px; bottom:3px; font-family:var(--f-round); font-size:13px; color:var(--ink-faint); line-height:1}
+  .g-line span{position:absolute; left:3px; bottom:4px; font-family:var(--f-round); font-size:14px; color:var(--ink-faint); line-height:1}
   .g-right{
-    flex:0 0 42%; position:relative; border:1.5px dashed var(--field-line); border-radius:6px;
+    flex:0 0 44%; position:relative; border:1.5px dashed var(--field-line); border-radius:6px;
     background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size:26px 26px; background-position:-1px -1px;
+    background-size:40px 40px; background-position:-1px -1px;
   }
-  .g-right span{position:absolute; top:2px; left:6px; font-family:var(--f-round); font-size:12px; color:var(--ink-faint); background:var(--field); padding:0 3px; line-height:1.3}
+  .g-right span{position:absolute; top:3px; left:7px; font-family:var(--f-round); font-size:13px; color:var(--ink-faint); background:var(--field); padding:0 4px; line-height:1.3}
   .pad-cv{position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:pan-y; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none}
   .pad.finger{border:2.5px solid var(--shu); background:var(--shu-wash)}
   .pad.finger .pad-cv{touch-action:none}
@@ -165,7 +166,8 @@
   .pad.finger .pad-state{color:var(--shu-ink); font-weight:700}
   .tool.finger{border-color:var(--shu); color:var(--shu-ink)}
   .tool.finger[aria-pressed="true"]{background:var(--shu); border-color:var(--shu); color:#fff}
-  @media (max-width:560px){ .pad-area{height:430px} .pad-guide{flex-direction:column} .g-right{flex:0 0 200px} .g-left{flex:1 1 auto} }
+  @media (min-width:900px){ .pad-area{height:460px} }
+  @media (max-width:560px){ .pad-area{height:620px} .pad-guide{flex-direction:column; gap:10px} .g-right{flex:0 0 300px} .g-left{flex:1 1 auto} }
 
   /* ---------- marking ---------- */
   .q.ok{border-color:var(--ok-ink)}
@@ -516,7 +518,7 @@
 
   // ---------- handwriting pad (vector strokes, redrawn on resize) ----------
   var pads = {}, livePads = [], lastPen = 0, fingerPad = null;
-  var PEN_W = { s: 0.0034, m: 0.0055, l: 0.0090 }, ERASER_W = 0.045;   // fraction of the canvas width
+  var PEN_W = { s: 0.0030, m: 0.0048, l: 0.0078 }, ERASER_W = 0.040;   // fraction of the canvas width
   var penSize = 'm';
   try { var sv = localStorage.getItem('suzu.pen.size'); if (PEN_W[sv]) penSize = sv; } catch (e) {}
   var sizeBtns = [];
