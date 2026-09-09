@@ -364,7 +364,7 @@
   .acc[aria-pressed="true"]{border-color:var(--shu); background:var(--shu-wash)}
   .acc.lock{opacity:.55}
   .acc small{display:block; font-family:var(--f-kaku); font-size:11px; color:var(--ink-soft); margin-top:2px}
-  .card{display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin:8px 0 4px}
+  .card{display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; margin:8px 0 4px; max-width:470px}
   .slot{aspect-ratio:1; border-radius:50%; border:2px dashed var(--rule); display:flex; align-items:center; justify-content:center; font-family:var(--f-round); font-size:11px; color:var(--ink-faint); background:var(--field)}
   .slot.on{border:2.5px solid var(--shu); color:var(--shu-ink); font-weight:700; font-size:13px; background:var(--shu-wash); transform:rotate(-8deg); box-shadow:inset 0 0 0 2px var(--paper)}
   .medals{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px}
@@ -536,6 +536,34 @@
   .stars{font-size:20px; letter-spacing:2px; line-height:1.4; color:#e6a100}
   .trow .pill.up{background:var(--shu-wash); color:var(--shu-ink); border-color:var(--shu)}
   .stars small{display:block; font-family:var(--f-kaku); font-size:12px; color:var(--ink-soft); letter-spacing:0}
+
+  /* カレンダー */
+  .calhd{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:10px 0 8px}
+  .calhd b{font-family:var(--f-round); font-size:19px; font-weight:700}
+  .calnav{min-width:48px; min-height:44px; border:1.5px solid var(--rule); border-radius:10px; background:var(--paper); color:var(--ink); font-size:18px}
+  .calgrid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
+  .cwd{text-align:center; font-family:var(--f-round); font-size:11.5px; color:var(--ink-soft); padding:2px 0}
+  .cwd.sat{color:#4d8fd6} .cwd.sun{color:var(--shu-ink)}
+  .cday{min-height:58px; padding:3px 2px; border:1.5px solid var(--rule); border-radius:10px; background:var(--paper); color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:2px}
+  .cday b{font-family:var(--f-round); font-size:13px; font-weight:700; line-height:1.1}
+  .cday.out{opacity:.3}
+  .cday.today{border-color:var(--shu); border-width:2.5px}
+  .cday.sel{background:var(--shu-wash); border-color:var(--shu)}
+  .cday .st{width:15px; height:15px; border-radius:50%; background:var(--shu); display:block}
+  .cday .dots{font-size:9px; color:var(--ok-ink); line-height:1; letter-spacing:1px}
+  .cday .pm{font-size:12px; line-height:1.1}
+  @media (max-width:560px){ .cday{min-height:52px; gap:1px} .cday b{font-size:12px} .cday .st{width:12px; height:12px} .calgrid{gap:3px} }
+  .calsum{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin:10px 0 2px}
+  .calsum b{color:var(--ink)}
+  .dlist{list-style:none; margin:6px 0 0; padding:0}
+  .dlist li{display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px dashed var(--rule-soft); font-size:14px}
+  .dlist li b{font-family:var(--f-round)}
+  .dlist .del{margin-left:auto; min-height:34px; padding:2px 10px; border-radius:999px; border:1.5px solid var(--rule); background:var(--paper); color:var(--shu-ink); font-size:12px}
+  .pcard{margin:8px 0 2px; padding:8px 12px; border-radius:14px; background:var(--shu-wash); border:1.5px solid var(--shu)}
+  .prow{display:flex; align-items:center; gap:10px; width:100%; background:none; border:0; padding:6px 2px; text-align:left; color:var(--ink)}
+  .prow b{font-family:var(--f-round); font-size:17px; color:var(--shu-ink); flex:none; min-width:74px}
+  .prow .ptx{font-family:var(--f-round); font-size:15px; flex:1; min-width:0}
+  .prow .ptx small{display:block; font-family:var(--f-kaku); font-size:12px; color:var(--ink-soft)}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -577,6 +605,10 @@
       <div id="wresult"></div>
       <div id="wqs"></div>
     </div>
+  </section>
+
+  <section id="v-cal" hidden>
+    <div class="wrap" id="cal"></div>
   </section>
 
   <section id="v-grow" hidden>
@@ -989,7 +1021,7 @@
   // ---------- storage ----------
   var LS = 'suzu.bunsho.v1', LOGMAX = 500;
   function fresh() {
-    var r = { _types: {}, _log: [], _pages: [], _pagesDeleted: {}, _game: null, _migrated: false };
+    var r = { _types: {}, _log: [], _pages: [], _pagesDeleted: {}, _plans: [], _game: null, _migrated: false };
     DATA.tests.forEach(function (t) { r[t.id] = { test: t.id, sheets: {}, types: {}, updatedAt: null }; });
     return r;
   }
@@ -1001,6 +1033,7 @@
     if (!r._log) r._log = [];
     if (!r._pages) r._pages = [];
     if (!r._pagesDeleted) r._pagesDeleted = {};
+    if (!r._plans) r._plans = [];
     if (!r._migrated) {                       // fold the v1 per-test counters into the global type stats
       DATA.tests.forEach(function (t) {
         var pt = (r[t.id] && r[t.id].types) || {};
@@ -1404,8 +1437,8 @@
   $('btnAgain').addEventListener('click', function () { if (cur) cur.again(); });
 
   // ---------- views ----------
-  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kanji', 'solve', 'weak', 'lessons', 'records', 'print'];
-  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', solve: 'テストの プリント', weak: 'にがてを とく', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
+  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kanji', 'solve', 'weak', 'cal', 'lessons', 'records', 'print'];
+  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -1420,6 +1453,7 @@
 
   // ---------- home ----------
   var ICONS = {
+    cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/><circle cx="8.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="13" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg>',
     keisan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3" width="17" height="18" rx="2"/><path d="M7 8h4M9 6v4M14 8h3.5M14.2 15.5h3.6M7.2 14.2l3.6 3.6M10.8 14.2l-3.6 3.6M14.2 18h3.6"/></svg>',
     grow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v11h14V10"/><rect x="9.5" y="13.5" width="5" height="7.5" rx="1"/></svg>',
     scan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
@@ -1453,6 +1487,7 @@
       ['solve', 'テストの プリント', '学校の テストから 作った プリント（' + allTests().length + 'セット）'],
       ['weak', 'にがてを とく', 'にがてな 型から 5問（どれかは ひみつ）'],
       ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
+      ['cal', 'カレンダー', 'テストの よてい・やった日が 見える'],
       ['grow', 'マイルーム', 'ドリまる・なかま・かざり・もくひょう・メダル'],
       ['records', 'きろく', 'せいかいりつ・にがて・きょうの けっか'],
       ['print', 'いんさつ', '紙の プリントを 作る・PDF']
@@ -1473,6 +1508,7 @@
     if (v === 'keisan') { if (!(cur && cur.view === 'keisan')) renderKeisan(); }
     if (v === 'solve') { if (!(cur && cur.view === 'solve')) startSheet(); renderTabs(); }
     if (v === 'weak') { if (!(cur && cur.view === 'weak')) renderWeakIntro(); }
+    if (v === 'cal') renderCal();
     if (v === 'lessons') renderLessons();
     if (v === 'records') renderRecords();
     if (v === 'print') renderPrint();
@@ -3173,6 +3209,171 @@
     sp.appendChild(btn('linkbtn', '漢字の 印を つける（かんじの 画面）→', function () { renderKanji(); show('kanji'); }));
     box.appendChild(sp);
   }
+
+  // ---------- カレンダー（テストの よてい・やった日・スタンプ） ----------
+  var SUBJ = { math: ['さんすう', '📘'], kanji: ['かんじ', '✍️'], other: ['よてい', '📌'] };
+  var MODE_NAME = { sheet: 'テストの プリント', daily: 'きょうの 5問', weak: 'にがてを とく', kanji: 'かんじ', keisan: 'けいさん 1まい', test: 'テストの よみとり' };
+  var calM = null, calSel = null, calForm = null;
+  function monthStart(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+  function plansOn(k) { return recs._plans.filter(function (p) { return p.date === k; }); }
+  function logsOn(k) { return recs._log.filter(function (e) { return dayKey(e.at) === k; }); }
+  function planName(p) { return p.title || (SUBJ[p.subject] || SUBJ.other)[0] + 'テスト'; }
+  function planIcon(p) { return (SUBJ[p.subject] || SUBJ.other)[1]; }
+  function scopeText(p) {
+    if (!p.scope) return '';
+    if (p.scope.unit) { var u = unitById(p.scope.unit); return u ? u.name : ''; }
+    if (p.scope.kanji) { var g = KANJI.filter(function (x) { return x.id === p.scope.kanji; })[0]; return g ? 'かんじ ' + g.name : ''; }
+    return '';
+  }
+  function daysUntil(k) { return Math.round((new Date(k + 'T00:00:00') - new Date(todayKey() + 'T00:00:00')) / 86400000); }
+  function untilText(n) { return n <= 0 ? 'きょう！' : n === 1 ? 'あした' : 'あと ' + n + '日'; }
+  function upcomingPlans(limit, within) {
+    var t = todayKey();
+    return recs._plans.filter(function (p) { return p.date >= t && (!within || daysUntil(p.date) <= within); })
+      .sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }).slice(0, limit || 3);
+  }
+  function openCalOn(k) {
+    calSel = k; calM = monthStart(new Date(k + 'T00:00:00')); calForm = null;
+    renderCal(); show('cal');
+  }
+  function planCard(list) {   // ホームの「つぎの テスト」
+    var c = el('div', 'pcard');
+    list.forEach(function (p) {
+      var row = btn('prow', null, function () { openCalOn(p.date); });
+      row.appendChild(el('b', null, untilText(daysUntil(p.date))));
+      var tx = el('span', 'ptx', planIcon(p) + ' ' + planName(p));
+      var sc = scopeText(p);
+      tx.appendChild(el('small', null, fmtDay(p.date) + (sc ? '　' + sc : '')));
+      row.appendChild(tx);
+      c.appendChild(row);
+    });
+    return c;
+  }
+  function stampGrid() {   // スタンプカード（30日で 1まい）
+    var wrap = el('div');
+    var cnt = Object.keys(game.stamps).length, cardNo = Math.floor((cnt - (cnt && cnt % 30 === 0 ? 1 : 0)) / 30) + 1, filled = cnt - (cardNo - 1) * 30;
+    wrap.appendChild(html('h2', 'sec', 'スタンプカード <small>' + cardNo + 'まいめ　' + filled + ' / 30</small>'));
+    wrap.appendChild(html('p', 'streak', 'れんぞく <b>' + streak() + '</b> 日　／　さいこう ' + (game.streakMax || 0) + ' 日　／　ぜんぶで ' + cnt + ' こ'));
+    var days = Object.keys(game.stamps).sort(), cardDays = days.slice((cardNo - 1) * 30, cardNo * 30), grid = el('div', 'card');
+    for (var i = 0; i < 30; i++) { var k = cardDays[i], sl = el('div', 'slot' + (k ? ' on' : '')); if (k) { var p = k.split('-'); sl.textContent = (+p[1]) + '/' + (+p[2]); } else sl.textContent = String(i + 1); grid.appendChild(sl); }
+    wrap.appendChild(grid);
+    return wrap;
+  }
+  function renderCal() {
+    var box = $('cal'); box.innerHTML = ''; cur = null; $('bar').hidden = true;
+    if (!calM) calM = monthStart(new Date());
+    if (!game) initGame();
+    var up = upcomingPlans(3, 30);
+    if (up.length) { box.appendChild(html('h2', 'sec', 'つぎの テスト')); box.appendChild(planCard(up)); }
+
+    var hd = el('div', 'calhd');
+    hd.appendChild(btn('calnav', '‹', function () { calM = new Date(calM.getFullYear(), calM.getMonth() - 1, 1); renderCal(); }));
+    hd.appendChild(el('b', null, calM.getFullYear() + '年 ' + (calM.getMonth() + 1) + '月'));
+    hd.appendChild(btn('calnav', '›', function () { calM = new Date(calM.getFullYear(), calM.getMonth() + 1, 1); renderCal(); }));
+    box.appendChild(hd);
+
+    var grid = el('div', 'calgrid');
+    '月火水木金土日'.split('').forEach(function (w, i) { grid.appendChild(el('div', 'cwd' + (i === 5 ? ' sat' : i === 6 ? ' sun' : ''), w)); });
+    var first = new Date(calM), lead = (first.getDay() + 6) % 7, tk = todayKey();
+    var start = new Date(first); start.setDate(1 - lead);
+    for (var i = 0; i < 42; i++) {
+      var d = new Date(start); d.setDate(start.getDate() + i);
+      var k = dayKey(d.toISOString()), out = d.getMonth() !== calM.getMonth();
+      var cell = btn('cday' + (out ? ' out' : '') + (k === tk ? ' today' : '') + (k === calSel ? ' sel' : ''), null, (function (key) { return function () { calSel = key; calForm = null; renderCal(); }; })(k));
+      cell.appendChild(el('b', null, String(d.getDate())));
+      if (game.stamps[k]) cell.appendChild(el('i', 'st'));
+      var n = sheetsOnDay(k);
+      if (n) cell.appendChild(el('span', 'dots', new Array(Math.min(4, n) + 1).join('●')));
+      plansOn(k).forEach(function (p) { cell.appendChild(el('span', 'pm', planIcon(p))); });
+      grid.appendChild(cell);
+      if (i >= 34 && d.getMonth() !== calM.getMonth() && i % 7 === 6) break;
+    }
+    box.appendChild(grid);
+
+    var mk = calM.getFullYear() + '-' + pad2(calM.getMonth() + 1), dn = 0, sh = 0, tot = 0, ok = 0;
+    for (var key in game.stamps) { if (key.indexOf(mk) === 0) dn++; }
+    recs._log.forEach(function (e) { var dk = dayKey(e.at); if (dk.indexOf(mk) !== 0) return; if (isSetLog(e)) sh++; tot += e.total || 0; ok += e.score || 0; });
+    box.appendChild(html('p', 'calsum', 'この月：れんしゅうした日 <b>' + dn + '日</b>　／　<b>' + sh + 'まい</b>　／　といた <b>' + tot + '問</b>' + (tot ? '（せいかい ' + pct(ok, tot) + '%）' : '')));
+
+    box.appendChild(dayPanel(calSel || tk));
+    box.appendChild(stampGrid());
+  }
+  function dayPanel(k) {
+    var p = el('div', 'panel'), plans = plansOn(k), logs = logsOn(k);
+    p.appendChild(el('h3', null, fmtDay(k) + (k === todayKey() ? '（きょう）' : '')));
+    if (plans.length) {
+      var ul = el('ul', 'dlist');
+      plans.forEach(function (pl) {
+        var li = el('li'), n = daysUntil(pl.date);
+        li.appendChild(el('b', null, planIcon(pl) + ' ' + planName(pl)));
+        var sc = scopeText(pl);
+        li.appendChild(el('span', null, (sc ? sc + '　' : '') + (n >= 0 ? untilText(n) : 'おわった')));
+        li.appendChild(btn('del', 'けす', function () {
+          if (!confirm('「' + planName(pl) + '」を けしますか？')) return;
+          recs._plans = recs._plans.filter(function (x) { return x !== pl; }); save(); renderCal();
+        }));
+        ul.appendChild(li);
+      });
+      p.appendChild(ul);
+    }
+    if (logs.length) {
+      var ul2 = el('ul', 'dlist');
+      logs.forEach(function (e) {
+        var li = el('li');
+        li.appendChild(el('b', null, MODE_NAME[e.mode] || 'れんしゅう'));
+        li.appendChild(el('span', null, (e.label ? e.label + '　' : '') + (e.kai ? e.kai + '回目　' : '') + e.score + ' / ' + e.total));
+        ul2.appendChild(li);
+      });
+      p.appendChild(ul2);
+    }
+    if (!plans.length && !logs.length) p.appendChild(el('p', 'muted', 'この日の きろくは まだ ありません。'));
+    if (calForm && calForm.date === k) p.appendChild(planForm(k));
+    else p.appendChild(btn('btn sm', '📌 よていを 入れる', function () { calForm = { date: k, subject: 'math', scope: null, title: '' }; renderCal(); }));
+    return p;
+  }
+  function planForm(k) {
+    var f = el('div'), sub = el('div', 'accs');
+    f.appendChild(el('h3', null, fmtDay(k) + 'の よてい'));
+    ['math', 'kanji', 'other'].forEach(function (id) {
+      var b = btn('acc', null, function () { calForm.subject = id; calForm.scope = null; renderCal(); });
+      b.setAttribute('aria-pressed', String(calForm.subject === id));
+      b.appendChild(el('span', null, SUBJ[id][1] + ' ' + SUBJ[id][0]));
+      sub.appendChild(b);
+    });
+    f.appendChild(sub);
+    if (calForm.subject === 'math') {
+      f.appendChild(el('p', 'muted', 'テストの はんい（あとで つかいます。えらばなくても いいです）'));
+      var ug = el('div', 'accs');
+      UNITS.forEach(function (u) {
+        var on = calForm.scope && calForm.scope.unit === u.id;
+        var b = btn('acc', null, function () { calForm.scope = on ? null : { unit: u.id }; renderCal(); });
+        b.setAttribute('aria-pressed', String(!!on)); b.appendChild(el('span', null, u.name)); ug.appendChild(b);
+      });
+      f.appendChild(ug);
+    } else if (calForm.subject === 'kanji') {
+      f.appendChild(el('p', 'muted', 'テストの はんい（漢字の グループ）'));
+      var kg = el('div', 'accs');
+      KANJI.forEach(function (g, i) {
+        var on = calForm.scope && calForm.scope.kanji === g.id;
+        var b = btn('acc', null, function () { calForm.scope = on ? null : { kanji: g.id }; renderCal(); });
+        b.setAttribute('aria-pressed', String(!!on)); b.appendChild(el('span', null, (i + 1) + ' ' + g.name)); kg.appendChild(b);
+      });
+      f.appendChild(kg);
+    }
+    var acts = el('div', 'rec-actions');
+    acts.appendChild(btn('linkbtn', '名まえ：' + (calForm.title || planName({ subject: calForm.subject })) + ' ✎', function () {
+      var v = prompt('よていの 名まえ', calForm.title || planName({ subject: calForm.subject }));
+      if (v !== null) { calForm.title = v.trim().slice(0, 20); renderCal(); }
+    }));
+    acts.appendChild(btn('btn sm', 'この 日に 入れる', function () {
+      recs._plans.push({ id: 'pl' + Date.now(), date: k, kind: 'test', subject: calForm.subject, title: calForm.title || '', scope: calForm.scope });
+      calForm = null; save(); renderCal();
+      toastText('📌 よていを 入れました');
+    }));
+    acts.appendChild(btn('linkbtn', 'やめる', function () { calForm = null; renderCal(); }));
+    f.appendChild(acts);
+    return f;
+  }
   function renderQuestSettings(box) {   // マイルーム: おうちの人が クエストを えらぶ・つくる
     var c = gameCtx(), onCount = questDefs().length;
     var qh = html('h2', 'sec', 'クエスト <small>学校・おうちの もくひょう（おうちの人が えらぶ）</small>'); qh.id = 'qsec';
@@ -3311,6 +3512,8 @@
     card.appendChild(info);
     box.appendChild(card);
     box.appendChild(questCard());
+    var soon = upcomingPlans(2, 14);
+    if (soon.length) box.appendChild(planCard(soon));
   }
   function stepper(label, get, set, min, max, unit, fmt, step) {
     var sp = step || 1, row = el('div', 'stp');
@@ -3390,12 +3593,10 @@
     });
     box.appendChild(dg);
 
-    var cnt = Object.keys(game.stamps).length, cardNo = Math.floor((cnt - (cnt && cnt % 30 === 0 ? 1 : 0)) / 30) + 1, filled = cnt - (cardNo - 1) * 30;
-    box.appendChild(html('h2', 'sec', 'スタンプカード <small>' + cardNo + 'まいめ　' + filled + ' / 30</small>'));
-    box.appendChild(html('p', 'streak', 'れんぞく <b>' + streak() + '</b> 日　／　さいこう ' + (game.streakMax || 0) + ' 日　／　ぜんぶで ' + cnt + ' こ'));
-    var days = Object.keys(game.stamps).sort(), cardDays = days.slice((cardNo - 1) * 30, cardNo * 30), grid = el('div', 'card');
-    for (var i = 0; i < 30; i++) { var k = cardDays[i], sl = el('div', 'slot' + (k ? ' on' : '')); if (k) { var p = k.split('-'); sl.textContent = (+p[1]) + '/' + (+p[2]); } else sl.textContent = String(i + 1); grid.appendChild(sl); }
-    box.appendChild(grid);
+    var cnt2 = Object.keys(game.stamps).length, cardNo2 = Math.floor((cnt2 - (cnt2 && cnt2 % 30 === 0 ? 1 : 0)) / 30) + 1, filled2 = cnt2 - (cardNo2 - 1) * 30;
+    box.appendChild(html('h2', 'sec', 'スタンプカード <small>' + cardNo2 + 'まいめ　' + filled2 + ' / 30</small>'));
+    box.appendChild(html('p', 'streak', 'れんぞく <b>' + streak() + '</b> 日　／　さいこう ' + (game.streakMax || 0) + ' 日　／　ぜんぶで ' + cnt2 + ' こ'));
+    box.appendChild(btn('linkbtn', 'カレンダーで 見る（スタンプ・テストの よてい）→', function () { calSel = null; renderCal(); show('cal'); }));
 
     var earned = Object.keys(game.badges).length;
     box.appendChild(html('h2', 'sec', 'メダル <small>' + earned + ' / ' + BADGES.length + '</small>'));

@@ -1,5 +1,5 @@
 /* すずドリル service worker — offline cache */
-const VERSION = 'suzu-drill-v21';
+const VERSION = 'suzu-drill-v22';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
 
 self.addEventListener('install', (e) => {
