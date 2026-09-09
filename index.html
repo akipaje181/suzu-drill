@@ -3191,15 +3191,13 @@
     m.appendChild(box); document.body.appendChild(m);
   }
   var pickSel = {};
-  function pickPanel(k) {   // その日 やる クエストを 本人が えらぶ
+  function pickPanel(k) {   // その日 やる クエストを 本人が えらぶ（かずの せいげんは なし）
     var n = pickN(), pool = questDefs(), box = el('div', 'qpick'), sel = Object.keys(pickSel).length;
-    box.appendChild(html('div', 'qpickhd', 'きょうの クエストを えらぼう<small>' + n + 'こ　いま ' + sel + 'こ えらんだ</small>'));
+    box.appendChild(html('div', 'qpickhd', 'きょうの クエストを えらぼう<small>すきなだけ えらんで いいよ　いま ' + sel + 'こ</small>'));
     var grid = el('div', 'qpickgrid');
     pool.forEach(function (d) {
       var on = !!pickSel[d.id], b = btn('pk', null, function () {
-        if (on) delete pickSel[d.id];
-        else if (Object.keys(pickSel).length >= n) { toastText('えらべるのは ' + n + 'こまで だよ'); return; }
-        else pickSel[d.id] = 1;
+        if (on) delete pickSel[d.id]; else pickSel[d.id] = 1;
         renderCharCard();
       });
       b.setAttribute('aria-pressed', String(on));
@@ -3214,7 +3212,12 @@
       game.qpick[k] = ids; pickSel = {}; save(); renderCharCard();
       toastText('きょうの クエストが きまった！ がんばろう');
     }));
-    ft.appendChild(btn('qok', '🎲 おまかせで きめる', function () {
+    ft.appendChild(btn('qok', (sel === pool.length ? '↩ ぜんぶ はずす' : '✓ ぜんぶ えらぶ'), function () {
+      if (Object.keys(pickSel).length === pool.length) pickSel = {};
+      else { pickSel = {}; pool.forEach(function (d) { pickSel[d.id] = 1; }); }
+      renderCharCard();
+    }));
+    ft.appendChild(btn('qok', '🎲 おまかせで ' + n + 'こ', function () {
       var ps = questDefs().slice(), ids = [];
       while (ids.length < n && ps.length) ids.push(ps.splice(Math.floor(Math.random() * ps.length), 1)[0].id);
       game.qpick[k] = ids; pickSel = {}; save(); renderCharCard();
@@ -3252,7 +3255,7 @@
       card.appendChild(om);
     }
     var tt = el('div', 'qtitle'); tt.appendChild(el('span', null, 'きょうの クエスト'));
-    tt.appendChild(el('small', null, qs.choosing ? questDefs().length + 'この 中から ' + pickN() + 'こ' : qs.done + ' / ' + qs.total + '　ぜんぶ クリアで +' + allXp()));
+    tt.appendChild(el('small', null, qs.choosing ? questDefs().length + 'この 中から えらぶ' : qs.done + ' / ' + qs.total + '　ぜんぶ クリアで +' + allXp()));
     card.appendChild(tt);
     if (qs.choosing) { card.appendChild(pickPanel(k)); card.appendChild(bigLine()); card.appendChild(moodRow(k)); card.appendChild(parentLink()); return card; }
     var ul = el('ul', 'qlist');
@@ -3542,7 +3545,7 @@
       ['🎯', 'クエストを えらぶ・ふやす', '<ul>'
         + '<li>クエストカードの 下の <b>おうちの人へ</b> の リンク、または マイルーム →「クエスト」。</li>'
         + '<li>学校・おうちの もくひょうが <b>57種・7グループ</b>。出す／しまうを タップで きめます。「じぶんで つくる」で 自由に 追加も できます。</li>'
-        + '<li>「1日に 出す かず」を きめると、出している 中から <b>本人が えらぶ</b> ように なります（おまかせボタンも あります）。</li>'
+        + '<li>「えらぶ かず（めやす）」より 多く 出していると、その中から <b>本人が えらぶ</b> 画面に なります。<b>えらべる かずに せいげんは ありません</b>。1こでも ぜんぶでも かまいません（「ぜんぶ えらぶ」「おまかせ」ボタンも あります）。</li>'
         + '<li>ポイント、おうちの人の ✓ を つかうか、学校の クエストの 曜日も ここで きめられます。</li></ul>'],
       ['🏫', '学校の しんどに あわせる', '<ul>'
         + '<li>マイルーム →「学校の しんど」→ <b>学校は いま ここ</b> を えらぶと、「きょうの 5問」に「ならった ところから 5問」が 出ます。習っていない 単元は 出しません。</li>'
@@ -3610,8 +3613,8 @@
     qp.appendChild(el('p', 'qstat', 'クリアした クエスト ' + c.quests + 'こ　／　ぜんぶクリアの 日 ' + c.allclears + '日　／　あいさつ ' + c.mornings + '日　／　おうちの人の ✓ ' + c.oks + '回'));
 
     qp.appendChild(el('h3', null, '⚙️ 出しかた'));
-    qp.appendChild(stepper('1日に 出す かず', pickN, function (v) { game.pickN = v; }, 0, 8, 'こ', function (v) { return v === 0 ? 'ぜんぶ' : v + 'こ'; }));
-    qp.appendChild(el('p', 'muted', 'いま 出している クエストは ' + onCount + 'こ。かずを きめると、その中から その日 やる ぶんを 本人が えらべます（「おまかせ」ボタンも あります）。「ぜんぶ」なら 出している ものが すべて 出ます。'));
+    qp.appendChild(stepper('えらぶ かず（めやす）', pickN, function (v) { game.pickN = v; }, 0, 12, 'こ', function (v) { return v === 0 ? 'ぜんぶ 出す' : v + 'こ'; }));
+    qp.appendChild(el('p', 'muted', 'いま 出している クエストは ' + onCount + 'こ。この かずより 多く 出していると、その中から その日 やる ぶんを 本人が えらぶ 画面に なります。えらべる かずに せいげんは ありません（1こでも ぜんぶでも かまいません）。ここの 数は「おまかせ」ボタンが えらぶ かずの めやすです。「ぜんぶ 出す」に すると、えらばずに 出している もの ぜんぶが 出ます。'));
     qp.appendChild(stepper('1つの ポイント', qxp, function (v) { game.qxp = v; }, 5, 30, 'ポイント', null, 5));
     qp.appendChild(stepper('ぜんぶ クリアで', allXp, function (v) { game.allXp = v; }, 10, 100, 'ポイント', null, 10));
     qp.appendChild(toggleRow('おうちの人の ✓', okOn, function (v) { game.okOn = v; }, 'つかう（+' + XP.parentOk + '）', 'つかわない'));
