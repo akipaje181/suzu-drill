@@ -30,6 +30,7 @@
     --ok-wash:#f0f4ec; --ok-ink:#3f7a52;
     --bar:#2e2b25; --bar-ink:#f3efe4;
     --field:#fdfcf8; --field-line:#c8c0ad; --grid:#e4ddcc;
+    --a1:#d4453a; --a1w:#fdeeec; --a2:#4d8fd6; --a2w:#eaf2fb; --a3:#5aa86b; --a3w:#ecf5ed;
     --f-round:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Hiragino Sans','Yu Gothic',sans-serif;
     --f-kaku:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif;
   }
@@ -39,6 +40,7 @@
       --rule:#403b32; --rule-soft:#332f28; --shu:#ef6b60; --shu-ink:#f08076; --shu-wash:#3a2723;
       --ok-wash:#22301f; --ok-ink:#8fc79f; --bar:#efeade; --bar-ink:#23211d;
       --field:#201e19; --field-line:#4d4739; --grid:#3a3529;
+      --a1:#ef6b60; --a1w:#3a2723; --a2:#7bb0e8; --a2w:#1f2a35; --a3:#8fc79f; --a3w:#1f2b22;
     }
   }
   :root[data-theme="dark"]{
@@ -46,6 +48,7 @@
     --rule:#403b32; --rule-soft:#332f28; --shu:#ef6b60; --shu-ink:#f08076; --shu-wash:#3a2723;
     --ok-wash:#22301f; --ok-ink:#8fc79f; --bar:#efeade; --bar-ink:#23211d;
     --field:#201e19; --field-line:#4d4739; --grid:#3a3529;
+    --a1:#ef6b60; --a1w:#3a2723; --a2:#7bb0e8; --a2w:#1f2a35; --a3:#8fc79f; --a3w:#1f2b22;
   }
 
   *{box-sizing:border-box}
@@ -89,7 +92,7 @@
   .hello b{color:var(--ink); font-size:17px}
   .tiles{display:grid; grid-template-columns:repeat(auto-fit, minmax(215px, 1fr)); gap:12px}
   .tile{
-    display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+    display:flex; flex-direction:column; align-items:flex-start; gap:9px;
     min-height:128px; padding:16px 16px 14px; border-radius:16px; text-align:left;
     background:var(--paper); border:1.5px solid var(--rule); color:var(--ink);
   }
@@ -570,6 +573,44 @@
   .fixhd b{font-family:var(--f-round); font-size:17px; font-weight:700; color:var(--shu-ink)}
   .fixhd span{font-size:13px; color:var(--ink-soft); line-height:1.5}
   .score.fix .big{color:var(--shu-ink)}
+
+  /* ホームの グループ・つかいかた */
+  .hsec{display:flex; align-items:center; gap:8px; margin:20px 0 9px}
+  .hsec b{font-family:var(--f-round); font-size:15.5px; font-weight:700; color:var(--ink)}
+  .hsec i{width:22px; height:22px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; font-style:normal; flex:none}
+  .hsec s{flex:1; height:1.5px; background:var(--rule-soft); text-decoration:none}
+  .g1 .hsec i{background:var(--a1w); color:var(--a1)} .g2 .hsec i{background:var(--a2w); color:var(--a2)} .g3 .hsec i{background:var(--a3w); color:var(--a3)}
+  .tile{box-shadow:0 2px 0 var(--rule-soft)}
+  .tile .ic{width:46px; height:46px; border-radius:15px; display:flex; align-items:center; justify-content:center; flex:none}
+  .tile .tt{display:flex; flex-direction:column; gap:3px; min-width:0; width:100%}
+  .tile .ic svg{width:26px; height:26px}
+  .g1 .tile .ic{background:var(--a1w)} .g1 .tile .ic svg{color:var(--a1)}
+  .g2 .tile .ic{background:var(--a2w)} .g2 .tile .ic svg{color:var(--a2)}
+  .g3 .tile .ic{background:var(--a3w)} .g3 .tile .ic svg{color:var(--a3)}
+  .g1 .tile{background:linear-gradient(180deg, var(--a1w), var(--paper) 62%)}
+  .g2 .tile{background:linear-gradient(180deg, var(--a2w), var(--paper) 62%)}
+  .tiles.mini{grid-template-columns:repeat(auto-fit, minmax(158px, 1fr)); gap:8px}
+  .tiles.mini .tile{flex-direction:row; align-items:center; gap:10px; min-height:60px; padding:9px 12px; box-shadow:none}
+  .tiles.mini .tile .ic{width:36px; height:36px; border-radius:12px}
+  .tiles.mini .tile .ic svg{width:21px; height:21px}
+  .tiles.mini .tile b{font-size:15.5px}
+  .tiles.mini .tile .tt span{display:none}
+  .tiles.mini .tile .tt{gap:0}
+  .helpb{margin-left:auto; width:40px; height:40px; border-radius:50%; border:1.5px solid currentColor; background:transparent; color:var(--bar-ink); font-family:var(--f-round); font-size:17px; font-weight:700; opacity:.85; flex:none}
+  .hq{border:1.5px solid var(--rule); border-radius:14px; background:var(--paper); margin:8px 0; overflow:hidden}
+  .hq>summary{list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:13px 14px; font-family:var(--f-round); font-size:16.5px; font-weight:700}
+  .hq>summary::-webkit-details-marker{display:none}
+  .hq>summary::after{content:'＋'; margin-left:auto; color:var(--ink-faint); font-size:16px}
+  .hq[open]>summary::after{content:'−'}
+  .hq[open]>summary{border-bottom:1px dashed var(--rule-soft)}
+  .hq .em{width:32px; height:32px; border-radius:11px; background:var(--a1w); display:flex; align-items:center; justify-content:center; font-size:17px; flex:none}
+  .hbody{padding:10px 15px 14px; font-size:14.5px; line-height:1.85; color:var(--ink)}
+  .hbody p{margin:0 0 8px}
+  .hbody ol, .hbody ul{margin:0 0 8px; padding-left:1.3em}
+  .hbody li{margin:3px 0}
+  .hbody b{color:var(--shu-ink)}
+  .hbody .k{display:inline-block; font-family:var(--f-round); font-size:13px; background:var(--rule-soft); border-radius:8px; padding:1px 8px; margin:0 1px}
+  .hnote{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin:4px 0 14px; line-height:1.7}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -578,6 +619,7 @@
 <div class="top"><div class="wrap">
   <button type="button" class="back" id="back" hidden>‹ ホーム</button>
   <h1 id="ttl">すずドリル</h1>
+  <button type="button" class="helpb" id="helpBtn" aria-label="つかいかた">？</button>
   <div class="tabs" id="tabs" hidden></div>
 </div></div>
 
@@ -587,7 +629,7 @@
     <div class="wrap">
       <div id="charCard"></div>
       <p class="hello" id="hello"></p>
-      <div class="tiles" id="tiles"></div>
+      <div id="tiles"></div>
       <p class="note">2年生 文しょうだい　1-⑤・1-⑥・1-⑦　ぜんぶで 150問</p>
     </div>
   </section>
@@ -611,6 +653,10 @@
       <div id="wresult"></div>
       <div id="wqs"></div>
     </div>
+  </section>
+
+  <section id="v-help" hidden>
+    <div class="wrap" id="help"></div>
   </section>
 
   <section id="v-cal" hidden>
@@ -1484,8 +1530,8 @@
   $('btnAgain').addEventListener('click', function () { if (!cur) return; if (cur.againAction) cur.againAction(); else cur.again(); });
 
   // ---------- views ----------
-  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kanji', 'solve', 'weak', 'cal', 'lessons', 'records', 'print'];
-  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ' };
+  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kanji', 'solve', 'weak', 'cal', 'lessons', 'records', 'print', 'help'];
+  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ', help: 'つかいかた' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -1497,9 +1543,11 @@
     window.scrollTo(0, 0);
   }
   $('back').addEventListener('click', function () { renderHome(); show('home'); });
+  $('helpBtn').addEventListener('click', function () { renderHelp(); show('help'); });
 
   // ---------- home ----------
   var ICONS = {
+    help: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 1 1 3.7 2.6c-.7.3-1 .9-1 1.6v.3"/><circle cx="12" cy="17.2" r="1.1" fill="currentColor" stroke="none"/></svg>',
     cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/><circle cx="8.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="13" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg>',
     keisan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3" width="17" height="18" rx="2"/><path d="M7 8h4M9 6v4M14 8h3.5M14.2 15.5h3.6M7.2 14.2l3.6 3.6M10.8 14.2l-3.6 3.6M14.2 18h3.6"/></svg>',
     grow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v11h14V10"/><rect x="9.5" y="13.5" width="5" height="7.5" rx="1"/></svg>',
@@ -1526,24 +1574,45 @@
     else hello.textContent = 'きょうは どれから やる？';
 
     var box = $('tiles'); box.innerHTML = '';
-    [
-      ['scan', 'テストを よみとる', '写真を とると、その子用の プリントが できる', true],
-      ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問'],
-      ['keisan', 'けいさん 1まい', 'まいにち 1まい 10問（ぜんぶで 60回）'],
-      ['kanji', 'かんじ', '2年生の 漢字 160字　よみ・かき・なぞり書き'],
-      ['solve', 'テストの プリント', '学校の テストから 作った プリント（' + allTests().length + 'セット）'],
-      ['weak', 'にがてを とく', 'にがてな 型から 5問（どれかは ひみつ）'],
-      ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
-      ['cal', 'カレンダー', 'テストの よてい・やった日が 見える'],
-      ['grow', 'マイルーム', 'ドリまる・なかま・かざり・もくひょう・メダル'],
-      ['records', 'きろく', 'せいかいりつ・にがて・きょうの けっか'],
-      ['print', 'いんさつ', '紙の プリントを 作る・PDF']
-    ].forEach(function (d) {
-      var t = btn('tile' + (d[3] ? ' primary' : ''), null, function () { open(d[0]); });
-      t.innerHTML = ICONS[d[0]];
-      t.appendChild(el('b', null, d[1]));
-      t.appendChild(el('span', null, d[2]));
-      box.appendChild(t);
+    var groups = [
+      { cls: 'g1', ic: '🌱', name: 'まいにち やること', items: [
+        ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問'],
+        ['keisan', 'けいさん 1まい', 'まいにち 1まい 10問（ぜんぶで 60回）'],
+        ['kanji', 'かんじ', '2年生の 漢字 160字　よみ・かき・なぞり書き']
+      ] },
+      { cls: 'g2', ic: '📷', name: 'テストの ために', items: [
+        ['scan', 'テストを よみとる', '写真を とると、その子用の プリントが できる'],
+        ['solve', 'テストの プリント', '学校の テストから 作った プリント（' + allTests().length + 'セット）'],
+        ['weak', 'にがてを とく', 'にがてな 型から 5問（どれかは ひみつ）']
+      ] },
+      { cls: 'g3', ic: '🔎', name: '見る・つかう', mini: true, items: [
+        ['cal', 'カレンダー', 'テストの よてい・やった日'],
+        ['grow', 'マイルーム', 'ドリまる・なかま・もくひょう'],
+        ['records', 'きろく', 'せいかいりつ・にがて'],
+        ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
+        ['print', 'いんさつ', '紙の プリントを 作る・PDF'],
+        ['help', 'つかいかた', 'この アプリの せつめい']
+      ] }
+    ];
+    groups.forEach(function (g) {
+      var wrap = el('div', g.cls);
+      var hd = el('div', 'hsec');
+      hd.appendChild(el('i', null, g.ic));
+      hd.appendChild(el('b', null, g.name));
+      hd.appendChild(el('s'));
+      wrap.appendChild(hd);
+      var grid = el('div', 'tiles' + (g.mini ? ' mini' : ''));
+      g.items.forEach(function (d) {
+        var t = btn('tile', null, function () { open(d[0]); });
+        t.appendChild(html('div', 'ic', ICONS[d[0]] || ''));
+        var tx = el('div', 'tt');
+        tx.appendChild(el('b', null, d[1]));
+        tx.appendChild(el('span', null, d[2]));
+        t.appendChild(tx);
+        grid.appendChild(t);
+      });
+      wrap.appendChild(grid);
+      box.appendChild(wrap);
     });
   }
   function open(v) {
@@ -1556,6 +1625,7 @@
     if (v === 'solve') { if (!(cur && cur.view === 'solve')) startSheet(); renderTabs(); }
     if (v === 'weak') { if (!(cur && cur.view === 'weak')) renderWeakIntro(); }
     if (v === 'cal') renderCal();
+    if (v === 'help') renderHelp();
     if (v === 'lessons') renderLessons();
     if (v === 'records') renderRecords();
     if (v === 'print') renderPrint();
@@ -3420,6 +3490,117 @@
     acts.appendChild(btn('linkbtn', 'やめる', function () { calForm = null; renderCal(); }));
     f.appendChild(acts);
     return f;
+  }
+
+  // ---------- つかいかた（ヘルプ） ----------
+  var helpTab = 'suzu';
+  var HELP = {
+    suzu: [
+      ['🏠', 'ホームの 見かた', '<p>ホームは 上から こう ならんで います。</p><ul>'
+        + '<li><b>マイルーム</b>の カード…ドリまるの レベルと、いまの ようす。タップすると へやに 入れます。</li>'
+        + '<li><b>きょうの クエスト</b>…あいさつ・おみくじ・きょう やること。</li>'
+        + '<li><b>つぎの テスト</b>…テストが 近いと「あと ○日」と 出ます。</li>'
+        + '<li>その下の <b>ボタン</b>…べんきょうを えらぶ ところ。</li></ul>'],
+      ['✏️', 'もんだいの ときかた', '<ul>'
+        + '<li><b>ペンで 書きます</b>。指は 画面を うごかす ため。指で 書きたい ときは、わくの 上の <span class="k">指で かく</span> を おします。</li>'
+        + '<li>（しき）（こたえ）（ひっさん）の ところに 書きます。ここは まるつけには つかいません。じゆうに つかって いいです。</li>'
+        + '<li>下の 白い ますに <b>数字で こたえを 入れます</b>。ここを 見て まるつけを します。</li>'
+        + '<li>ぜんぶ 書けたら、いちばん下の <span class="k">まるつけ</span> を おします。</li>'
+        + '<li>まちがえた ときは、その もんだいの 下に <b>こたえと しき</b>が 出ます。「せんせいの ワンポイント」も よめます。</li></ul>'],
+      ['🔁', 'なおし', '<p>まちがえた もんだいが あると、ボタンが <span class="k">まちがえた ○問を なおす</span> に かわります。</p><ul>'
+        + '<li>おすと、<b>まちがえた ぶんだけ</b> もう一度 出ます。</li>'
+        + '<li>ぜんぶ なおせたら「つぎ」に すすめます。</li>'
+        + '<li>なおせると ポイントが もらえます。</li>'
+        + '<li>2回 なおしても むずかしい ときは「つぎへ すすむ」が 出ます。むりを しなくて だいじょうぶ。</li></ul>'],
+      ['⭐', 'ポイントと レベル', '<ul>'
+        + '<li>もんだいを といたり、クエストを クリアすると <b>ポイント</b>が たまります。</li>'
+        + '<li>たまると <b>レベルアップ</b>。がんばった 日は 1レベルぐらい 上がります。</li>'
+        + '<li><b>10レベルごとに ★</b>が 1つ ふえます。</li>'
+        + '<li>レベルが 上がると、へやの かざり・なかま・ドリまるの すがたが ふえます。つぎに 何が もらえるかは「つぎの ごほうび」に 出ています。</li></ul>'],
+      ['✅', 'きょうの クエスト', '<ul>'
+        + '<li>あさ いちばんに <span class="k">おはよう！</span> を おすと、きょうの <b>おみくじ</b>が ひけます。</li>'
+        + '<li>学校や おうちの もくひょうが ならんで います。できたら 四角を タップして ✓。</li>'
+        + '<li>ぜんぶ できたら <b>ボーナス</b>。それが つづくと「おおきな もくひょう」も クリアです。</li>'
+        + '<li>さいごに「きょうは どうだった？」で きぶんを えらびます。</li></ul>'],
+      ['📅', 'カレンダー', '<ul>'
+        + '<li>べんきょうした 日に <b>赤い まる</b>、やった まい数だけ 緑の 点が つきます。</li>'
+        + '<li>テストの 日には しるしが つき、ホームに「あと ○日」と 出ます。</li>'
+        + '<li>日を タップすると、その日 やった ことが 見られます。</li></ul>']
+    ],
+    oya: [
+      ['🕐', '1日の ながれ（おすすめ）', '<ol>'
+        + '<li><b>朝</b>：アプリを ひらく → ドリまるの ひとこと → 「おはよう！」で おみくじ → きょうの クエストを 見る。</li>'
+        + '<li><b>学習</b>：「けいさん 1まい」（10問）＋「きょうの 5問」または「かんじ」。10〜20分が 目安です。</li>'
+        + '<li><b>夜</b>：できた クエストに ✓ → おうちの人が 👪 ✓ → ふりかえりの きぶんを えらぶ。</li></ol>'
+        + '<p>1日 2まいで だいたい 1レベル 上がります。</p>'],
+      ['📷', 'テストの 写真から プリントを 作る', '<ol>'
+        + '<li>iPadで <b>テストを よみとる</b> → 写真を とる → 名前を 黒く ぬる → <span class="k">おくる</span>。</li>'
+        + '<li>共有シートで「ファイルに保存」→ <b>iCloud Drive › すずドリル › テストの写真</b> に 入れます。</li>'
+        + '<li>Mac の Claude に「テストの写真を入れた」と つたえると、型と ○✗ を 読みとって アプリに とどきます。</li>'
+        + '<li>とどくと「テストの プリント」に その子用の 10まいが ふえ、記録にも 反映されます。</li></ol>'
+        + '<p>APIキーの 入力は いりません。</p>'],
+      ['🎯', 'クエストを えらぶ・ふやす', '<ul>'
+        + '<li>クエストカードの 下の <b>おうちの人へ</b> の リンク、または マイルーム →「クエスト」。</li>'
+        + '<li>学校・おうちの もくひょうが <b>57種・7グループ</b>。出す／しまうを タップで きめます。「じぶんで つくる」で 自由に 追加も できます。</li>'
+        + '<li>「1日に 出す かず」を きめると、出している 中から <b>本人が えらぶ</b> ように なります（おまかせボタンも あります）。</li>'
+        + '<li>ポイント、おうちの人の ✓ を つかうか、学校の クエストの 曜日も ここで きめられます。</li></ul>'],
+      ['🏫', '学校の しんどに あわせる', '<ul>'
+        + '<li>マイルーム →「学校の しんど」→ <b>学校は いま ここ</b> を えらぶと、「きょうの 5問」に「ならった ところから 5問」が 出ます。習っていない 単元は 出しません。</li>'
+        + '<li>単元の ならびは <b>東京書籍「新編 あたらしい さんすう」</b>の じゅんばんです。</li>'
+        + '<li>漢字は「かんじ」画面の <b>学校で ならった 字</b> で、ドリルで 習った 字に 印を つけます。「ならった 字だけ 出す」に すると、その 字だけから 出ます。</li></ul>'],
+      ['📈', 'もんだいの むずかしさ（自動）', '<ul>'
+        + '<li>型ごとに、<b>5回 やって 8割</b> できたら むずかしさ Lv.2、<b>12回 やって 9割</b>で Lv.3に なります。</li>'
+        + '<li>2けたが 3けたに、九九が ×12に、くり下がりが 必ず 入る、など 少しずつ 上がります。</li>'
+        + '<li><b>にがてな 型は 上がりません</b>。難しい 問題は ポイントも 多く なります。</li>'
+        + '<li>いまの むずかしさは「きろく」の 型べつ一覧で 見られます。</li></ul>'],
+      ['⚡', 'レベルの スピード', '<ul>'
+        + '<li>マイルーム →「レベルの スピード」で <b>はやい／ふつう／ゆっくり</b>。ふつうが おすすめです。</li>'
+        + '<li>上がるのが 早すぎる・遅すぎると 感じたら 変えてください。<b>変えても レベルは 下がりません。</b></li></ul>'],
+      ['📅', 'テストの よていを 入れる', '<ol>'
+        + '<li><b>カレンダー</b>を ひらき、テストの 日を タップします。</li>'
+        + '<li><span class="k">📌 よていを 入れる</span> → 種類（さんすう／かんじ／よてい）→ はんい（単元や 漢字グループ）を えらぶ。</li>'
+        + '<li>「この 日に 入れる」で かんりょう。ホームに「あと ○日」が 出ます。</li></ol>'
+        + '<p>はんいは これから の 出題に つかう ので、分かる ときは 入れて おくと べんりです。</p>'],
+      ['🖨', 'いんさつ（紙の プリント）', '<ul>'
+        + '<li><b>いんさつ</b>から、テストの プリント／型を えらんで 作る／かんじノート を PDFに できます。</li>'
+        + '<li>iPad の 共有シートから 印刷や 保存が できます。</li></ul>'],
+      ['💾', 'きろくの ほぞん', '<ul>'
+        + '<li>記録は <b>その iPad の 中だけ</b>に あります（サーバは ありません）。ほかの 端末とは 別です。</li>'
+        + '<li>「きろく」画面の <span class="k">きろくを 書き出す</span> で ファイルに 保存できます。ときどき 保存して おくと あんしんです。</li>'
+        + '<li>同じ画面の「きろくを ぜんぶ けす」は <b>元に もどせません</b>。ふだんは さわらないで ください。</li></ul>'],
+      ['🔄', 'アプリの こうしん', '<ul>'
+        + '<li>Wi-Fiに つないだ 状態で アプリを ひらき直すと 新しく なります。</li>'
+        + '<li>変わらない ときは、アプリを 終了（上に スワイプ）して もう一度 ひらいて ください。</li>'
+        + '<li>それでも 変わらない ときは Safariで <b>akipaje181.github.io/suzu-drill/</b> を ひらいて ください。</li></ul>'],
+      ['🆘', 'こまった とき', '<ul>'
+        + '<li><b>ペンで 書けない</b>…わくの 上の <span class="k">指で かく</span> を おすと 指でも 書けます。もう一度 おすと もどります。</li>'
+        + '<li><b>まちがえて ✓ を おした</b>…もう一度 おすと 消えます（ポイントは そのままです）。</li>'
+        + '<li><b>音を 消したい</b>…マイルームの いちばん下「音：オン」を おします。</li>'
+        + '<li><b>字が 小さい</b>…iPadの 画面を 横向きに すると 大きく なります。</li></ul>']
+    ]
+  };
+  function renderHelp() {
+    var box = $('help'); box.innerHTML = ''; cur = null; $('bar').hidden = true;
+    var tabs = el('div', 'tabs inpage'); tabs.style.cssText = 'margin:16px 0 10px; flex-wrap:wrap';
+    [['suzu', '👧 すず'], ['oya', '👪 おうちの人']].forEach(function (t) {
+      var b = btn('tab', t[1], function () { helpTab = t[0]; renderHelp(); });
+      b.setAttribute('aria-pressed', String(helpTab === t[0]));
+      tabs.appendChild(b);
+    });
+    box.appendChild(tabs);
+    box.appendChild(el('p', 'hnote', helpTab === 'suzu'
+      ? 'つかいかたの せつめいだよ。しりたい ところを タップして ひらいてね。'
+      : 'おうちの人むけの せつめいです。設定と ふだんの 運用は ここに まとまっています。'));
+    HELP[helpTab].forEach(function (h) {
+      var d = el('details', 'hq'), sm = el('summary');
+      sm.appendChild(el('span', 'em', h[0]));
+      sm.appendChild(el('span', null, h[1]));
+      d.appendChild(sm);
+      d.appendChild(html('div', 'hbody', h[2]));
+      box.appendChild(d);
+    });
+    if (helpTab === 'oya') box.appendChild(el('p', 'hnote', 'このアプリは iPadの ホーム画面に 追加して つかえます。Safariで ひらき、共有ボタン →「ホーム画面に追加」。'));
+    window.scrollTo(0, 0);
   }
   function renderQuestSettings(box) {   // マイルーム: おうちの人が クエストを えらぶ・つくる
     var c = gameCtx(), onCount = questDefs().length;
