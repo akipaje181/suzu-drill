@@ -564,6 +564,12 @@
   .prow b{font-family:var(--f-round); font-size:17px; color:var(--shu-ink); flex:none; min-width:74px}
   .prow .ptx{font-family:var(--f-round); font-size:15px; flex:1; min-width:0}
   .prow .ptx small{display:block; font-family:var(--f-kaku); font-size:12px; color:var(--ink-soft)}
+
+  /* なおし（まちがえた もんだいだけ） */
+  .fixhd{display:flex; align-items:center; gap:10px; margin:6px 0 10px; padding:10px 14px; border-radius:14px; background:var(--shu-wash); border:1.5px solid var(--shu)}
+  .fixhd b{font-family:var(--f-round); font-size:17px; font-weight:700; color:var(--shu-ink)}
+  .fixhd span{font-size:13px; color:var(--ink-soft); line-height:1.5}
+  .score.fix .big{color:var(--shu-ink)}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -1381,9 +1387,10 @@
 
   // ---------- set runner (sheet mode / weak mode) ----------
   var cur = null;
-  function setBar(mainText, again) {
+  function setBar(mainText, again, againText) {
     $('btnMain').textContent = mainText;
     $('btnAgain').hidden = !again;
+    $('btnAgain').textContent = againText || 'もういちど';
   }
   function startSet(o) {
     livePads.length = 0; fingerPad = null;
@@ -1394,6 +1401,24 @@
     setBar('まるつけ', false);
     $('bar').hidden = false;
   }
+  // まちがえた もんだいだけを もう一度（記録には ひびかせない。ぜんぶ なおせたら つぎへ）
+  function startFix(o) {
+    var wrongItems = o.items.filter(function (it) { return !it.ok; });
+    if (!wrongItems.length) { o.next(); return; }
+    var round = (o.fixRound || 0) + 1;
+    var items = wrongItems.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; });
+    startSet({
+      view: o.view, mode: o.mode, unit: o.unit, keys: o.keys, kai: o.kai, test: o.test, sheet: o.sheet,
+      items: items, box: o.box, result: o.result, tag: o.tag + '/f' + round,
+      fixing: true, fixRound: round,
+      nextLabel: o.nextLabel, next: o.next, again: o.again
+    });
+    var hd = el('div', 'fixhd');
+    hd.appendChild(el('b', null, 'なおし　' + items.length + '問'));
+    hd.appendChild(el('span', null, round === 1 ? 'まちがえた ところだけ もう一度。ぜんぶ なおせたら つぎに すすめるよ。' : round + '回目の なおし。ゆっくりで だいじょうぶ。'));
+    o.box.insertBefore(hd, o.box.firstChild);
+    window.scrollTo(0, 0);
+  }
   function gradeSet() {
     if (fingerPad) fingerPad.off();
     var o = cur, score = 0, blank = 0, wrong = [];
@@ -1402,9 +1427,28 @@
       it.graded = true; it.answered = v !== null; it.ok = ok;
       if (v === null) blank++;
       if (ok) score++; else wrong.push(it.key);
-      decorate(it, ok); bump(it.key, ok);
+      decorate(it, ok); if (!o.fixing) bump(it.key, ok);
     });
     var now = new Date().toISOString();
+    if (o.fixing) {   // なおしの ラウンド: 記録・まい数には かぞえず、なおせた ぶんだけ ポイント
+      var ev = score ? gameEvent(score * XP.fix, { lines: [['なおせた ' + score + '問', score * XP.fix]] }) : null;
+      save();
+      var fres = el('div', 'score fix' + (score === o.items.length ? ' all' : ''));
+      var fbig = el('div', 'big', String(score)); fbig.appendChild(el('i', null, ' / ' + o.items.length));
+      fres.appendChild(fbig);
+      fres.appendChild(el('div', 'msg', score === o.items.length ? 'ぜんぶ なおせた！ よく がんばったね。' : 'あと ' + (o.items.length - score) + '問。しきを 見て、もういちど。'));
+      o.result.appendChild(fres);
+      if (ev) o.result.appendChild(gameResultPanel(ev));
+      o.graded = true;
+      if (score === o.items.length) { o.mainAction = null; o.againAction = null; setBar(o.nextLabel(), false); }
+      else {
+        o.mainAction = function () { startFix(o); };
+        o.againAction = function () { o.next(); };
+        setBar('まちがえた ' + (o.items.length - score) + '問を なおす', o.fixRound >= 2, 'つぎへ すすむ');
+      }
+      window.scrollTo(0, 0);
+      return;
+    }
     if (o.mode === 'sheet') {
       var t = o.test, sh = o.sheet, rec = recFor(t.id);
       var prev = rec.sheets[sh.n] || { tries: 0, best: 0 };
@@ -1424,17 +1468,20 @@
     res.appendChild(el('div', 'msg',
       score === o.items.length ? 'ぜんもん せいかい！ よくできました。'
       : blank ? 'まだ 入れて いない ところが あるよ。'
-      : score >= 3 ? 'おしい！ ✗の しきを 見て、もういちど やってみよう。'
-      : '✗の しきを 見て、かんがえ方を たしかめよう。'));
+      : score >= 3 ? 'おしい！ まちがえた ' + (o.items.length - score) + '問を なおそう。ぜんぶ なおせたら つぎに すすめるよ。'
+      : '✗の しきを 見て、かんがえ方を たしかめよう。まちがえた ' + (o.items.length - score) + '問を なおそう。'));
     o.result.appendChild(res);
     o.result.appendChild(gameResultPanel(gev));
     o.graded = true;
-    setBar(o.nextLabel(), true);
+    var miss = o.items.length - score;
+    o.mainAction = null; o.againAction = null;
+    if (miss) { o.mainAction = function () { startFix(o); }; setBar('まちがえた ' + miss + '問を なおす', true); }
+    else setBar(o.nextLabel(), true);
     if (o.mode === 'sheet') renderChips();
     window.scrollTo(0, 0);
   }
-  $('btnMain').addEventListener('click', function () { if (!cur) return; if (!cur.graded) gradeSet(); else cur.next(); });
-  $('btnAgain').addEventListener('click', function () { if (cur) cur.again(); });
+  $('btnMain').addEventListener('click', function () { if (!cur) return; if (!cur.graded) gradeSet(); else if (cur.mainAction) cur.mainAction(); else cur.next(); });
+  $('btnAgain').addEventListener('click', function () { if (!cur) return; if (cur.againAction) cur.againAction(); else cur.again(); });
 
   // ---------- views ----------
   var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kanji', 'solve', 'weak', 'cal', 'lessons', 'records', 'print'];
@@ -2506,7 +2553,7 @@
 
   // ---------- game: ポイント・レベル・もくひょう・スタンプ・メダル・なかま・マイルーム ----------
   var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20,
-    quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100, hard: 2 };   // クエスト系（bigGoal=1レベルぶん）
+    quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100, hard: 2, fix: 3 };   // fix = なおせた 1問ぶん   // クエスト系（bigGoal=1レベルぶん）
   // レベルの スピード: はじめは すぐ 上がり、やがて「ふつうの 1日 ＝ 約1レベル」に おちつく
   // ふつうの 1日（あいさつ＋クエスト＋ドリル1まい＋ふりかえり）で だいたい 190ポイント
   var LV_SPEEDS = [['はやい', 140], ['ふつう', 180], ['ゆっくり', 240]];
