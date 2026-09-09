@@ -529,6 +529,12 @@
   .termrow .tabs{margin:0}
   .schoolnow{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin:2px 0 8px}
   .schoolnow b{color:var(--shu-ink)}
+
+  /* つぎの ごほうび・ほし */
+  .nextrw{font-family:var(--f-round); font-size:13px; color:var(--ink-soft); margin-top:3px}
+  .nextrw b{color:var(--shu-ink)}
+  .stars{font-size:20px; letter-spacing:2px; line-height:1.4; color:#e6a100}
+  .stars small{display:block; font-family:var(--f-kaku); font-size:12px; color:var(--ink-soft); letter-spacing:0}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -2376,16 +2382,37 @@
   // ---------- game: ポイント・レベル・もくひょう・スタンプ・メダル・なかま・マイルーム ----------
   var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20,
     quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100 };   // クエスト系（bigGoal=1レベルぶん）
-  var LEVEL_NEED = 100;
+  // レベルの スピード: はじめは すぐ 上がり、やがて「ふつうの 1日 ＝ 約1レベル」に おちつく
+  // ふつうの 1日（あいさつ＋クエスト＋ドリル1まい＋ふりかえり）で だいたい 190ポイント
+  var LV_SPEEDS = [['はやい', 140], ['ふつう', 180], ['ゆっくり', 240]];
+  var LEVEL_NEED = 180;                       // おちついた ときの 1レベルぶん（ふつう）
+  var LV_START = 100, LV_STEP = 20;           // Lv.1→2 は 100、そこから 20ずつ ふえて 上の 数で 止まる
+  var CUM = null, CUM_BASE = null;
+  function lvBase() { var v = game && game.lvSpeed; return v === 140 || v === 240 ? v : LEVEL_NEED; }
+  function needFor(lv) { return Math.min(lvBase(), LV_START + LV_STEP * (lv - 1)); }
+  function cumTable() {   // CUM[lv] = Lv.lv に なるまでの ごうけい ポイント
+    var base = lvBase();
+    if (CUM && CUM_BASE === base) return CUM;
+    CUM_BASE = base; CUM = [0, 0];
+    for (var lv = 1; lv <= 999; lv++) CUM[lv + 1] = CUM[lv] + Math.min(base, LV_START + LV_STEP * (lv - 1));
+    return CUM;
+  }
+  function starsOf(level) { return Math.floor(level / 10); }   // 10レベルごとに ★1つ（ずっと つづく ごほうび）
+  function setLvSpeed(v) {   // スピードを かえても レベルは 下がらない
+    var lv = levelOf().level; game.lvSpeed = v; CUM = null;
+    var c = cumTable(); if (game.xp < c[lv]) game.xp = c[lv];
+  }
+  function lvSpeedIdx() { var b = lvBase(); for (var i = 0; i < LV_SPEEDS.length; i++) { if (LV_SPEEDS[i][1] === b) return i; } return 1; }
+
   var COLORS = ['#f4c14d', '#7ec8e3', '#f49ac1', '#8fd18f', '#c9a3ff', '#ffb27a'];
-  var STAGES = [['たまご', 1], ['あかちゃん', 3], ['こども', 7], ['おとな', 15], ['マスター', 30]];
+  var STAGES = [['たまご', 1], ['あかちゃん', 3], ['こども', 7], ['おとな', 15], ['マスター', 30], ['ヒーロー', 45], ['でんせつ', 70]];
   var ACCS = [
-    { id: 'ribbon', name: 'リボン', need: 'Lv.2', ok: function () { return levelOf().level >= 2; } },
-    { id: 'hat', name: 'ぼうし', need: 'Lv.4', ok: function () { return levelOf().level >= 4; } },
+    { id: 'ribbon', lv: 2, name: 'リボン', need: 'Lv.2', ok: function () { return levelOf().level >= 2; } },
+    { id: 'hat', lv: 4, name: 'ぼうし', need: 'Lv.4', ok: function () { return levelOf().level >= 4; } },
     { id: 'glasses', name: 'めがね', need: 'メダル「型マスター」', ok: function () { return !!game.badges.master1; } },
     { id: 'cape', name: 'マント', need: '7日 つづける', ok: function () { return !!game.badges.streak7; } },
     { id: 'star', name: 'ほしバッジ', need: 'パーフェクト ×10', ok: function () { return !!game.badges.perfect10; } },
-    { id: 'crown', name: 'かんむり', need: 'Lv.10', ok: function () { return levelOf().level >= 10; } }
+    { id: 'crown', lv: 10, name: 'かんむり', need: 'Lv.10', ok: function () { return levelOf().level >= 10; } }
   ];
   var MATES = [
     { id: 'usagi', name: 'うさまる', sp: 'usagi', color: '#fbe3ea', need: '10まい とく', ok: function (c) { return c.sheets >= 10; } },
@@ -2395,17 +2422,23 @@
     { id: 'kaeru', name: 'かえるん', sp: 'kaeru', color: '#8fd18f', need: '型マスター ×3', ok: function (c) { return c.masters >= 3; } },
     { id: 'robo', name: 'ロボまる', sp: 'robo', color: '#a9b6c9', need: 'スタンプカード 1まい', ok: function (c) { return c.stamps >= 30; } },
     { id: 'hiyo', name: 'ひよぴ', sp: 'hiyo', color: '#f9e07a', need: 'あいさつ 5日 れんぞく', ok: function (c) { return c.morningMax >= 5; } },
-    { id: 'fukurou', name: 'ふくろう', sp: 'fukurou', color: '#b08968', need: 'クエスト ぜんぶクリア ×5', ok: function (c) { return c.allclears >= 5; } }
+    { id: 'fukurou', name: 'ふくろう', sp: 'fukurou', color: '#b08968', need: 'クエスト ぜんぶクリア ×5', ok: function (c) { return c.allclears >= 5; } },
+    { id: 'hitsuji', name: 'もこすけ', sp: 'hitsuji', color: '#f3ece0', need: 'Lv.20', lv: 20, ok: function (c) { return c.level >= 20; } },
+    { id: 'ryu', name: 'ドラごん', sp: 'ryu', color: '#7fc7a8', need: 'Lv.35', lv: 35, ok: function (c) { return c.level >= 35; } }
   ];
   var DECOR = [
-    { id: 'rug', name: 'ラグ', need: 'Lv.2', ok: function (c) { return c.level >= 2; } },
-    { id: 'plant', name: 'かんようしょくぶつ', need: 'Lv.4', ok: function (c) { return c.level >= 4; } },
-    { id: 'clock', name: 'とけい', need: 'Lv.5', ok: function (c) { return c.level >= 5; } },
-    { id: 'poster', name: 'ポスター', need: 'Lv.8', ok: function (c) { return c.level >= 8; } },
-    { id: 'lamp', name: 'ランプ', need: 'Lv.10', ok: function (c) { return c.level >= 10; } },
-    { id: 'globe', name: 'ちきゅうぎ', need: 'Lv.12', ok: function (c) { return c.level >= 12; } },
+    { id: 'rug', lv: 2, name: 'ラグ', need: 'Lv.2', ok: function (c) { return c.level >= 2; } },
+    { id: 'plant', lv: 4, name: 'かんようしょくぶつ', need: 'Lv.4', ok: function (c) { return c.level >= 4; } },
+    { id: 'clock', lv: 5, name: 'とけい', need: 'Lv.5', ok: function (c) { return c.level >= 5; } },
+    { id: 'poster', lv: 8, name: 'ポスター', need: 'Lv.8', ok: function (c) { return c.level >= 8; } },
+    { id: 'lamp', lv: 10, name: 'ランプ', need: 'Lv.10', ok: function (c) { return c.level >= 10; } },
+    { id: 'globe', lv: 12, name: 'ちきゅうぎ', need: 'Lv.12', ok: function (c) { return c.level >= 12; } },
     { id: 'trophy', name: 'トロフィーだな', need: 'メダル 5こ', ok: function (c) { return c.medals >= 5; } },
-    { id: 'garland', name: 'ガーランド', need: 'Lv.15', ok: function (c) { return c.level >= 15; } }
+    { id: 'garland', name: 'ガーランド', need: 'Lv.15', lv: 15, ok: function (c) { return c.level >= 15; } },
+    { id: 'fish', name: 'きんぎょばち', need: 'Lv.18', lv: 18, ok: function (c) { return c.level >= 18; } },
+    { id: 'piano', name: 'ピアノ', need: 'Lv.22', lv: 22, ok: function (c) { return c.level >= 22; } },
+    { id: 'tent', name: 'こどもテント', need: 'Lv.26', lv: 26, ok: function (c) { return c.level >= 26; } },
+    { id: 'mobile', name: 'ほしの モービル', need: 'Lv.30', lv: 30, ok: function (c) { return c.level >= 30; } }
   ];
   var BADGES = [
     { id: 'first', ic: '🌱', name: 'はじめの いっぽ', desc: 'はじめて まるつけした', ok: function (c) { return c.sheets >= 1; } },
@@ -2435,7 +2468,22 @@
     { id: 'big1', ic: '🏅', name: 'おおきな もくひょう', desc: 'こんしゅうの おおきな もくひょうを クリア', ok: function (c) { return c.bigGoals >= 1; } },
     { id: 'oks10', ic: '👪', name: 'おうちの人の ✓ ×10', desc: 'おうちの人に ✓ を 10回 もらった', ok: function (c) { return c.oks >= 10; } }
   ];
-  function levelOf() { var xp = game ? game.xp : 0, lv = Math.min(999, Math.floor(xp / LEVEL_NEED) + 1); return { level: lv, into: xp - (lv - 1) * LEVEL_NEED, need: LEVEL_NEED }; }
+  function nextReward() {   // つぎに 何が もらえるか（レベルの ちかい ものを 1つ）
+    var lv = levelOf().level, best = null;
+    var cand = function (need, what) { if (need > lv && (!best || need < best.lv)) best = { lv: need, what: what }; };
+    STAGES.forEach(function (st) { cand(st[1], game.name + 'が ' + st[0] + 'に なる'); });
+    DECOR.forEach(function (d) { if (d.lv && !game.decor[d.id]) cand(d.lv, 'へやに「' + d.name + '」'); });
+    ACCS.forEach(function (a) { if (a.lv && !a.ok()) cand(a.lv, a.name + 'が つけられる'); });
+    MATES.forEach(function (m) { if (m.lv && !game.mates[m.id]) cand(m.lv, 'なかま「' + m.name + '」'); });
+    cand((starsOf(lv) + 1) * 10, '★が ' + (starsOf(lv) + 1) + 'こに なる');
+    return best;
+  }
+  function nextRewardLine() { var n = nextReward(); return n ? 'つぎの ごほうび：<b>Lv.' + n.lv + '</b>で ' + n.what : ''; }
+  function levelOf() {
+    var xp = game ? game.xp : 0, c = cumTable(), lv = 1;
+    while (lv < 999 && xp >= c[lv + 1]) lv++;
+    return { level: lv, into: xp - c[lv], need: needFor(lv) };
+  }
   function stageOf(level) { var st = 0; STAGES.forEach(function (x, i) { if (level >= x[1]) st = i; }); return st; }
   function isSetLog(e) { return (e.mode === 'sheet' || e.mode === 'daily' || e.mode === 'weak' || e.mode === 'kanji' || e.mode === 'keisan') && (e.total || 0) >= 5; }
   function weekKey(d) { var x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return dayKey(x.toISOString()); }
@@ -2486,6 +2534,11 @@
     if (!game.quests.custom) game.quests.custom = [];
     game.quests.custom.forEach(function (cq) { if (!cq.grp) cq.grp = cq.cat === 'school' ? 'life' : 'help'; });   // v16までの じぶんで書いた ぶん
     bigGoal();
+    if (!game.curve2) {   // v19までは 100ポイントで 1レベル。同じ レベルの ままに なるよう ポイントを そろえる
+      var oldLv = Math.max(1, Math.min(999, Math.floor(game.xp / 100) + 1)), ct = cumTable();
+      if (game.xp < ct[oldLv]) game.xp = ct[oldLv];
+      game.curve2 = 1;
+    }
     if (typeof game.streakMax !== 'number') game.streakMax = streakFrom(game.stamps);
     rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
     checkUnlocks();
@@ -2515,8 +2568,9 @@
     game.xp += xp;
     if (meta && meta.scan) game.scans++;
     var lv = levelOf(), got = checkUnlocks();
+    var starUp = starsOf(lv.level) > starsOf(before);
     rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
-    var ev = { xp: xp, lines: (meta && meta.lines) || [], level: lv.level, up: lv.level > before ? lv.level : 0, stamp: !!(meta && meta.stamp), badges: got.badges, mates: got.mates, decor: got.decor, stampCount: Object.keys(game.stamps).length };
+    var ev = { xp: xp, lines: (meta && meta.lines) || [], level: lv.level, up: lv.level > before ? lv.level : 0, star: starUp ? starsOf(lv.level) : 0, stamp: !!(meta && meta.stamp), badges: got.badges, mates: got.mates, decor: got.decor, stampCount: Object.keys(game.stamps).length };
     if (ev.up || got.badges.length || got.mates.length) chime(ev.up ? 'up' : 'badge');
     return ev;
   }
@@ -2567,7 +2621,9 @@
     ev.mates.forEach(function (m) { tags.appendChild(html('span', 'badge', '🤝 なかまが ふえた！「' + m.name + '」')); });
     ev.badges.forEach(function (b) { tags.appendChild(html('span', 'badge', b.ic + ' メダル「' + b.name + '」')); });
     ev.decor.forEach(function (d) { tags.appendChild(html('span', 'badge', '🛋 へやに「' + d.name + '」が ふえた')); });
+    if (ev.star) tags.appendChild(html('span', 'badge', '⭐ ★が ' + ev.star + 'こに なった！'));
     if (tags.children.length) p.appendChild(tags);
+    var nrl = nextRewardLine(); if (nrl) p.appendChild(html('div', 'nextrw', nrl));
     p.appendChild(btn('linkbtn', 'マイルームを 見る →', function () { renderGrow(); show('grow'); }));
     if (ev.up) for (var i = 0; i < 18; i++) { var c = el('i', 'confetti'); c.style.left = (5 + Math.random() * 90) + '%'; c.style.background = COLORS[i % COLORS.length]; c.style.animationDelay = (Math.random() * .6) + 's'; p.appendChild(c); }
     return p;
@@ -2618,13 +2674,15 @@
   // ドリまる／なかま の 絵（中身）。stage 0..4, mood, wear, sp（なかまの しゅるい）
   function charInner(o) {
     var c = o.color || COLORS[0], dk = shade(c, -40), w = o.wear || {}, st = o.stage || 0, m = o.mood || 'normal', sp = o.sp || '';
-    var r = [0, 50, 58, 64, 70][st], cx = 100, cy = st ? 188 - r : 112, top = st ? cy - r : 42, ey = st ? cy - 8 : 104, ex = st ? 19 : 14;
+    var r = [0, 50, 58, 64, 70, 74, 78][st] || 78, cx = 100, cy = st ? 188 - r : 112, top = st ? cy - r : 42, ey = st ? cy - 8 : 104, ex = st ? 19 : 14;
     var out = '';
     if (w.cape && st) out += '<path d="M' + (cx - r * .9) + ' ' + (cy - r * .2) + ' L' + (cx - r * 1.25) + ' ' + (cy + r) + ' L' + (cx + r * 1.25) + ' ' + (cy + r) + ' L' + (cx + r * .9) + ' ' + (cy - r * .2) + ' Z" fill="#c0392f"/>';
     if (sp === 'usagi' && st) out += '<ellipse cx="' + (cx - 16) + '" cy="' + (top - 14) + '" rx="10" ry="28" fill="' + c + '"/><ellipse cx="' + (cx - 16) + '" cy="' + (top - 12) + '" rx="4.5" ry="18" fill="#f4a0a0"/><ellipse cx="' + (cx + 16) + '" cy="' + (top - 14) + '" rx="10" ry="28" fill="' + c + '"/><ellipse cx="' + (cx + 16) + '" cy="' + (top - 12) + '" rx="4.5" ry="18" fill="#f4a0a0"/>';
     if (sp === 'neko' && st) out += '<path d="M' + (cx - r * .75) + ' ' + (top + 18) + ' l-4 -30 26 16z M' + (cx + r * .75) + ' ' + (top + 18) + ' l4 -30 -26 16z" fill="' + c + '"/>';
     if (sp === 'kuma' && st) out += '<circle cx="' + (cx - r * .72) + '" cy="' + (top + 10) + '" r="15" fill="' + c + '"/><circle cx="' + (cx - r * .72) + '" cy="' + (top + 10) + '" r="7" fill="' + dk + '" opacity=".5"/><circle cx="' + (cx + r * .72) + '" cy="' + (top + 10) + '" r="15" fill="' + c + '"/><circle cx="' + (cx + r * .72) + '" cy="' + (top + 10) + '" r="7" fill="' + dk + '" opacity=".5"/>';
     if (sp === 'robo' && st) out += '<path d="M' + cx + ' ' + top + ' v-22" stroke="#6b7a8f" stroke-width="4"/><circle cx="' + cx + '" cy="' + (top - 26) + '" r="6" fill="#e2574c"/>';
+    if (sp === 'hitsuji' && st) [[-.85, -.15], [-.5, -.6], [0, -.8], [.5, -.6], [.85, -.15]].forEach(function (p) { out += '<circle cx="' + (cx + r * p[0]) + '" cy="' + (cy + r * p[1]) + '" r="' + (r * .34) + '" fill="#fffaf0"/>'; });
+    if (sp === 'ryu' && st) out += '<path d="M' + (cx - r * .55) + ' ' + (top + 6) + ' l-3 -20 16 12z M' + (cx + r * .55) + ' ' + (top + 6) + ' l3 -20 -16 12z" fill="#e6a100"/><path d="M' + (cx - r * 1.1) + ' ' + (cy - r * .2) + ' q-26 -18 -30 8 q18 4 30 6z M' + (cx + r * 1.1) + ' ' + (cy - r * .2) + ' q26 -18 30 8 q-18 4 -30 6z" fill="#a7dcc4" stroke="#7fc7a8" stroke-width="1.5"/>';
     if (sp === 'fukurou' && st) out += '<path d="M' + (cx - r * .7) + ' ' + (top + 16) + ' l-6 -26 24 12z M' + (cx + r * .7) + ' ' + (top + 16) + ' l6 -26 -24 12z" fill="' + c + '"/>';
     if (sp === 'hiyo' && st) out += '<path d="M' + cx + ' ' + (top + 2) + ' q-6 -12 -14 -14 M' + cx + ' ' + (top + 2) + ' q0 -14 3 -20 M' + cx + ' ' + (top + 2) + ' q6 -12 14 -14" fill="none" stroke="' + dk + '" stroke-width="3" stroke-linecap="round"/>';
     if (!st) {
@@ -2640,7 +2698,9 @@
       if (sp === 'robo') out += '<rect x="' + (cx - 16) + '" y="' + (cy + 14) + '" width="32" height="20" rx="4" fill="#6b7a8f"/><circle cx="' + (cx - 7) + '" cy="' + (cy + 24) + '" r="4" fill="#8fd18f"/><circle cx="' + (cx + 7) + '" cy="' + (cy + 24) + '" r="4" fill="#ffd166"/>';
       if (st >= 2 || sp) out += '<circle cx="' + (cx - r * .95) + '" cy="' + (cy + r * .25) + '" r="11" fill="' + c + '"/><circle cx="' + (cx + r * .95) + '" cy="' + (cy + r * .25) + '" r="11" fill="' + c + '"/>';
       if (st === 1 && !sp) out += '<path d="M' + cx + ' ' + top + ' q2 -14 12 -18 q-2 12 -12 18 q-2 -14 -12 -18 q2 12 12 18" fill="#5fae5f"/>';
-      if (st === 4 && !sp) out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 8) + '" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="6 9" opacity=".8"/>';
+      if (st >= 4 && !sp) out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 8) + '" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="6 9" opacity=".8"/>';
+      if (st >= 5 && !sp) out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r + 15) + '" fill="none" stroke="#ffd166" stroke-width="2" stroke-dasharray="3 12" opacity=".7"/>';
+      if (st >= 6 && !sp) [[-1.15, -.7], [1.15, -.7], [0, -1.25]].forEach(function (p) { out += '<path transform="translate(' + (cx + r * p[0]) + ' ' + (cy + r * p[1]) + ') scale(.9)" d="M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>'; });
       if (sp === 'kuma') out += '<ellipse cx="' + cx + '" cy="' + (ey + 16) + '" rx="17" ry="12" fill="' + shade(c, 45) + '"/>';
       out += '<circle cx="' + (cx - r * .55) + '" cy="' + (cy + 8) + '" r="7" fill="#f4a0a0" opacity=".55"/><circle cx="' + (cx + r * .55) + '" cy="' + (cy + 8) + '" r="7" fill="#f4a0a0" opacity=".55"/>';
     }
@@ -2700,6 +2760,12 @@
     if (d.lamp) s += '<rect x="500" y="170" width="4" height="36" fill="#6f695d"/><path d="M484 172 h36 l-6 -18 h-24z" fill="#f2c94c"/>';
     if (d.globe) s += '<circle cx="350" cy="190" r="14" fill="#7ec8e3"/><path d="M340 184 q10 -4 18 4 q-10 6 -14 12" fill="#8fd18f"/><rect x="346" y="203" width="8" height="4" fill="#6f695d"/>';
     s += '<rect x="404" y="192" width="82" height="14" rx="3" fill="#fff" stroke="#c9c2b4"/><text x="445" y="203" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + game.name + '　Lv.' + lv + '</text>';
+    if (d.tent) s += '<path d="M50 344 L104 272 L158 344 Z" fill="#8fd18f" stroke="#5fae5f" stroke-width="2" stroke-linejoin="round"/><path d="M92 344 L104 272 L116 344 Z" fill="#f6ecd2"/>';
+    if (d.piano) { s += '<rect x="466" y="288" width="94" height="52" rx="4" fill="#3b3630"/><rect x="466" y="282" width="94" height="8" rx="2" fill="#5a534a"/>'; for (var pk = 0; pk < 10; pk++) s += '<rect x="' + (470 + pk * 9) + '" y="294" width="7.5" height="18" fill="#fff"/>'; for (var pb = 0; pb < 9; pb++) { if (pb % 3 === 2) continue; s += '<rect x="' + (475.5 + pb * 9) + '" y="294" width="5" height="11" fill="#2b2620"/>'; } }
+    if (d.mobile) { s += '<path d="M196 0 v10 M196 10 h48" stroke="#c9c2b4" stroke-width="1.5"/>'; [[200, 30], [220, 22], [240, 34]].forEach(function (p, i) { s += '<path d="M' + p[0] + ' 10 v' + (p[1] - 16) + '" stroke="#c9c2b4" stroke-width="1"/><path transform="translate(' + p[0] + ' ' + p[1] + ') scale(.8)" d="M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="' + COLORS[i + 1] + '" stroke="#e6a100" stroke-width="1"/>'; }); }
+    if (d.fish) s += '<ellipse cx="530" cy="194" rx="15" ry="12" fill="#cfe9f8" stroke="#8fc7e8" stroke-width="1.5"/><path d="M524 196 l7 -4 0 8z" fill="#f2803a"/><circle cx="533" cy="196" r="3.5" fill="#f2803a"/><path d="M515 200 q15 6 30 0" stroke="#8fc7e8" stroke-width="1.5" fill="none"/>';
+    var stn = starsOf(lv);
+    if (stn) { s += '<rect x="60" y="196" width="128" height="6" fill="#c9a36f"/>'; for (var si = 0; si < Math.min(6, stn); si++) s += '<path transform="translate(' + (72 + si * 21) + ' 186) scale(1.05)" d="M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>'; if (stn > 6) s += '<text x="196" y="194" font-size="11" font-family="sans-serif" fill="#6f695d">×' + stn + '</text>'; }
     var spots = [[150, 262], [230, 292], [70, 290], [470, 292], [560, 296], [300, 250], [390, 300], [600, 270]], k = 0, mates = MATES.filter(function (m) { return game.mates[m.id]; });
     var talker = mates.length ? Math.floor(Math.random() * mates.length) : -1;
     mates.forEach(function (m, i) {
@@ -3149,6 +3215,7 @@
     var tx = el('div', 'xptxt'); tx.appendChild(el('span', null, 'あと ' + (lv.need - lv.into) + ' ポイントで Lv.' + (lv.level + 1)));
     tx.appendChild(html('span', null, game.stamps[dayKey(new Date().toISOString())] ? '<b>スタンプ ✓</b>' : 'れんぞく ' + streak() + '日'));
     info.appendChild(tx);
+    var nr = nextRewardLine(); if (nr) info.appendChild(html('div', 'nextrw', nr));
     info.appendChild(el('div', 'goal', goalLine()));
     card.appendChild(info);
     box.appendChild(card);
@@ -3177,6 +3244,14 @@
     big.appendChild(el('div', 'xptxt', 'あと ' + (lv.need - lv.into) + ' ポイントで Lv.' + (lv.level + 1) + '（ぜんぶで ' + game.xp + '）'));
     box.appendChild(big);
 
+    var stn = starsOf(lv.level);
+    box.appendChild(html('div', 'stars', (stn ? new Array(stn + 1).join('★') : '☆') + '<small>' + (stn ? '★ ' + stn + 'こ' : 'Lv.10で ★が 1つ もらえる') + '　（10レベルごとに 1つ ふえる）</small>'));
+    var nrl2 = nextRewardLine(); if (nrl2) box.appendChild(html('p', 'nextrw', nrl2));
+    box.appendChild(html('h2', 'sec', 'レベルの スピード <small>ポイントの たまり方</small>'));
+    var lp2 = el('div', 'panel');
+    lp2.appendChild(stepper('スピード', lvSpeedIdx, function (v) { setLvSpeed(LV_SPEEDS[v][1]); }, 0, LV_SPEEDS.length - 1, '', function (v) { return LV_SPEEDS[v][0] + '（1レベル ' + LV_SPEEDS[v][1] + 'ポイント）'; }));
+    lp2.appendChild(el('p', 'muted', 'はじめの Lv.1→2 は 100ポイント、そこから すこしずつ ふえて、上の 数で 止まります。「ふつう」で、あいさつ＋クエスト＋ドリル1まい＋ふりかえりの ふつうの 1日が だいたい 1レベルです。かえても レベルは 下がりません。'));
+    box.appendChild(lp2);
     box.appendChild(html('h2', 'sec', 'もくひょう <small>たっせいで ボーナス</small>'));
     var gp = el('div', 'panel');
     gp.appendChild(el('p', 'goal', goalLine()));
