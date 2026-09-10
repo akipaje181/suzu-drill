@@ -632,6 +632,20 @@
   .gbig .char{animation:dbreath 3.6s ease-in-out infinite}
   @keyframes dblink{0%,91%,100%{transform:scaleY(1)} 94.5%{transform:scaleY(.12)}}
   @keyframes dbreath{0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.015)}}
+
+  /* テストを よみとる（3つの 方法） */
+  .ways{display:grid; gap:8px; margin:10px 0 4px}
+  .way{border:1.5px solid var(--rule); border-radius:14px; padding:12px 14px; background:var(--paper)}
+  .way.on{border-color:var(--a3); background:var(--a3w)}
+  .way > b{font-family:var(--f-round); font-size:15.5px; display:block; margin-bottom:2px}
+  .way li b, .way small b{font-family:inherit; font-size:inherit; display:inline; margin:0}
+  .way small{display:block; font-size:12.5px; color:var(--ink-soft); line-height:1.6}
+  .way .actions{margin-top:8px}
+  .setup{list-style:none; padding:0; margin:6px 0 4px; counter-reset:st}
+  .setup li{position:relative; padding:4px 0 4px 34px; font-size:14px; line-height:1.6; counter-increment:st}
+  .setup li::before{content:counter(st); position:absolute; left:0; top:5px; width:24px; height:24px; border-radius:50%; background:var(--a1w); color:var(--a1); font-family:var(--f-round); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center}
+  .nrow{display:flex; align-items:center; gap:10px; margin:6px 0 2px}
+  .nrow b{font-family:var(--f-round); font-size:20px; min-width:48px; text-align:center}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -2235,21 +2249,48 @@
       row.appendChild(btn('btn sm', 'カメラで とる', function () { inCam.click(); }));
       row.appendChild(btn('btn sm ghost', '写真から えらぶ', function () { inLib.click(); }));
       p.appendChild(row); p.appendChild(inCam); p.appendChild(inLib);
-      p.appendChild(html('p', 'muted', '撮ったら 名前を 黒く ぬって「おくる」。<b>ファイルに保存 → iCloud Drive › すずドリル › テストの写真</b> に 入れると、Mac の Claude が 読んで、この iPad に ページを とどけます。'));
+      p.appendChild(el('p', 'muted', hasKey
+        ? '撮ったら 名前を 黒く ぬって「じどうで よみとる」。この iPad だけで、その場で プリントが できます。'
+        : '撮ったら 名前を 黒く ぬります。そのあと「じぶんで 入れる」か「おくる」で プリントに します。iPad だけで じどうに したい ときは、下の せっていを 1回 します。'));
 
-      var kp = el('div', 'panel'); box.appendChild(kp);
-      var kh = btn('linkbtn', (hasKey ? 'じどう読み取り：オン（APIキー せってい済み）' : 'じどう読み取り（APIキー）の せってい ▸'), function () { kbody.hidden = !kbody.hidden; });
-      kp.appendChild(kh);
-      var kbody = el('div'); kbody.hidden = !hasKey; kp.appendChild(kbody);
-      kbody.appendChild(html('p', 'muted', 'Anthropic の <b>console.anthropic.com</b> で 作った APIキー（sk-ant-…）を 入れると、iPad だけで その場で 読み取れます（1まい 約 ¥15〜40）。キーは この iPad の 中にだけ 保存。なくても「おくる」は つかえます。'));
+      // --- 3つの 方法 ---
+      var ways = el('div', 'ways'); box.appendChild(ways);
+      var w1 = el('div', 'way' + (hasKey ? ' on' : '')); ways.appendChild(w1);
+      w1.appendChild(el('b', null, (hasKey ? '✅ ' : '🤖 ') + 'iPad だけで じどうに よみとる' + (hasKey ? '（オン）' : '（1回だけ せってい）')));
+      w1.appendChild(el('small', null, '写真を Claude が 読んで、型と ○✗ を きめ、その子用の プリント 10まいを その場で 作ります。1まい 約 ¥15〜40（Anthropic に かかる ぶん）。'));
+      var kbody = el('div'); w1.appendChild(kbody);
+      if (!hasKey) {
+        var ul = el('ol', 'setup');
+        [['Safari で <b>console.anthropic.com</b> を ひらき、アカウントを 作る（メールで ログイン）。', ''],
+         ['左の <b>Billing</b> で しはらい方法を 入れる（つかった ぶんだけ の しはらい）。', ''],
+         ['<b>API Keys</b> → <b>Create Key</b>。出てきた <b>sk-ant-…</b> を コピー。', ''],
+         ['下の わくに はりつけて「ほぞん」。キーは この iPad の 中にだけ 保存されます。', '']].forEach(function (t) { ul.appendChild(html('li', null, t[0])); });
+        kbody.appendChild(ul);
+      } else kbody.appendChild(el('small', null, 'APIキーは せってい済み。写真を 撮ると「じどうで よみとる」が 出ます。'));
       var kr = el('div', 'keyrow'), ki = el('input'); ki.type = 'password'; ki.placeholder = 'sk-ant-…'; ki.autocomplete = 'off'; ki.setAttribute('autocapitalize', 'off');
       kr.appendChild(ki);
       kr.appendChild(btn('btn sm', hasKey ? 'かえる' : 'ほぞん', function () {
         var v = ki.value.trim(); if (!v) return;
-        try { localStorage.setItem(KEY_LS, v); } catch (e) {} renderScan();
+        if (v.indexOf('sk-ant-') !== 0 && !confirm('sk-ant- で はじまって いません。このまま ほぞんしますか？')) return;
+        try { localStorage.setItem(KEY_LS, v); } catch (e) {} renderScan(); toastText('✅ じどう読み取りが オンに なりました');
       }));
-      if (hasKey) kr.appendChild(btn('linkbtn shu', 'けす', function () { try { localStorage.removeItem(KEY_LS); } catch (e) {} renderScan(); }));
+      if (hasKey) kr.appendChild(btn('linkbtn shu', 'けす', function () { if (confirm('APIキーを けしますか？')) { try { localStorage.removeItem(KEY_LS); } catch (e) {} renderScan(); } }));
       kbody.appendChild(kr);
+
+      var w2 = el('div', 'way'); ways.appendChild(w2);
+      w2.appendChild(el('b', null, '✍️ じぶんで 入れる（せってい なし・すぐ）'));
+      w2.appendChild(el('small', null, '写真は なくても OK。もんだいの 数を きめて、1問ずつ「型」と ○✗ を タップすると、その場で プリントが できます。1まいぶん 1分ぐらい。'));
+      var nr = el('div', 'nrow'); scan.manualN = scan.manualN || 5;
+      nr.appendChild(el('span', 'lbl', 'もんだいの 数'));
+      nr.appendChild(btn('tool', '−', function () { scan.manualN = Math.max(1, scan.manualN - 1); renderScan(); }));
+      nr.appendChild(el('b', null, scan.manualN + '問'));
+      nr.appendChild(btn('tool', '＋', function () { scan.manualN = Math.min(10, scan.manualN + 1); renderScan(); }));
+      w2.appendChild(nr);
+      var a2 = el('div', 'actions'); a2.appendChild(btn('btn sm', 'じぶんで 入れる →', function () { manualStart(scan.manualN); })); w2.appendChild(a2);
+
+      var w3 = el('div', 'way'); ways.appendChild(w3);
+      w3.appendChild(el('b', null, '📤 Mac に おくる（いままでの 方法）'));
+      w3.appendChild(html('small', null, '写真を 撮って「おくる」→ ファイルに保存 → <b>iCloud Drive › すずドリル › テストの写真</b>。Mac の Claude が 読んで、つぎに ひらいた とき ページが とどきます。'));
     }
 
     if (scan.step === 'sent') {
@@ -2286,9 +2327,18 @@
       acts.appendChild(btn('btn sm ghost', '写真を えらびなおす', function () { scan.step = 'pick'; renderScan(); }));
       p.appendChild(acts);
       var send = el('div', 'actions');
-      send.appendChild(btn('btn sm', 'おくる（ファイルに ほぞん・AirDrop）', function () { sendPhoto(); }));
-      if (apiKey()) send.appendChild(btn('btn sm ghost', 'じどうで よみとる', function () { startReading(); }));
-      p.appendChild(send);
+      if (apiKey()) {
+        send.appendChild(btn('btn sm', '🤖 じどうで よみとる', function () { startReading(); }));
+        send.appendChild(btn('btn sm ghost', 'じぶんで 入れる', function () { manualStart(scan.manualN || 5); }));
+        send.appendChild(btn('btn sm ghost', 'Mac に おくる', function () { sendPhoto(); }));
+      } else {
+        send.appendChild(btn('btn sm', '✍️ じぶんで 入れる（型と ○✗）', function () { manualStart(scan.manualN || 5); }));
+        send.appendChild(btn('btn sm ghost', 'Mac に おくる', function () { sendPhoto(); }));
+        p.appendChild(send);
+        p.appendChild(el('p', 'muted', 'iPad だけで じどうに 読み取りたい ときは、さいしょの 画面で APIキーを 1回 せっていします。'));
+        send = null;
+      }
+      if (send) p.appendChild(send);
     }
 
     if (scan.step === 'reading') {
@@ -2326,6 +2376,12 @@
       navigator.share({ files: [file], title: 'すずドリル テスト' }).then(done).catch(function (e) { if (!(e && e.name === 'AbortError')) fallback(); });
     } else fallback();
   }
+  function manualStart(n) {   // 写真の 読み取りを つかわず、型と ○✗ を じぶんで 入れる
+    n = Math.max(1, Math.min(10, n || 5));
+    var probs = []; for (var i = 0; i < n; i++) probs.push({ no: i + 1, key: 'unknown', summary: '', numbers: '', correct: '', child: '', ok: null, conf: 'high', manual: true });
+    scan.result = { test_title: '', problems: probs, manual: true };
+    scan.step = 'confirm'; renderScan(); window.scrollTo(0, 0);
+  }
   function startReading() {
     if (!apiKey()) { scan.err = 'APIキーが ありません。さいしょの 画面で 入れて ください。'; scan.step = 'error'; renderScan(); return; }
     scan.step = 'reading'; renderScan();
@@ -2338,8 +2394,10 @@
   }
   function renderConfirm(p, box) {
     var r = scan.result, d = new Date();
-    p.appendChild(el('h3', null, '読み取った ないようを たしかめる'));
-    p.appendChild(el('p', 'muted', '型や ○✗が ちがって いたら、ここで 直せます。「？」は きろくに 入れません。'));
+    p.appendChild(el('h3', null, r.manual ? '型と ○✗ を 入れる' : '読み取った ないようを たしかめる'));
+    p.appendChild(el('p', 'muted', r.manual
+      ? 'テストを 見ながら、1問ずつ「型」を えらんで ○か ✗を タップします。型が わからない 問題は「わからない」の ままで OK（その 問題は 入れません）。「？」は きろくに 入れません。'
+      : '型や ○✗が ちがって いたら、ここで 直せます。「？」は きろくに 入れません。'));
     var ti = el('input', 'ttl-in'); ti.value = r.test_title && r.test_title.trim() ? r.test_title.trim().slice(0, 30) : (d.getMonth() + 1) + '/' + d.getDate() + ' テスト';
     ti.placeholder = 'テストの 名前'; p.appendChild(ti);
     r.problems.forEach(function (q, i) {
@@ -2351,10 +2409,12 @@
       var ou = el('option', null, 'わからない（この 問題は 入れない）'); ou.value = 'unknown'; sel.appendChild(ou);
       sel.value = q.key; sel.addEventListener('change', function () { q.key = sel.value; });
       body.appendChild(sel);
-      var sm = el('div', 'sm'); sm.textContent = q.summary + (q.numbers ? '　［' + q.numbers + '］' : '');
-      if (q.conf === 'low') sm.appendChild(el('span', 'conf-low', '型に 自信なし'));
-      body.appendChild(sm);
-      body.appendChild(el('div', 'sm', '本人の こたえ：' + (q.child || '（読めず）') + '　／　正しい こたえ：' + (q.correct || '—')));
+      if (!q.manual) {
+        var sm = el('div', 'sm'); sm.textContent = q.summary + (q.numbers ? '　［' + q.numbers + '］' : '');
+        if (q.conf === 'low') sm.appendChild(el('span', 'conf-low', '型に 自信なし'));
+        body.appendChild(sm);
+        body.appendChild(el('div', 'sm', '本人の こたえ：' + (q.child || '（読めず）') + '　／　正しい こたえ：' + (q.correct || '—')));
+      }
       var res = el('div', 'res');
       [['o', '○', true], ['x', '✗', false], ['q', '？', null]].forEach(function (t) {
         var b = btn('tool ' + t[0], t[1], function () { q.ok = t[2]; Array.prototype.forEach.call(res.children, function (c) { c.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); });
@@ -2364,14 +2424,14 @@
     });
     var acts = el('div', 'actions');
     acts.appendChild(btn('btn sm', 'この テストで ページを 作る', function () {
-      var probs = r.problems.filter(function (q) { return q.key !== 'unknown'; }).map(function (q) { return { no: q.no, key: q.key, ok: q.ok, summary: q.summary }; });
-      if (!probs.length) { alert('型が わかった 問題が ありません。'); return; }
+      var probs = r.problems.filter(function (q) { return q.key !== 'unknown'; }).map(function (q) { return { no: q.no, key: q.key, ok: q.ok, summary: q.summary || TYPES[q.key].name }; });
+      if (!probs.length) { alert(r.manual ? '1問も 型が えらばれて いません。それぞれの 問題で 型を えらんでください。' : '型が わかった 問題が ありません。'); return; }
       var page = createPage(ti.value.trim() || 'テスト', probs);
       scan.step = 'pick'; scan.img = null; scan.result = null;
       st.t = allTests().length - 1; st.s = 0; startSheet(); show('solve');
       alert('「' + page.label + '」の ページが できました。まちがえた 型を 多めに 入れた プリント 10まいです。');
     }));
-    acts.appendChild(btn('btn sm ghost', 'やりなおす', function () { scan.step = 'mask'; renderScan(); }));
+    acts.appendChild(btn('btn sm ghost', 'やりなおす', function () { scan.step = scan.img ? 'mask' : 'pick'; renderScan(); }));
     p.appendChild(acts);
   }
   function createPage(label, problems) {
@@ -3570,12 +3630,14 @@
         + '<li><b>学習</b>：「けいさん 1まい」（10問）＋「きょうの 5問」または「かんじ」。10〜20分が 目安です。</li>'
         + '<li><b>夜</b>：できた クエストに ✓ → おうちの人が 👪 ✓ → ふりかえりの きぶんを えらぶ。</li></ol>'
         + '<p>1日 2まいで だいたい 1レベル 上がります。</p>'],
-      ['📷', 'テストの 写真から プリントを 作る', '<ol>'
-        + '<li>iPadで <b>テストを よみとる</b> → 写真を とる → 名前を 黒く ぬる → <span class="k">おくる</span>。</li>'
-        + '<li>共有シートで「ファイルに保存」→ <b>iCloud Drive › すずドリル › テストの写真</b> に 入れます。</li>'
-        + '<li>Mac の Claude に「テストの写真を入れた」と つたえると、型と ○✗ を 読みとって アプリに とどきます。</li>'
-        + '<li>とどくと「テストの プリント」に その子用の 10まいが ふえ、記録にも 反映されます。</li></ol>'
-        + '<p>APIキーの 入力は いりません。</p>'],
+      ['📷', 'テストから プリントを 作る（3つの 方法）', '<p><b>A. iPad だけで じどうに（おすすめ）</b>：1回だけ APIキーを 入れます。</p><ol>'
+        + '<li>Safari で <b>console.anthropic.com</b> を ひらき、アカウントを 作る。</li>'
+        + '<li>Billing で しはらい方法を 入れる（つかった ぶんだけ。1まい 約 ¥15〜40）。</li>'
+        + '<li>API Keys → Create Key → <b>sk-ant-…</b> を コピー。</li>'
+        + '<li>アプリの「テストを よみとる」の 下の わくに はりつけて <span class="k">ほぞん</span>。</li></ol>'
+        + '<p>そのあとは、写真を とる → 名前を 黒く ぬる → <span class="k">じどうで よみとる</span> → 型と ○✗ を たしかめて <span class="k">この テストで ページを 作る</span>。ぜんぶ iPad の 中で おわります。</p>'
+        + '<p><b>B. じぶんで 入れる</b>（せってい なし）：もんだいの 数を きめて、1問ずつ 型と ○✗ を タップ。写真が なくても できます。</p>'
+        + '<p><b>C. Mac に おくる</b>：写真を <span class="k">おくる</span> → ファイルに保存 → iCloud Drive › すずドリル › テストの写真。Mac の Claude が 読んで、つぎに ひらいた とき ページが とどきます。</p>'],
       ['🎯', 'クエストを えらぶ・ふやす', '<ul>'
         + '<li>クエストカードの 下の <b>おうちの人へ</b> の リンク、または マイルーム →「クエスト」。</li>'
         + '<li>学校・おうちの もくひょうが <b>57種・7グループ</b>。出す／しまうを タップで きめます。「じぶんで つくる」で 自由に 追加も できます。</li>'
