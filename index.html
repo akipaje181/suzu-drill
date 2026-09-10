@@ -338,7 +338,7 @@
   .xptxt{font-size:12px; color:var(--ink-faint); margin-top:3px; font-variant-numeric:tabular-nums; display:flex; justify-content:space-between}
   .xptxt b{color:var(--ok-ink)}
   .char{overflow:visible; transform-origin:50% 100%; animation:breathe 3.2s ease-in-out infinite}
-  .char .eye{transform-origin:center; animation:blink 4.5s infinite}
+  .char .eye{transform-box:fill-box; transform-origin:center; animation:blink 4.5s infinite}
   @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(.985,1.03)}}
   @keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
 
@@ -611,6 +611,27 @@
   .hbody b{color:var(--shu-ink)}
   .hbody .k{display:inline-block; font-family:var(--f-round); font-size:13px; background:var(--rule-soft); border-radius:8px; padding:1px 8px; margin:0 1px}
   .hnote{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin:4px 0 14px; line-height:1.7}
+
+  /* ドリまるの うごき（へや） */
+  .room .dori{transform-box:fill-box; transform-origin:50% 92%}
+  .room .dori.study{animation:dstudy 2.8s ease-in-out infinite}
+  .room .dori.rest{animation:drest 4.2s ease-in-out infinite}
+  .room .dori.sleep{animation:dsleep 4.6s ease-in-out infinite}
+  @keyframes dstudy{0%,100%{transform:translateY(0) rotate(0deg)} 22%{transform:translateY(1.6px) rotate(-2.2deg)} 55%{transform:translateY(-.5px) rotate(1.6deg)} 78%{transform:translateY(1.2px) rotate(-1deg)}}
+  @keyframes drest{0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-3.5px) rotate(1deg)}}
+  @keyframes dsleep{0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(2.5px) rotate(-4deg)}}
+  .room .pencil{transform-box:fill-box; transform-origin:50% 100%; animation:dpen 1.4s ease-in-out infinite}
+  @keyframes dpen{0%,100%{transform:translateX(0) rotate(-10deg)} 50%{transform:translateX(11px) rotate(-1deg)}}
+  .room .steam{animation:dsteam 3s ease-in-out infinite}
+  .room .steam2{animation:dsteam 3s ease-in-out .9s infinite}
+  @keyframes dsteam{0%{opacity:0; transform:translateY(2px)} 35%{opacity:.85} 100%{opacity:0; transform:translateY(-13px)}}
+  .room .zzz{animation:dzzz 3.4s ease-in-out infinite}
+  .room .zzz2{animation:dzzz 3.4s ease-in-out 1.2s infinite}
+  @keyframes dzzz{0%{opacity:0; transform:translate(0,0) scale(.6)} 30%{opacity:.9} 100%{opacity:0; transform:translate(10px,-20px) scale(1.1)}}
+  .eye{transform-box:fill-box; transform-origin:center; animation:dblink 5.6s infinite}
+  .gbig .char{animation:dbreath 3.6s ease-in-out infinite}
+  @keyframes dblink{0%,91%,100%{transform:scaleY(1)} 94.5%{transform:scaleY(.12)}}
+  @keyframes dbreath{0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.015)}}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -2949,6 +2970,7 @@
       out += '<circle cx="' + (cx - r * .55) + '" cy="' + (cy + 8) + '" r="7" fill="#f4a0a0" opacity=".55"/><circle cx="' + (cx + r * .55) + '" cy="' + (cy + 8) + '" r="7" fill="#f4a0a0" opacity=".55"/>';
     }
     var eye = function (x) {
+      if (m === 'sleep') return '<path d="M' + (x - 8) + ' ' + (ey - 1) + ' q8 8 16 0" fill="none" stroke="#2b2620" stroke-width="3.5" stroke-linecap="round"/>';
       if (m === 'happy') return '<path d="M' + (x - 8) + ' ' + ey + ' q8 -11 16 0" fill="none" stroke="#2b2620" stroke-width="3.5" stroke-linecap="round"/>';
       if (m === 'hungry') return '<ellipse class="eye" cx="' + x + '" cy="' + ey + '" rx="7" ry="4" fill="#2b2620"/>';
       if (m === 'excited') return '<path d="M' + x + ' ' + (ey - 9) + ' l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#e6a100"/>';
@@ -2997,13 +3019,25 @@
     var books = Math.min(21, Math.floor(game.sets / 5));
     for (var b = 0; b < books; b++) { var sh = Math.floor(b / 7), bx = 566 + (b % 7) * 9, by = 62 + sh * 50 + (b % 3) * 2; s += '<rect x="' + bx + '" y="' + by + '" width="8" height="' + (36 - (b % 3) * 2) + '" rx="1" fill="' + COLORS[(b * 5) % 6] + '"/>'; }
     if (d.plant) s += '<path d="M28 215 h34 l-4 36 h-26z" fill="#c76b4a"/><ellipse cx="45" cy="205" rx="14" ry="24" fill="#5fae5f" transform="rotate(-20 45 205)"/><ellipse cx="50" cy="200" rx="12" ry="26" fill="#6cbf6c" transform="rotate(20 50 200)"/>';
+    // いす → ドリまる → つくえ の じゅんに 描く（顔が かくれないように）
+    var pose = (h >= 21 || h < 6) ? 'sleep' : (sheetsOnDay(todayKey()) >= goals().day ? 'rest' : 'study');
+    s += '<rect x="406" y="152" width="88" height="58" rx="10" fill="#e2b96f"/><rect x="442" y="196" width="16" height="26" fill="#d3a95c"/>';   // いすの せもたれ と あし
+    s += '<g class="dori ' + pose + '"><svg x="374" y="58" width="152" height="152" viewBox="0 0 200 200">'
+      + charInner({ stage: st, color: game.color, wear: game.wear, mood: pose === 'sleep' ? 'sleep' : pose === 'rest' ? 'happy' : mood() })
+      + '</svg></g>';
     s += '<rect x="330" y="205" width="220" height="14" rx="3" fill="#a97747"/><rect x="340" y="219" width="12" height="60" fill="#8f6a3e"/><rect x="528" y="219" width="12" height="60" fill="#8f6a3e"/>';
-    s = s.replace('<rect x="330" y="205"', '<rect x="380" y="150" width="90" height="60" rx="8" fill="#e2b96f"/><rect x="330" y="205"');   // いす の せもたれ
-    s = s.replace('<rect x="380" y="150"', '<svg x="365" y="85" width="120" height="120" viewBox="0 0 200 200">' + charInner({ stage: st, color: game.color, wear: game.wear, mood: mood() }) + '</svg><rect x="380" y="150"');
-    s = s.replace('<svg x="365" y="85"', '<rect x="380" y="150" width="90" height="60" rx="8" fill="#e2b96f"/><svg x="365" y="85"');
     if (d.lamp) s += '<rect x="500" y="170" width="4" height="36" fill="#6f695d"/><path d="M484 172 h36 l-6 -18 h-24z" fill="#f2c94c"/>';
     if (d.globe) s += '<circle cx="350" cy="190" r="14" fill="#7ec8e3"/><path d="M340 184 q10 -4 18 4 q-10 6 -14 12" fill="#8fd18f"/><rect x="346" y="203" width="8" height="4" fill="#6f695d"/>';
-    s += '<rect x="404" y="192" width="82" height="14" rx="3" fill="#fff" stroke="#c9c2b4"/><text x="445" y="203" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + game.name + '　Lv.' + lv + '</text>';
+    // つくえの 上（ようすで かわる）
+    if (pose === 'study') {
+      s += '<rect x="418" y="196" width="70" height="10" rx="2" fill="#fff" stroke="#c9c2b4" stroke-width="1.2"/><path d="M453 196 v10" stroke="#c9c2b4" stroke-width="1.2"/><path d="M424 201 h22 M460 201 h22" stroke="#e0dacd" stroke-width="1.5"/>';
+      s += '<g class="pencil"><rect x="468" y="181" width="5" height="24" rx="2.5" fill="#f2c94c"/><path d="M468 181 h5 l-2.5 -7z" fill="#2b2620"/><rect x="468" y="199" width="5" height="6" rx="1" fill="#e2857a"/></g>';
+    } else if (pose === 'rest') {
+      s += '<rect x="452" y="189" width="21" height="17" rx="3" fill="#fff" stroke="#c9c2b4" stroke-width="1.2"/><path d="M473 193 q8 5 0 10" stroke="#c9c2b4" stroke-width="2" fill="none"/>';
+      s += '<path class="steam" d="M458 186 q4 -5 0 -10" stroke="#c9c2b4" stroke-width="2" fill="none" stroke-linecap="round"/><path class="steam2" d="M467 186 q4 -5 0 -10" stroke="#c9c2b4" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    } else {
+      s += '<text class="zzz" x="498" y="118" font-size="17" font-family="sans-serif" fill="#6f695d">z</text><text class="zzz2" x="512" y="104" font-size="12" font-family="sans-serif" fill="#6f695d">z</text>';
+    }
     if (d.tent) s += '<path d="M50 344 L104 272 L158 344 Z" fill="#8fd18f" stroke="#5fae5f" stroke-width="2" stroke-linejoin="round"/><path d="M92 344 L104 272 L116 344 Z" fill="#f6ecd2"/>';
     if (d.piano) { s += '<rect x="466" y="288" width="94" height="52" rx="4" fill="#3b3630"/><rect x="466" y="282" width="94" height="8" rx="2" fill="#5a534a"/>'; for (var pk = 0; pk < 10; pk++) s += '<rect x="' + (470 + pk * 9) + '" y="294" width="7.5" height="18" fill="#fff"/>'; for (var pb = 0; pb < 9; pb++) { if (pb % 3 === 2) continue; s += '<rect x="' + (475.5 + pb * 9) + '" y="294" width="5" height="11" fill="#2b2620"/>'; } }
     if (d.mobile) { s += '<path d="M196 0 v10 M196 10 h48" stroke="#c9c2b4" stroke-width="1.5"/>'; [[200, 30], [220, 22], [240, 34]].forEach(function (p, i) { s += '<path d="M' + p[0] + ' 10 v' + (p[1] - 16) + '" stroke="#c9c2b4" stroke-width="1"/><path transform="translate(' + p[0] + ' ' + p[1] + ') scale(.8)" d="M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="' + COLORS[i + 1] + '" stroke="#e6a100" stroke-width="1"/>'; }); }
