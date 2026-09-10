@@ -667,6 +667,27 @@
   .pnote p{margin:0 0 4px}
   .dview{margin:6px 0; font-family:var(--f-round); font-size:14.5px; line-height:1.7}
   .dview p{margin:0 0 4px}
+
+  /* えらびなおす・さいしょから／くく */
+  .setnav{display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 10px}
+  .kdans{display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin:8px 0 10px}
+  .kdan{min-height:56px; border:1.5px solid var(--rule); border-radius:12px; background:var(--paper); font-family:var(--f-round); font-size:18px; font-weight:700; color:var(--ink)}
+  .kdan[aria-pressed="true"]{background:var(--shu); border-color:var(--shu); color:#fff}
+  .kdan.all{grid-column:span 5; font-size:15px; min-height:46px}
+  .kkopt{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:4px 0 10px; font-family:var(--f-round); font-size:14px; color:var(--ink-soft)}
+  .kktbl{display:grid; grid-template-columns:repeat(10, 1fr); gap:3px; margin:8px 0}
+  .kkc{aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:7px; font-family:var(--f-round); font-size:13px; background:var(--field); color:var(--ink); border:1px solid var(--rule-soft); padding:0}
+  .kkc.h{background:var(--rule-soft); font-weight:700; color:var(--ink-soft)}
+  .kkc.rowh{background:var(--shu-wash); color:var(--shu-ink); font-weight:700; border-color:var(--shu)}
+  .kkc.ok{background:var(--a3w); border-color:var(--a3); color:var(--ink)}
+  .kkc.some{background:#fff3d6}
+  .kkc.ng{background:var(--a1w); border-color:var(--a1)}
+  .kkread{columns:3; column-gap:14px; font-family:var(--f-round); font-size:14.5px; line-height:1.9; margin:6px 0 0}
+  .kkread div{break-inside:avoid}
+  .kkread b{color:var(--shu-ink); margin-right:6px}
+  .kktime{font-family:var(--f-round); font-size:15px; margin:6px 0 10px; padding:8px 12px; border-radius:10px; background:var(--a2w)}
+  .kktime b{font-size:20px; color:var(--a2)}
+  @media (max-width:560px){ .kkread{columns:2} .kkc{font-size:11px} }
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -732,6 +753,14 @@
       <div id="kintro"></div>
       <div id="kresult"></div>
       <div id="kqs"></div>
+    </div>
+  </section>
+
+  <section id="v-kuku" hidden>
+    <div class="wrap">
+      <div id="kkintro"></div>
+      <div id="kkresult"></div>
+      <div id="kkqs"></div>
     </div>
   </section>
 
@@ -1460,7 +1489,7 @@
 
   // ---------- problem cards ----------
   function makeCard(item, idx, padKey, showType) {
-    var card = el('div', 'q' + (item.q.pad === 'calc' ? ' calc' : '')), q = item.q;
+    var card = el('div', 'q' + (item.q.pad === 'calc' || item.q.big ? ' calc' : '')), q = item.q;
     var hd = el('div', 'q-hd');
     hd.appendChild(el('span', 'q-n', MARKS[idx] || String(idx + 1)));
     hd.appendChild(q.html ? html('p', 'q-t', q.html) : el('p', 'q-t', q.t));
@@ -1498,6 +1527,12 @@
     livePads.length = 0; fingerPad = null;
     o.box.innerHTML = ''; if (o.result) o.result.innerHTML = '';
     o.graded = false;
+    if (o.back || o.again) {   // えらびなおす／さいしょから（まちがえて えらんだ ときの 出口）
+      var nav = el('div', 'setnav');
+      if (o.back) nav.appendChild(btn('tool', '← えらびなおす', function () { if (confirm('えらびなおしますか？（いま 書いた ものは きえます）')) { cur = null; o.back(); window.scrollTo(0, 0); } }));
+      if (o.again) nav.appendChild(btn('tool', '↻ さいしょから', function () { if (confirm('さいしょから やりなおしますか？（書いた ものは きえます）')) { o.again(); window.scrollTo(0, 0); } }));
+      o.box.appendChild(nav);
+    }
     o.items.forEach(function (it, i) { o.box.appendChild(makeCard(it, i, o.mode + '/' + o.tag + '/' + i, o.mode !== 'sheet')); });
     cur = o;
     setBar('まるつけ', false);
@@ -1573,6 +1608,7 @@
       : score >= 3 ? 'おしい！ まちがえた ' + (o.items.length - score) + '問を なおそう。ぜんぶ なおせたら つぎに すすめるよ。'
       : '✗の しきを 見て、かんがえ方を たしかめよう。まちがえた ' + (o.items.length - score) + '問を なおそう。'));
     o.result.appendChild(res);
+    if (o.afterGrade) o.afterGrade(score, o.result);
     o.result.appendChild(gameResultPanel(gev));
     o.graded = true;
     var miss = o.items.length - score;
@@ -1586,8 +1622,8 @@
   $('btnAgain').addEventListener('click', function () { if (!cur) return; if (cur.againAction) cur.againAction(); else cur.again(); });
 
   // ---------- views ----------
-  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kanji', 'solve', 'weak', 'cal', 'lessons', 'records', 'print', 'help'];
-  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ', help: 'つかいかた' };
+  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kuku', 'kanji', 'solve', 'weak', 'cal', 'lessons', 'records', 'print', 'help'];
+  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', kuku: 'くく', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ', help: 'つかいかた' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -1603,6 +1639,7 @@
 
   // ---------- home ----------
   var ICONS = {
+    kuku: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/><rect x="2.5" y="2.5" width="19" height="19" rx="4"/></svg>',
     help: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 1 1 3.7 2.6c-.7.3-1 .9-1 1.6v.3"/><circle cx="12" cy="17.2" r="1.1" fill="currentColor" stroke="none"/></svg>',
     cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/><circle cx="8.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="13" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg>',
     keisan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3" width="17" height="18" rx="2"/><path d="M7 8h4M9 6v4M14 8h3.5M14.2 15.5h3.6M7.2 14.2l3.6 3.6M10.8 14.2l-3.6 3.6M14.2 18h3.6"/></svg>',
@@ -1634,6 +1671,7 @@
       { cls: 'g1', ic: '🌱', name: 'まいにち やること', items: [
         ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問'],
         ['keisan', 'けいさん 1まい', 'まいにち 1まい 10問（ぜんぶで 60回）'],
+        ['kuku', 'くく', '2〜9の だんを えらんで れんしゅう・タイム'],
         ['kanji', 'かんじ', '2年生の 漢字 160字　よみ・かき・なぞり書き']
       ] },
       { cls: 'g2', ic: '📷', name: 'テストの ために', items: [
@@ -1678,6 +1716,7 @@
     if (v === 'scan') renderScan();
     if (v === 'daily') { if (!(cur && cur.view === 'daily')) renderDailyIntro(); }
     if (v === 'keisan') { if (!(cur && cur.view === 'keisan')) renderKeisan(); }
+    if (v === 'kuku') { if (!(cur && cur.view === 'kuku')) renderKuku(); }
     if (v === 'solve') { if (!(cur && cur.view === 'solve')) startSheet(); renderTabs(); }
     if (v === 'weak') { if (!(cur && cur.view === 'weak')) renderWeakIntro(); }
     if (v === 'cal') renderCal();
@@ -1753,7 +1792,7 @@
     $('wintro').hidden = true;
     var tag = String(Date.now());
     startSet({
-      view: 'weak', mode: 'weak', items: items, keys: keys, box: $('wqs'), result: $('wresult'), tag: tag,
+      view: 'weak', mode: 'weak', items: items, keys: keys, box: $('wqs'), result: $('wresult'), tag: tag, back: function () { renderWeakIntro(); },
       nextLabel: function () { return 'べつの 5問 →'; },
       next: function () { startWeak(keys); },
       again: function () { dropPads('weak/' + tag + '/'); startWeak(keys, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
@@ -1789,7 +1828,7 @@
     $('dintro').hidden = true;
     var tag = String(Date.now());
     startSet({
-      view: 'daily', mode: 'daily', unit: 'school', keys: keys, items: items, box: $('dqs'), result: $('dresult'), tag: tag,
+      view: 'daily', mode: 'daily', unit: 'school', keys: keys, items: items, box: $('dqs'), result: $('dresult'), tag: tag, back: function () { renderDailyIntro(); },
       nextLabel: function () { return 'つぎの 5問 →'; },
       next: function () { startSchoolSet(); },
       again: function () { dropPads('daily/' + tag + '/'); startSchoolSet(items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
@@ -1835,7 +1874,7 @@
     $('dintro').hidden = true;
     var tag = String(Date.now());
     startSet({
-      view: 'daily', mode: 'daily', unit: u.id, keys: u.keys, items: items, box: $('dqs'), result: $('dresult'), tag: tag,
+      view: 'daily', mode: 'daily', unit: u.id, keys: u.keys, items: items, box: $('dqs'), result: $('dresult'), tag: tag, back: function () { renderDailyIntro(); },
       nextLabel: function () { return 'つぎの 5問 →'; },
       next: function () { startDaily(u.id); },
       again: function () { dropPads('daily/' + tag + '/'); startDaily(u.id, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
@@ -2587,12 +2626,106 @@
     $('cintro').hidden = true;
     var tag = 'k' + kai;
     startSet({
-      view: 'keisan', mode: 'keisan', kai: kai, unit: 'keisan', keys: c[1], items: items, box: $('cqs'), result: $('cresult'), tag: tag,
+      view: 'keisan', mode: 'keisan', kai: kai, unit: 'keisan', keys: c[1], items: items, box: $('cqs'), result: $('cresult'), tag: tag, back: function () { renderKeisan(); },
       nextLabel: function () { return kai < KAI_MAX ? (kai + 1) + '回目 →' : 'さいしょに もどる'; },
       next: function () { var nx = kai < KAI_MAX ? kai + 1 : 1; dropPads('keisan/k' + nx + '/'); startKeisan(nx); window.scrollTo(0, 0); },
       again: function () { dropPads('keisan/' + tag + '/'); startKeisan(kai, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
     });
     show('keisan');
+  }
+
+  // ---------- くく（九九）: だんを えらんで れんしゅう・タイム・九九の ひょう ----------
+  var KUKU_YOMI = [
+    ['いんいちが いち', 'いんにが に', 'いんさんが さん', 'いんしが し', 'いんごが ご', 'いんろくが ろく', 'いんしちが しち', 'いんはちが はち', 'いんくが く'],
+    ['にいちが に', 'ににんが し', 'にさんが ろく', 'にしが はち', 'にご じゅう', 'にろく じゅうに', 'にしち じゅうし', 'にはち じゅうろく', 'にく じゅうはち'],
+    ['さんいちが さん', 'さんにが ろく', 'さざんが く', 'さんし じゅうに', 'さんご じゅうご', 'さぶろく じゅうはち', 'さんしち にじゅういち', 'さんぱ にじゅうし', 'さんく にじゅうしち'],
+    ['しいちが し', 'しにが はち', 'しさん じゅうに', 'しし じゅうろく', 'しご にじゅう', 'しろく にじゅうし', 'ししち にじゅうはち', 'しは さんじゅうに', 'しく さんじゅうろく'],
+    ['ごいちが ご', 'ごに じゅう', 'ごさん じゅうご', 'ごし にじゅう', 'ごご にじゅうご', 'ごろく さんじゅう', 'ごしち さんじゅうご', 'ごは しじゅう', 'ごっく しじゅうご'],
+    ['ろくいちが ろく', 'ろくに じゅうに', 'ろくさん じゅうはち', 'ろくし にじゅうし', 'ろくご さんじゅう', 'ろくろく さんじゅうろく', 'ろくしち しじゅうに', 'ろくは しじゅうはち', 'ろっく ごじゅうし'],
+    ['しちいちが しち', 'しちに じゅうし', 'しちさん にじゅういち', 'しちし にじゅうはち', 'しちご さんじゅうご', 'しちろく しじゅうに', 'しちしち しじゅうく', 'しちは ごじゅうろく', 'しちく ろくじゅうさん'],
+    ['はちいちが はち', 'はちに じゅうろく', 'はちさん にじゅうし', 'はちし さんじゅうに', 'はちご しじゅう', 'はちろく しじゅうはち', 'はちしち ごじゅうろく', 'はっぱ ろくじゅうし', 'はっく しちじゅうに'],
+    ['くいちが く', 'くに じゅうはち', 'くさん にじゅうしち', 'くし さんじゅうろく', 'くご しじゅうご', 'くろく ごじゅうし', 'くしち ろくじゅうさん', 'くは しちじゅうに', 'くく はちじゅういち']
+  ];
+  var kk = { dans: { 2: 1 }, order: 'mix', showDan: null };
+  try { var kkSaved = JSON.parse(localStorage.getItem('suzu.kuku') || 'null'); if (kkSaved && kkSaved.dans) kk = kkSaved; } catch (e) {}
+  function kkSave() { try { localStorage.setItem('suzu.kuku', JSON.stringify({ dans: kk.dans, order: kk.order })); } catch (e) {} }
+  function kkStat(a, b) { return recs._types['kk' + a + 'x' + b] || { ok: 0, ng: 0 }; }
+  function kkClass(a, b) { var st = kkStat(a, b), n = st.ok + st.ng; if (!n) return ''; if ((st.ok >= 1 && st.ng === 0) || (st.ok >= 2 && st.ok / n >= 0.8)) return ' ok'; if (st.ng > st.ok) return ' ng'; return ' some'; }
+  function kkBest() { if (!game.kuku) game.kuku = { best: {} }; if (!game.kuku.best) game.kuku.best = {}; return game.kuku.best; }
+  function kkDanList() { return Object.keys(kk.dans).map(Number).filter(function (d) { return kk.dans[d]; }).sort(function (a, b) { return a - b; }); }
+  function renderKuku() {
+    var box = $('kkintro'); box.hidden = false; box.innerHTML = ''; $('kkqs').innerHTML = ''; $('kkresult').innerHTML = '';
+    cur = null; $('bar').hidden = true;
+    var dans = kkDanList(), p = el('div', 'panel');
+    p.appendChild(el('h3', null, 'どの だんを やる？'));
+    var grid = el('div', 'kdans');
+    for (var d = 1; d <= 9; d++) {
+      (function (dd) {
+        var b = btn('kdan', dd + 'の だん', function () { if (kk.dans[dd]) delete kk.dans[dd]; else kk.dans[dd] = 1; kkSave(); renderKuku(); });
+        b.setAttribute('aria-pressed', String(!!kk.dans[dd])); grid.appendChild(b);
+      })(d);
+    }
+    var all = btn('kdan all', dans.length === 9 ? 'ぜんぶ はずす' : 'ぜんぶ（1〜9の だん）', function () { if (dans.length === 9) kk.dans = {}; else { kk.dans = {}; for (var i = 1; i <= 9; i++) kk.dans[i] = 1; } kkSave(); renderKuku(); });
+    all.setAttribute('aria-pressed', String(dans.length === 9)); grid.appendChild(all);
+    p.appendChild(grid);
+    var opt = el('div', 'kkopt'); opt.appendChild(el('span', null, 'ならびかた'));
+    [['order', 'じゅんばん（×1から）'], ['mix', 'バラバラ']].forEach(function (o) {
+      var b = btn('tool', o[1], function () { kk.order = o[0]; kkSave(); renderKuku(); }); b.setAttribute('aria-pressed', String(kk.order === o[0])); opt.appendChild(b);
+    });
+    p.appendChild(opt);
+    var n = dans.length * 9;
+    p.appendChild(el('p', 'muted', dans.length ? 'えらんだ だん：' + dans.join('・') + '　→ ' + n + '問' + (dans.length >= 2 ? '（1まいに かぞえます）' : '（2つ いじょう えらぶと 1まいに かぞえます）') : 'だんを 1つ いじょう えらんでね。'));
+    var best = kkBest()[dans.join(',')];
+    if (best) p.appendChild(html('p', 'kktime', 'この くみあわせの さいこう タイム：<b>' + best + '</b> びょう（ぜんもん せいかいの とき）'));
+    var go = btn('btn', 'スタート（' + n + '問）', function () { if (dans.length) startKuku(dans); });
+    if (!dans.length) go.disabled = true;
+    p.appendChild(go);
+    box.appendChild(p);
+
+    var tp = el('div', 'panel');
+    tp.appendChild(el('h3', null, '九九の ひょう　'));
+    tp.appendChild(el('p', 'muted', 'できるように なった ところは みどり、まちがえやすい ところは あか。左の 数字を タップすると よみかたが 出ます。'));
+    var t = el('div', 'kktbl');
+    t.appendChild(el('div', 'kkc h', '×'));
+    for (var c = 1; c <= 9; c++) t.appendChild(el('div', 'kkc h', String(c)));
+    for (var a = 1; a <= 9; a++) {
+      (function (aa) {
+        var rh = btn('kkc rowh', String(aa), function () { kk.showDan = kk.showDan === aa ? null : aa; renderKuku(); });
+        rh.setAttribute('aria-pressed', String(kk.showDan === aa)); t.appendChild(rh);
+        for (var bb = 1; bb <= 9; bb++) t.appendChild(el('div', 'kkc' + kkClass(aa, bb), String(aa * bb)));
+      })(a);
+    }
+    tp.appendChild(t);
+    if (kk.showDan) {
+      var rd = el('div', 'kkread');
+      for (var j = 1; j <= 9; j++) { var dv = el('div'); dv.appendChild(el('b', null, kk.showDan + '×' + j + '=' + (kk.showDan * j))); dv.appendChild(el('span', null, KUKU_YOMI[kk.showDan - 1][j - 1])); rd.appendChild(dv); }
+      tp.appendChild(rd);
+    }
+    box.appendChild(tp);
+  }
+  function kkItems(dans) {
+    var items = [];
+    dans.forEach(function (a) { for (var b = 1; b <= 9; b++) items.push({ q: { t: a + ' × ' + b + ' ＝', s: [a + '×' + b + '=' + (a * b) + '（' + KUKU_YOMI[a - 1][b - 1] + '）'], ans: num(a * b, ''), pad: 'none', big: true }, key: 'kk' + a + 'x' + b, ref: 'kk/' + a + '/' + b }); });
+    return kk.order === 'mix' ? shuffle(items) : items;
+  }
+  function startKuku(dans, items) {
+    items = items || kkItems(dans);
+    $('kkintro').hidden = true;
+    var tag = String(Date.now()), keyName = dans.join(',');
+    startSet({
+      view: 'kuku', mode: 'kuku', unit: 'kuku', dans: dans, keys: items.map(function (it) { return it.key; }), items: items, box: $('kkqs'), result: $('kkresult'), tag: tag, startedAt: Date.now(),
+      back: function () { renderKuku(); },
+      nextLabel: function () { return 'もう一度（バラバラ）→'; },
+      next: function () { startKuku(dans); window.scrollTo(0, 0); },
+      again: function () { dropPads('kuku/' + tag + '/'); startKuku(dans, items.map(function (it) { return { q: it.q, key: it.key, ref: it.ref }; })); },
+      afterGrade: function (score, box) {
+        var sec = Math.round((Date.now() - this.startedAt) / 100) / 10, best = kkBest(), prev = best[keyName], line = 'タイム <b>' + sec + '</b> びょう';
+        if (score === items.length) { if (!prev || sec < prev) { best[keyName] = sec; save(); line += '　🎉 あたらしい さいこう！'; } else line += '　（さいこう ' + prev + ' びょう）'; }
+        else line += '　ぜんもん せいかいの タイムだけ きろくします';
+        box.appendChild(html('div', 'kktime', line));
+      }
+    });
+    show('kuku');
   }
   function renderKanji() {
     var box = $('kintro'); box.hidden = false; box.innerHTML = ''; $('kqs').innerHTML = ''; $('kresult').innerHTML = '';
@@ -2684,7 +2817,7 @@
     $('kintro').hidden = true;
     var tag = String(Date.now());
     startSet({
-      view: 'kanji', mode: 'kanji', unit: g.id, keys: keys.map(function (k) { return 'k_' + k; }), items: items, box: $('kqs'), result: $('kresult'), tag: tag,
+      view: 'kanji', mode: 'kanji', unit: g.id, keys: keys.map(function (k) { return 'k_' + k; }), items: items, box: $('kqs'), result: $('kresult'), tag: tag, back: function () { renderKanji(); },
       nextLabel: function () { return kind === 'weak' ? 'にがてを もう一度 →' : 'べつの ことばで もう一度 →'; },
       next: function () { startKanji(kind, kind === 'weak' ? null : keys); },
       again: function () { dropPads('kanji/' + tag + '/'); startKanji(kind, keys, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
@@ -2832,7 +2965,7 @@
     return { level: lv, into: xp - c[lv], need: needFor(lv) };
   }
   function stageOf(level) { var st = 0; STAGES.forEach(function (x, i) { if (level >= x[1]) st = i; }); return st; }
-  function isSetLog(e) { return (e.mode === 'sheet' || e.mode === 'daily' || e.mode === 'weak' || e.mode === 'kanji' || e.mode === 'keisan') && (e.total || 0) >= 5; }
+  function isSetLog(e) { if (e.mode === 'kuku') return (e.total || 0) >= 18; return (e.mode === 'sheet' || e.mode === 'daily' || e.mode === 'weak' || e.mode === 'kanji' || e.mode === 'keisan') && (e.total || 0) >= 5; }   // くくは 2だん いじょうで 1まい
   function weekKey(d) { var x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return dayKey(x.toISOString()); }
   function sheetsOnDay(k) { var n = 0; recs._log.forEach(function (e) { if (isSetLog(e) && dayKey(e.at) === k) n++; }); return n; }
   function weekStats(d) {
@@ -2925,7 +3058,7 @@
   function gameAfterSet(o, score) {
     var lines = [], answered = 0, correct = 0;
     o.items.forEach(function (it) { if (it.answered) answered++; if (it.ok) correct++; });
-    var many = o.mode === 'kanji' || o.mode === 'keisan';
+    var many = o.mode === 'kanji' || o.mode === 'keisan' || o.mode === 'kuku';
     var wA = many ? 1 : XP.attempt, wC = many ? 2 : XP.correct + (o.mode === 'weak' ? XP.weakBonus : 0);
     lines.push(['こたえた ' + answered + '問', answered * wA]);
     if (correct) lines.push(['せいかい ' + correct + '問', correct * wC]);
@@ -3563,7 +3696,7 @@
 
   // ---------- カレンダー（テストの よてい・やった日・スタンプ） ----------
   var SUBJ = { math: ['さんすう', '📘'], kanji: ['かんじ', '✍️'], other: ['よてい', '📌'] };
-  var MODE_NAME = { sheet: 'テストの プリント', daily: 'きょうの 5問', weak: 'にがてを とく', kanji: 'かんじ', keisan: 'けいさん 1まい', test: 'テストの よみとり' };
+  var MODE_NAME = { sheet: 'テストの プリント', daily: 'きょうの 5問', weak: 'にがてを とく', kanji: 'かんじ', keisan: 'けいさん 1まい', kuku: 'くく', test: 'テストの よみとり' };
   var calM = null, calSel = null, calForm = null;
   function monthStart(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
   function plansOn(k) { return recs._plans.filter(function (p) { return p.date === k; }); }
@@ -3752,6 +3885,16 @@
         + '<li>下の 白い ますに <b>数字で こたえを 入れます</b>。ここを 見て まるつけを します。</li>'
         + '<li>ぜんぶ 書けたら、いちばん下の <span class="k">まるつけ</span> を おします。</li>'
         + '<li>まちがえた ときは、その もんだいの 下に <b>こたえと しき</b>が 出ます。「せんせいの ワンポイント」も よめます。</li></ul>'],
+      ['✖️', 'くく', '<ul>'
+        + '<li>ホームの <b>くく</b>で、だんを タップして えらびます（いくつでも）。「じゅんばん」か「バラバラ」を えらんで <span class="k">スタート</span>。</li>'
+        + '<li>こたえは 数字で 入れて <span class="k">まるつけ</span>。ぜんもん せいかいだと <b>タイム</b>が きろくされ、さいこうを こえると 🎉。</li>'
+        + '<li>九九の ひょうは、できた ところが みどりに なります。左の 数字を おすと「にしちじゅうし」の ような よみかたが 出ます。</li>'
+        + '<li>2つ いじょうの だんを やると、ドリル 1まいに かぞえます。</li></ul>'],
+      ['↩️', 'まちがえて えらんだ とき', '<ul>'
+        + '<li>もんだいの 上に <span class="k">← えらびなおす</span> と <span class="k">↻ さいしょから</span> が あります。</li>'
+        + '<li><b>えらびなおす</b>…たんげんや だん、グループを えらぶ 画面に もどります。</li>'
+        + '<li><b>さいしょから</b>…同じ もんだいを 書いた ものを けして やりなおします。</li>'
+        + '<li>左上の <span class="k">‹ ホーム</span> は いつでも ホームに もどります。</li></ul>'],
       ['🔁', 'なおし', '<p>まちがえた もんだいが あると、ボタンが <span class="k">まちがえた ○問を なおす</span> に かわります。</p><ul>'
         + '<li>おすと、<b>まちがえた ぶんだけ</b> もう一度 出ます。</li>'
         + '<li>ぜんぶ なおせたら「つぎ」に すすめます。</li>'
