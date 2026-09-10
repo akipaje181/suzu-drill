@@ -295,6 +295,17 @@
   .psheet .ln.ans .rule{border-bottom-width:1.4pt; border-bottom-color:#9c9587}
   .psheet .hs{grid-column:2; grid-row:1 / 3; border:1pt dashed #cfc8b8; position:relative; min-height:34mm; padding:3.4mm 2mm 2mm}
   .psheet .hs span{position:absolute; top:.8mm; left:1.6mm; font-family:var(--f-round); font-size:8pt; color:#9c9587}
+  .psheet .kkg{display:grid; grid-template-columns:repeat(3, 1fr); gap:2.6mm 7mm; margin-top:5mm}
+  .psheet .kkg .c{display:flex; align-items:baseline; gap:2mm; font-family:var(--f-round); font-size:13pt; font-variant-numeric:tabular-nums}
+  .psheet .kkg .c .n{font-size:8.5pt; color:#c0392f; font-weight:700; width:6mm; flex:none}
+  .psheet .kkg .c .t{white-space:nowrap}
+  .psheet .kkg .c .r{flex:1; border-bottom:1pt solid #9c9587; min-height:8mm; min-width:12mm}
+  .psheet .kkg .c .a{flex:1; color:#c0392f; font-weight:700; border-bottom:1pt dotted #e7e1d3}
+  .psheet .kkg.c4{grid-template-columns:repeat(4, 1fr); gap:2.2mm 5mm}
+  .psheet .kkg.c4 .c{font-size:11.5pt}
+  .psheet .kkg.c4 .c .n{width:5mm; font-size:8pt}
+  .psheet .kkg.c4 .c .r{min-width:9mm; min-height:7.4mm}
+  .psheet .kkg .c{break-inside:avoid; page-break-inside:avoid}
   .psheet .akey{display:grid; grid-template-columns:1fr 1fr; gap:6mm 8mm; margin-top:6mm}
   .psheet .ak{border:.9pt solid #e7e1d3}
   .psheet > .ak{margin-top:6mm}
@@ -1889,7 +1900,7 @@
 
   // ---------- views ----------
   var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kuku', 'kanji', 'solve', 'weak', 'cal', 'kotsu', 'lessons', 'records', 'print', 'help'];
-  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', kuku: 'くく', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', kotsu: 'おぼえかたカード', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ', help: 'つかいかた' };
+  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', kuku: 'くく（九九）', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', kotsu: 'おぼえかたカード', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ', help: 'つかいかた' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -1938,7 +1949,7 @@
       { cls: 'g1', ic: '🌱', name: 'まいにち やること', items: [
         ['daily', 'きょうの 5問', 'たんげんを えらんで、まいかい ちがう 5問'],
         ['keisan', 'けいさん 1まい', 'まいにち 1まい 10問（ぜんぶで 60回）'],
-        ['kuku', 'くく', '2〜9の だんを えらんで れんしゅう・タイム'],
+        ['kuku', 'くく（九九）', 'だんを えらんで れんしゅう。□さがし・タイム・ひょう'],
         ['kanji', 'かんじ', '2年生の 漢字 160字　よみ・かき・なぞり書き']
       ] },
       { cls: 'g2', ic: '📷', name: 'テストの ために', items: [
@@ -2304,12 +2315,12 @@
 
   // ---------- print ----------
   var pst = { t: 0, s: 0, src: 'sheet', ans: false, unit: null, n: 5 };
-  var genSets = null;
+  var genSets = null, kukuPrint = null;
   var PDF = [['problems', 'もんだい 10まい'], ['answers', 'こたえ'], ['points', 'ポイント'], ['all', 'ぜんぶ']];
   function renderPrint() {
     var c = $('pctl'); c.innerHTML = '';
     var src = el('div', 'tabs inpage src');
-    [['sheet', 'テストの プリント'], ['gen', '型から 作る'], ['kanji', 'かんじ ノート'], ['weak', 'さっきの にがて 5問'], ['daily', 'さっきの きょうの5問']].forEach(function (o) {
+    [['sheet', 'テストの プリント'], ['gen', '型から 作る'], ['kuku', 'くく（九九）'], ['kanji', 'かんじ ノート'], ['weak', 'さっきの にがて 5問'], ['daily', 'さっきの きょうの5問']].forEach(function (o) {
       if (o[0] === 'weak' && !lastWeakItems) return;
       if (o[0] === 'daily' && !lastDailyItems) return;
       var b = btn('tab', o[1], function () { pst.src = o[0]; renderPrint(); });
@@ -2336,6 +2347,24 @@
       [1, 3, 5, 10].forEach(function (n) { var b = btn('tab', n + 'まい', function () { pst.n = n; genSets = null; renderPrint(); }); b.setAttribute('aria-pressed', String(pst.n === n)); nrow.appendChild(b); });
       nrow.appendChild(btn('btn sm', genSets ? 'べつの もんだいで 作りなおす' : '作る', function () { genSets = buildGenSets(u, pst.n, rng((Date.now() & 0x7fffffff))); renderPrint(); }));
       c.appendChild(nrow);
+    }
+    if (pst.src === 'kuku') {
+      var kdr = el('div', 'kdans'); kdr.style.margin = '12px 0 0';
+      for (var kd = 1; kd <= 9; kd++) {
+        (function (dd) {
+          var b = btn('kdan', dd + 'の だん', function () { if (kk.dans[dd]) delete kk.dans[dd]; else kk.dans[dd] = 1; kkSave(); kukuPrint = null; renderPrint(); });
+          b.setAttribute('aria-pressed', String(!!kk.dans[dd])); kdr.appendChild(b);
+        })(kd);
+      }
+      var kall = btn('kdan all', kkDanList().length === 9 ? 'ぜんぶ はずす' : 'ぜんぶ（1〜9の だん）', function () { if (kkDanList().length === 9) kk.dans = {}; else { kk.dans = {}; for (var i = 1; i <= 9; i++) kk.dans[i] = 1; } kkSave(); kukuPrint = null; renderPrint(); });
+      kall.setAttribute('aria-pressed', String(kkDanList().length === 9)); kdr.appendChild(kall);
+      c.appendChild(kdr);
+      var krow = el('div', 'tabs inpage opt-row');
+      KK_KINDS.forEach(function (o) { var b = btn('tab', o[1], function () { kk.kind = o[0]; kkSave(); kukuPrint = null; renderPrint(); }); b.setAttribute('aria-pressed', String(kkKind() === o[0])); krow.appendChild(b); });
+      [['order', 'じゅんばん'], ['mix', 'バラバラ']].forEach(function (o) { var b = btn('tab', o[1], function () { kk.order = o[0]; kkSave(); kukuPrint = null; renderPrint(); }); b.setAttribute('aria-pressed', String(kk.order === o[0])); krow.appendChild(b); });
+      krow.appendChild(btn('btn sm', 'もんだいを 作りなおす', function () { kukuPrint = kkItems(kkDanList()); renderPrint(); }));
+      c.appendChild(krow);
+      c.appendChild(el('p', 'muted', 'えらんだ だんの 九九を 1まいに します（1だん 9問）。ここで えらんだ だん・ならび方は「くく」の 画面と 同じです。'));
     }
     if (pst.src === 'kanji') {
       var ktabs = el('div', 'tabs inpage'); ktabs.style.cssText = 'margin:12px 0 0; flex-wrap:wrap';
@@ -2383,6 +2412,25 @@
     s.appendChild(probs);
     return s;
   }
+  function buildKukuSheet(set, withAns) {
+    var s = el('div', 'psheet'), items = set.items;
+    var head = el('div', 'head');
+    head.appendChild(el('h2', 'ttl', set.title + (withAns ? '　こたえ' : '')));
+    head.appendChild(el('div', 'no', set.no));
+    s.appendChild(head);
+    s.appendChild(html('div', 'meta', withAns ? '<span>ぜんぶで ' + items.length + '問</span>'
+      : '日づけ　<span class="fill d">&nbsp;</span>月<span class="fill d">&nbsp;</span>日<span style="flex:1;display:flex;align-items:baseline;gap:2mm">なまえ　<span class="fill nm">&nbsp;</span></span><span class="sc">てんすう　　　／' + items.length + '</span>'));
+    var g = el('div', 'kkg' + (items.length > 45 ? ' c4' : ''));   // 45問より 多い ときは 4れつ（A4 1まいに おさめる）
+    items.forEach(function (it, i) {
+      var c = el('div', 'c');
+      c.appendChild(el('span', 'n', String(i + 1)));
+      c.appendChild(el('span', 't', it.q.t));
+      c.appendChild(withAns ? el('span', 'a', answerText(it.q.ans)) : el('span', 'r'));
+      g.appendChild(c);
+    });
+    s.appendChild(g);
+    return s;
+  }
   function buildAnswerSheets(sets) {
     var pages = [], per = 6;
     for (var i = 0; i < sets.length; i += per) {
@@ -2410,6 +2458,12 @@
     if (pst.src === 'weak' && lastWeakItems) return [{ title: 'にがて れんしゅう', no: 'にがて', items: lastWeakItems }];
     if (pst.src === 'daily' && lastDailyItems) return [{ title: '2年　文しょうだい　きょうの 5問', no: unitById(dst.unit).name, items: lastDailyItems }];
     if (pst.src === 'gen') return genSets || [];
+    if (pst.src === 'kuku') {
+      var kdl = kkDanList();
+      if (!kdl.length) return [];
+      if (!kukuPrint) kukuPrint = kkItems(kdl);
+      return [{ kind: 'kuku', title: '2年　くく（九九）　' + kkKindName(), no: kdl.length === 9 ? 'ぜんぶ' : kdl.join('・') + 'の だん', items: kukuPrint }];
+    }
     if (pst.src === 'kanji') return (pst.kg === 'all' ? KANJI : [KANJI.filter(function (g) { return g.id === (pst.kg || kgroup().id); })[0] || KANJI[0]]).map(function (g) { return { kind: 'kanji', g: g }; });
     var t = allTests()[Math.min(pst.t, allTests().length - 1)], sh = t.sheets[pst.s];
     return [{ title: '2年　文しょうだい　れんしゅう（' + t.label + '）', no: 'No.' + sh.n, items: sh.qs.map(function (q) { return { q: q }; }) }];
@@ -2418,8 +2472,11 @@
     var a = $('printArea'), sets = currentPrintSets();
     a.innerHTML = '';
     if (!sets.length) { a.appendChild(el('p', 'muted', '「作る」を おすと、ここに プリントが 出ます。')); return; }
-    sets.forEach(function (set) { a.appendChild(set.kind === 'kanji' ? buildKanjiSheet(set.g) : buildPSheet(set.title, set.no, set.items)); });
-    if (pst.ans) buildAnswerSheets(sets.filter(function (x) { return !x.kind; })).forEach(function (pg) { a.appendChild(pg); });
+    sets.forEach(function (set) { a.appendChild(set.kind === 'kanji' ? buildKanjiSheet(set.g) : set.kind === 'kuku' ? buildKukuSheet(set, false) : buildPSheet(set.title, set.no, set.items)); });
+    if (pst.ans) {
+      sets.forEach(function (set) { if (set.kind === 'kuku') a.appendChild(buildKukuSheet(set, true)); });
+      buildAnswerSheets(sets.filter(function (x) { return !x.kind; })).forEach(function (pg) { a.appendChild(pg); });
+    }
     fitPreview();
   }
   function fitPreview() {
@@ -2915,9 +2972,13 @@
     ['はちいちが はち', 'はちに じゅうろく', 'はちさん にじゅうし', 'はちし さんじゅうに', 'はちご しじゅう', 'はちろく しじゅうはち', 'はちしち ごじゅうろく', 'はっぱ ろくじゅうし', 'はっく しちじゅうに'],
     ['くいちが く', 'くに じゅうはち', 'くさん にじゅうしち', 'くし さんじゅうろく', 'くご しじゅうご', 'くろく ごじゅうし', 'くしち ろくじゅうさん', 'くは しちじゅうに', 'くく はちじゅういち']
   ];
-  var kk = { dans: { 2: 1 }, order: 'mix', showDan: null };
+  var kk = { dans: { 2: 1 }, order: 'mix', kind: 'ans', showDan: null };
+  var KK_KINDS = [['ans', 'こたえを かく', '7 × 8 ＝ □'], ['box', '□を さがす', '7 × □ ＝ 56'], ['mix', 'まぜる', '2つを まぜて 出す']];
   try { var kkSaved = JSON.parse(localStorage.getItem('suzu.kuku') || 'null'); if (kkSaved && kkSaved.dans) kk = kkSaved; } catch (e) {}
-  function kkSave() { try { localStorage.setItem('suzu.kuku', JSON.stringify({ dans: kk.dans, order: kk.order })); } catch (e) {} }
+  function kkSave() { try { localStorage.setItem('suzu.kuku', JSON.stringify({ dans: kk.dans, order: kk.order, kind: kk.kind })); } catch (e) {} }
+  function kkKind() { return kk.kind === 'box' || kk.kind === 'mix' ? kk.kind : 'ans'; }
+  function kkKindName() { for (var i = 0; i < KK_KINDS.length; i++) if (KK_KINDS[i][0] === kkKind()) return KK_KINDS[i][1]; return KK_KINDS[0][1]; }
+  function kkBestKey(dans) { return dans.join(',') + (kkKind() === 'ans' ? '' : '/' + kkKind()); }
   function kkStat(a, b) { return recs._types['kk' + a + 'x' + b] || { ok: 0, ng: 0 }; }
   function kkClass(a, b) { var st = kkStat(a, b), n = st.ok + st.ng; if (!n) return ''; if ((st.ok >= 1 && st.ng === 0) || (st.ok >= 2 && st.ok / n >= 0.8)) return ' ok'; if (st.ng > st.ok) return ' ng'; return ' some'; }
   function kkBest() { if (!game.kuku) game.kuku = { best: {} }; if (!game.kuku.best) game.kuku.best = {}; return game.kuku.best; }
@@ -2942,10 +3003,19 @@
       var b = btn('tool', o[1], function () { kk.order = o[0]; kkSave(); renderKuku(); }); b.setAttribute('aria-pressed', String(kk.order === o[0])); opt.appendChild(b);
     });
     p.appendChild(opt);
+    var kop = el('div', 'kkopt'); kop.appendChild(el('span', null, 'もんだい'));
+    KK_KINDS.forEach(function (o) {
+      var b = btn('tool', o[1], function () { kk.kind = o[0]; kkSave(); renderKuku(); });
+      b.setAttribute('aria-pressed', String(kkKind() === o[0])); kop.appendChild(b);
+    });
+    p.appendChild(kop);
+    p.appendChild(el('p', 'muted', kkKind() === 'ans' ? 'こたえを かく：7 × 8 ＝ □。九九を 言えるかの れんしゅう。'
+      : kkKind() === 'box' ? '□を さがす：7 × □ ＝ 56 や □ × 8 ＝ 56。こたえの ほうから 九九を さがします（わり算の じゅんび）。'
+      : 'まぜる：「こたえを かく」と「□を さがす」を まぜて 出します。'));
     var n = dans.length * 9;
     p.appendChild(el('p', 'muted', dans.length ? 'えらんだ だん：' + dans.join('・') + '　→ ' + n + '問' + (dans.length >= 2 ? '（1まいに かぞえます）' : '（2つ いじょう えらぶと 1まいに かぞえます）') : 'だんを 1つ いじょう えらんでね。'));
-    var best = kkBest()[dans.join(',')];
-    if (best) p.appendChild(html('p', 'kktime', 'この くみあわせの さいこう タイム：<b>' + best + '</b> びょう（ぜんもん せいかいの とき）'));
+    var best = kkBest()[kkBestKey(dans)];
+    if (best) p.appendChild(html('p', 'kktime', 'この くみあわせ（' + kkKindName() + '）の さいこう タイム：<b>' + best + '</b> びょう（ぜんもん せいかいの とき）'));
     var go = btn('btn', 'スタート（' + n + '問）', function () { if (dans.length) startKuku(dans); });
     if (!dans.length) go.disabled = true;
     p.appendChild(go);
@@ -2972,15 +3042,27 @@
     }
     box.appendChild(tp);
   }
-  function kkItems(dans) {
-    var items = [];
-    dans.forEach(function (a) { for (var b = 1; b <= 9; b++) items.push({ q: { t: a + ' × ' + b + ' ＝', s: [a + '×' + b + '=' + (a * b) + '（' + KUKU_YOMI[a - 1][b - 1] + '）'], ans: num(a * b, ''), pad: 'none', big: true }, key: 'kk' + a + 'x' + b, ref: 'kk/' + a + '/' + b }); });
+  function kkOne(a, b, kd) {   // kd: ans（こたえ）／bx（うしろが □）／xb（まえが □）
+    var ans = a * b, sk = [a + '×' + b + '=' + ans + '（' + KUKU_YOMI[a - 1][b - 1] + '）'], key = 'kk' + a + 'x' + b;
+    if (kd === 'bx') return { q: { t: a + ' × □ ＝ ' + ans, s: sk, ans: num(b, ''), pad: 'none', big: true }, key: key, ref: 'kk/b/' + a + '/' + b };
+    if (kd === 'xb') return { q: { t: '□ × ' + b + ' ＝ ' + ans, s: sk, ans: num(a, ''), pad: 'none', big: true }, key: key, ref: 'kk/x/' + a + '/' + b };
+    return { q: { t: a + ' × ' + b + ' ＝', s: sk, ans: num(ans, ''), pad: 'none', big: true }, key: key, ref: 'kk/' + a + '/' + b };
+  }
+  function kkItems(dans, r) {
+    var items = [], kind = kkKind();
+    r = r || rng(Date.now() & 0x7fffffff);
+    dans.forEach(function (a) {
+      for (var b = 1; b <= 9; b++) {
+        var kd = kind === 'ans' ? 'ans' : (kind === 'mix' && r() < 0.5) ? 'ans' : (r() < 0.5 ? 'bx' : 'xb');
+        items.push(kkOne(a, b, kd));
+      }
+    });
     return kk.order === 'mix' ? shuffle(items) : items;
   }
   function startKuku(dans, items) {
     items = items || kkItems(dans);
     $('kkintro').hidden = true;
-    var tag = String(Date.now()), keyName = dans.join(',');
+    var tag = String(Date.now()), keyName = kkBestKey(dans);
     startSet({
       view: 'kuku', mode: 'kuku', unit: 'kuku', dans: dans, keys: items.map(function (it) { return it.key; }), items: items, box: $('kkqs'), result: $('kkresult'), tag: tag, startedAt: Date.now(),
       back: function () { renderKuku(); },
@@ -4156,11 +4238,13 @@
         + '<li>下の 白い ますに <b>数字で こたえを 入れます</b>。ここを 見て まるつけを します。</li>'
         + '<li>ぜんぶ 書けたら、いちばん下の <span class="k">まるつけ</span> を おします。</li>'
         + '<li>まちがえた ときは、その もんだいの 下に <b>こたえと しき</b>が 出ます。「せんせいの ワンポイント」も よめます。</li></ul>'],
-      ['✖️', 'くく', '<ul>'
-        + '<li>ホームの <b>くく</b>で、だんを タップして えらびます（いくつでも）。「じゅんばん」か「バラバラ」を えらんで <span class="k">スタート</span>。</li>'
+      ['✖️', 'くく（九九）', '<ul>'
+        + '<li>ホームの <b>くく（九九）</b>で、だんを タップして えらびます（いくつでも）。「じゅんばん」か「バラバラ」を えらんで <span class="k">スタート</span>。</li>'
+        + '<li><b>もんだいは 3しゅるい</b>。<span class="k">こたえを かく</span>（7 × 8 ＝ □）／<span class="k">□を さがす</span>（7 × □ ＝ 56、□ × 8 ＝ 56）／<span class="k">まぜる</span>。「□を さがす」は こたえの ほうから 九九を さがす れんしゅうで、3年生の わり算の じゅんびに なります。</li>'
         + '<li>こたえは 数字で 入れて <span class="k">まるつけ</span>。ぜんもん せいかいだと <b>タイム</b>が きろくされ、さいこうを こえると 🎉。</li>'
         + '<li>九九の ひょうは、できた ところが みどりに なります。左の 数字を おすと「にしちじゅうし」の ような よみかたが 出ます。</li>'
-        + '<li>2つ いじょうの だんを やると、ドリル 1まいに かぞえます。</li></ul>'],
+        + '<li>2つ いじょうの だんを やると、ドリル 1まいに かぞえます。</li>'
+        + '<li>紙で やりたい ときは <b>いんさつ</b> →「くく（九九）」。えらんだ だんの 九九が 1まいに なります（ぜんぶ えらぶと 81問）。</li></ul>'],
       ['↩️', 'まちがえて えらんだ とき', '<ul>'
         + '<li>もんだいの 上に <span class="k">← えらびなおす</span> と <span class="k">↻ さいしょから</span> が あります。</li>'
         + '<li><b>えらびなおす</b>…たんげんや だん、グループを えらぶ 画面に もどります。</li>'
@@ -4240,7 +4324,8 @@
         + '<li>「この 日に 入れる」で かんりょう。ホームに「あと ○日」が 出ます。</li></ol>'
         + '<p>はんいは これから の 出題に つかう ので、分かる ときは 入れて おくと べんりです。</p>'],
       ['🖨', 'いんさつ（紙の プリント）', '<ul>'
-        + '<li><b>いんさつ</b>から、テストの プリント／型を えらんで 作る／かんじノート を PDFに できます。</li>'
+        + '<li><b>いんさつ</b>から、テストの プリント／型を えらんで 作る／<b>くく（九九）</b>／かんじノート を PDFに できます。</li>'
+        + '<li>九九プリントは だん・もんだいの しゅるい（こたえ／□さがす／まぜる）・ならび方を えらべます。ぜんぶの だんで 81問が A4 1まいに おさまります。「こたえの ページも つける」で 丸つけ用の こたえも 出ます。</li>'
         + '<li>iPad の 共有シートから 印刷や 保存が できます。</li></ul>'],
       ['💾', 'きろくの ほぞん', '<ul>'
         + '<li>記録は <b>その iPad の 中だけ</b>に あります（サーバは ありません）。ほかの 端末とは 別です。</li>'
