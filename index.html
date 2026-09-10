@@ -646,6 +646,27 @@
   .setup li::before{content:counter(st); position:absolute; left:0; top:5px; width:24px; height:24px; border-radius:50%; background:var(--a1w); color:var(--a1); font-family:var(--f-round); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center}
   .nrow{display:flex; align-items:center; gap:10px; margin:6px 0 2px}
   .nrow b{font-family:var(--f-round); font-size:20px; min-width:48px; text-align:center}
+
+  /* きょうの にっき・ルーティン・サイン */
+  .dcard{margin:8px 0 2px; padding:12px 14px 12px; border-radius:16px; background:var(--paper); border:1.5px solid var(--rule)}
+  .rstrip{display:flex; gap:6px; margin:6px 0 10px}
+  .rstep{flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:1px; padding:6px 2px; border-radius:12px; border:1.5px dashed var(--rule); font-family:var(--f-round); font-size:11.5px; color:var(--ink-faint); white-space:nowrap}
+  .rstep i{font-style:normal; font-size:18px; filter:grayscale(1); opacity:.45}
+  .rstep.on{border-style:solid; border-color:var(--a3); background:var(--a3w); color:var(--ink)}
+  .rstep.on i{filter:none; opacity:1}
+  .drow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:4px 0 8px; font-family:var(--f-round); font-size:14px; color:var(--ink-soft)}
+  .dtext{width:100%; font:inherit; font-family:var(--f-round); font-size:16px; line-height:1.6; border:1.5px solid var(--field-line); border-radius:10px; padding:10px 12px; background:var(--field); color:var(--ink); resize:none; margin:2px 0 6px}
+  .dsaved{font-family:var(--f-round); font-size:16px; line-height:1.6; padding:10px 12px; border-radius:10px; background:var(--a3w); margin:2px 0 8px; display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap}
+  .dsaved > span{flex:1; min-width:0; white-space:pre-wrap}
+  .presets{display:flex; gap:6px; flex-wrap:wrap; margin:4px 0 6px}
+  .signwrap{border:1.5px dashed var(--field-line); border-radius:10px; background:var(--field); width:262px; max-width:100%; overflow:hidden}
+  .signcv{display:block; touch-action:none}
+  .signbox{width:200px; max-width:100%; color:var(--ink)}
+  .signbox svg{width:100%; height:auto; display:block}
+  .pnote{padding:8px 12px; border-radius:10px; background:var(--a1w); font-family:var(--f-round); margin:2px 0 4px}
+  .pnote p{margin:0 0 4px}
+  .dview{margin:6px 0; font-family:var(--f-round); font-size:14.5px; line-height:1.7}
+  .dview p{margin:0 0 4px}
   @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
 </style>
 </head>
@@ -2704,7 +2725,8 @@
 
   // ---------- game: ポイント・レベル・もくひょう・スタンプ・メダル・なかま・マイルーム ----------
   var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20,
-    quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100, hard: 2, fix: 3 };   // fix = なおせた 1問ぶん   // クエスト系（bigGoal=1レベルぶん）
+    quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100, hard: 2, fix: 3,
+    diary: 10, sign: 15, routine: 20 };   // にっき／おうちの人の サイン／1日の ルーティン ぜんぶ   // fix = なおせた 1問ぶん   // クエスト系（bigGoal=1レベルぶん）
   // レベルの スピード: はじめは すぐ 上がり、やがて「ふつうの 1日 ＝ 約1レベル」に おちつく
   // ふつうの 1日（あいさつ＋クエスト＋ドリル1まい＋ふりかえり）で だいたい 190ポイント
   var LV_SPEEDS = [['はやい', 140], ['ふつう', 180], ['ゆっくり', 240]];
@@ -2789,7 +2811,9 @@
     { id: 'allclear7', ic: '🌈', name: 'ぜんぶ クリア ×7', desc: 'ぜんぶクリアの 日が 7日', ok: function (c) { return c.allclears >= 7; } },
     { id: 'morning7', ic: '🌅', name: 'あいさつ 7日', desc: '7日 れんぞくで あいさつした', ok: function (c) { return c.morningMax >= 7; } },
     { id: 'big1', ic: '🏅', name: 'おおきな もくひょう', desc: 'こんしゅうの おおきな もくひょうを クリア', ok: function (c) { return c.bigGoals >= 1; } },
-    { id: 'oks10', ic: '👪', name: 'おうちの人の ✓ ×10', desc: 'おうちの人に ✓ を 10回 もらった', ok: function (c) { return c.oks >= 10; } }
+    { id: 'oks10', ic: '👪', name: 'おうちの人の ✓ ×10', desc: 'おうちの人に ✓ を 10回 もらった', ok: function (c) { return c.oks >= 10; } },
+    { id: 'diary7', ic: '📝', name: 'にっき 7日', desc: 'きょうの にっきを 7日 書いた', ok: function (c) { return c.diaries >= 7; } },
+    { id: 'routine7', ic: '👑', name: 'ルーティン ×7', desc: '1日の ルーティンを 7日 ぜんぶ できた', ok: function (c) { return c.routines >= 7; } }
   ];
   function nextReward() {   // つぎに 何が もらえるか（レベルの ちかい ものを 1つ）
     var lv = levelOf().level, best = null;
@@ -2851,7 +2875,7 @@
     ['wear', 'lessonsRead', 'wasWeak', 'mates', 'decor', 'goalsDone'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     if (!game.bonus) game.bonus = { days: {}, weeks: {} };
     if (!game.goals) goals();
-    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear', 'qpick', 'learned'].forEach(function (k) { if (!game[k]) game[k] = {}; });
+    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear', 'qpick', 'learned', 'diary', 'routine'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     keisan();
     if (!game.quests) { game.quests = { on: {}, custom: [] }; QUEST_DEFAULT.forEach(function (id) { game.quests.on[id] = 1; }); }
     if (!game.quests.custom) game.quests.custom = [];
@@ -2871,7 +2895,8 @@
     rs.forEach(function (r) { if (r.n >= 5 && r.rate >= 0.8) masters++; if (game.wasWeak[r.key] && r.n >= 5 && r.rate >= 0.7) weakwin = true; });
     for (var w in game.bonus.weeks) { if (game.bonus.weeks[w].days || game.bonus.weeks[w].sheets) weekGoals++; }
     var quests = 0, oks = 0; for (var qk in game.qdone) quests += Object.keys(game.qdone[qk]).length; for (var ok in game.qok) oks += Object.keys(game.qok[ok]).length;
-    return { quests: quests, oks: oks, allclears: Object.keys(game.allclear).length, mornings: Object.keys(game.morning).length, morningMax: Math.max(streakFrom(game.morning), streakIn(game.morning)), bigGoals: Object.keys(bigGoal().done).length,
+    var diaries = 0; for (var dk in game.diary) { if (game.diary[dk] && game.diary[dk].text) diaries++; }
+    return { diaries: diaries, routines: Object.keys(game.routine).length, quests: quests, oks: oks, allclears: Object.keys(game.allclear).length, mornings: Object.keys(game.morning).length, morningMax: Math.max(streakFrom(game.morning), streakIn(game.morning)), bigGoals: Object.keys(bigGoal().done).length,
       sheets: game.sets, perfects: game.perfects, streak: streak(), streakMax: game.streakMax || 0, stamps: Object.keys(game.stamps).length, masters: masters, weakwin: weakwin,
       weakSets: game.weakSets, scans: game.scans, lessons: Object.keys(game.lessonsRead).length, level: levelOf().level, medals: Object.keys(game.badges).length, mates: Object.keys(game.mates).length, goalDays: goalDays, weekGoals: weekGoals };
   }
@@ -2923,6 +2948,7 @@
     if (ws.days >= g.weekDays && !wb.days) { wb.days = 1; lines.push(['📅 こんしゅう ' + g.weekDays + '日 たっせい！', XP.goalWeek]); flags.week = true; }
     if (ws.sheets >= g.weekSheets && !wb.sheets) { wb.sheets = 1; lines.push(['📅 こんしゅう ' + g.weekSheets + 'まい たっせい！', XP.goalWeek]); flags.week = true; }
     questBonusLines(k).forEach(function (l) { lines.push(l); });
+    routineBonusLines(k).forEach(function (l) { lines.push(l); });
     var total = 0; lines.forEach(function (l) { total += l[1]; });
     return gameEvent(total, { stamp: first, lines: lines });
   }
@@ -3246,6 +3272,7 @@
     return lines;
   }
   function finishQuestEvent(lines) {
+    routineBonusLines(todayKey()).forEach(function (l) { lines.push(l); });
     var total = 0; lines.forEach(function (l) { total += l[1]; });
     var ev = total ? gameEvent(total, { lines: lines }) : null;
     save(); renderCharCard();
@@ -3325,6 +3352,117 @@
     var h = $('qsec'); if (h) h.scrollIntoView();
   }
   function parentLink() { return btn('linkbtn', 'おうちの人へ：クエストを えらぶ・ふやす（マイルーム）→', openQuestSettings); }
+
+  // ---------- きょうの にっき・おうちの人の サイン・1日の ルーティン ----------
+  var diaryDraft = {}, signEdit = {};
+  function diaryOf(k) { return game.diary[k] || null; }
+  function routineState(k) {   // 1日の ルーティン 5つ
+    var d = diaryOf(k) || {};
+    var steps = [
+      { id: 'greet', ic: '☀️', name: 'あいさつ', done: !!game.morning[k] },
+      { id: 'quest', ic: '✅', name: 'クエスト', done: Object.keys(game.qdone[k] || {}).length > 0 },
+      { id: 'drill', ic: '📘', name: 'ドリル', done: sheetsOnDay(k) >= 1 },
+      { id: 'diary', ic: '📝', name: 'にっき', done: !!d.text },
+      { id: 'sign', ic: '👪', name: 'サイン', done: !!d.signedAt }
+    ];
+    var n = 0; steps.forEach(function (x) { if (x.done) n++; });
+    return { steps: steps, n: n, all: n === steps.length };
+  }
+  function routineBonusLines(k) {   // 5つ ぜんぶ できた 日の ボーナス（1日 1回）
+    var lines = [], r = routineState(k);
+    if (r.all && !game.routine[k]) { game.routine[k] = 1; lines.push(['👑 きょうの ルーティン ぜんぶ できた！', XP.routine]); }
+    return lines;
+  }
+  function saveDiary(k, text) {
+    var d = game.diary[k] || (game.diary[k] = {}), paid = qday(game.qpaid, k), lines = [];
+    d.text = text.trim().slice(0, 200); d.at = new Date().toISOString();
+    if (d.text && !paid.diary) { paid.diary = 1; lines.push(['📝 きょうの にっきを 書いた', XP.diary]); }
+    delete diaryDraft[k];
+    finishQuestEvent(lines);
+    if (d.text) toastText('📝 にっきを かきました');
+  }
+  function saveSign(k, note, strokes) {
+    var d = game.diary[k] || (game.diary[k] = {}), paid = qday(game.qpaid, k), lines = [];
+    d.note = (note || '').trim().slice(0, 60);
+    if (strokes && strokes.length) d.sign = strokes;
+    d.signedAt = new Date().toISOString();
+    if (!paid.sign) { paid.sign = 1; lines.push(['👪 おうちの人の ひとことと サイン', XP.sign]); }
+    delete signEdit[k];
+    finishQuestEvent(lines);
+  }
+  function signPad(onChange) {   // ちいさな 手書きの わく（指でも ペンでも）。せんは 座標で ほぞん
+    var W = 260, H = 90, wrap = el('div', 'signwrap'), cv = el('canvas', 'signcv'), dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; wrap.appendChild(cv);
+    var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr); ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#2b2620';
+    var strokes = [], curS = null;
+    function pos(e) { var r = cv.getBoundingClientRect(); return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10]; }
+    cv.addEventListener('pointerdown', function (e) { e.preventDefault(); curS = [pos(e)]; strokes.push(curS); try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
+    cv.addEventListener('pointermove', function (e) { if (!curS) return; var p = pos(e), n = curS.length; curS.push(p); ctx.beginPath(); ctx.moveTo(curS[n - 1][0], curS[n - 1][1]); ctx.lineTo(p[0], p[1]); ctx.stroke(); });
+    function up() { if (curS && curS.length === 1) { ctx.beginPath(); ctx.arc(curS[0][0], curS[0][1], 1.3, 0, 7); ctx.fillStyle = '#2b2620'; ctx.fill(); } curS = null; onChange(strokes); }
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    ['touchstart', 'touchmove'].forEach(function (t) { cv.addEventListener(t, function (e) { e.preventDefault(); }, { passive: false }); });
+    wrap.clear = function () { strokes.length = 0; ctx.clearRect(0, 0, W, H); onChange(strokes); };
+    return wrap;
+  }
+  function signSVG(strokes) {
+    return '<svg viewBox="0 0 260 90" aria-label="サイン">' + strokes.map(function (st) {
+      if (st.length === 1) return '<circle cx="' + st[0][0] + '" cy="' + st[0][1] + '" r="1.5" fill="currentColor"/>';
+      return '<polyline points="' + st.map(function (p) { return p[0] + ',' + p[1]; }).join(' ') + '" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>';
+    }).join('') + '</svg>';
+  }
+  function diaryCard(k) {
+    var card = el('div', 'dcard'), d = diaryOf(k) || {}, r = routineState(k), mv = game.evening[k];
+    var tt = el('div', 'qtitle'); tt.appendChild(el('span', null, '📝 きょうの にっき'));
+    tt.appendChild(el('small', null, 'ルーティン ' + r.n + ' / ' + r.steps.length + (r.all ? '　👑 コンプリート！' : '　ぜんぶで +' + XP.routine)));
+    card.appendChild(tt);
+    var strip = el('div', 'rstrip');
+    r.steps.forEach(function (x) { var e2 = el('div', 'rstep' + (x.done ? ' on' : '')); e2.appendChild(el('i', null, x.ic)); e2.appendChild(el('span', null, x.name)); strip.appendChild(e2); });
+    card.appendChild(strip);
+
+    var mrow = el('div', 'drow'); mrow.appendChild(el('span', null, mv === undefined ? 'きょうは どうだった？（+' + XP.evening + '）' : 'きょうは「' + MOODS[mv][1] + '」の 日'));
+    var md = el('div', 'moods');
+    MOODS.forEach(function (m, i) { var b = btn(null, m[0], function () { setMood(i); }); b.setAttribute('aria-pressed', String(mv === i)); b.setAttribute('aria-label', m[1]); md.appendChild(b); });
+    mrow.appendChild(md); card.appendChild(mrow);
+
+    if (d.text && diaryDraft[k] === undefined) {
+      var saved = el('div', 'dsaved'); saved.appendChild(el('span', null, d.text));
+      saved.appendChild(btn('linkbtn', '✎ なおす', function () { diaryDraft[k] = d.text; renderCharCard(); }));
+      card.appendChild(saved);
+    } else {
+      var ta = el('textarea', 'dtext'); ta.rows = 2; ta.placeholder = 'きょうの ひとこと（れい：かけ算が できるように なった！）'; ta.value = diaryDraft[k] || '';
+      ta.addEventListener('input', function () { diaryDraft[k] = ta.value; });
+      card.appendChild(ta);
+      var da = el('div', 'actions');
+      da.appendChild(btn('btn sm', 'にっきを かく（+' + XP.diary + '）', function () { if (!ta.value.trim()) { toastText('ひとこと 書いてね'); return; } saveDiary(k, ta.value); }));
+      if (d.text) da.appendChild(btn('linkbtn', 'やめる', function () { delete diaryDraft[k]; renderCharCard(); }));
+      card.appendChild(da);
+    }
+
+    var ph = el('div', 'qtitle'); ph.appendChild(el('span', null, '👪 おうちの人から'));
+    ph.appendChild(el('small', null, d.signedAt ? 'サイン ずみ ✓' : 'ひとことと サインで +' + XP.sign)); card.appendChild(ph);
+    if (d.signedAt && !signEdit[k]) {
+      var pv = el('div', 'pnote');
+      if (d.note) pv.appendChild(el('p', null, '「' + d.note + '」'));
+      if (d.sign) pv.appendChild(html('div', 'signbox', signSVG(d.sign)));
+      pv.appendChild(btn('linkbtn', '✎ なおす', function () { signEdit[k] = 1; renderCharCard(); }));
+      card.appendChild(pv);
+    } else {
+      var ni = el('input', 'dtext'); ni.placeholder = 'おうちの人の ひとこと'; ni.value = d.note || ''; ni.setAttribute('maxlength', '60');
+      var presets = el('div', 'presets');
+      ['よく がんばりました', 'すごい！', 'えらいね', 'あしたも いっしょに がんばろう'].forEach(function (t) { presets.appendChild(btn('qok', t, function () { ni.value = t; })); });
+      card.appendChild(presets); card.appendChild(ni);
+      var strokes = [];
+      var sp = signPad(function (st) { strokes = st; });
+      card.appendChild(el('p', 'muted', 'ここに サインを 書いてね（指でも ペンでも）'));
+      card.appendChild(sp);
+      var sa = el('div', 'actions');
+      sa.appendChild(btn('btn sm', 'サインする（+' + XP.sign + '）', function () { if (!ni.value.trim() && !strokes.length && !d.sign) { toastText('ひとことか サインを 入れてね'); return; } saveSign(k, ni.value, strokes); }));
+      sa.appendChild(btn('linkbtn', 'けす', function () { sp.clear(); }));
+      if (d.signedAt) sa.appendChild(btn('linkbtn', 'やめる', function () { delete signEdit[k]; renderCharCard(); }));
+      card.appendChild(sa);
+    }
+    return card;
+  }
   function questCard() {
     var k = todayKey(), qs = questState(k), f = fortune(k), checked = !!game.morning[k], card = el('div', 'qcard');
     var hd = el('div', 'qhead');
@@ -3351,7 +3489,7 @@
     var tt = el('div', 'qtitle'); tt.appendChild(el('span', null, 'きょうの クエスト'));
     tt.appendChild(el('small', null, qs.choosing ? questDefs().length + 'この 中から えらぶ' : qs.done + ' / ' + qs.total + '　ぜんぶ クリアで +' + allXp()));
     card.appendChild(tt);
-    if (qs.choosing) { card.appendChild(pickPanel(k)); card.appendChild(bigLine()); card.appendChild(moodRow(k)); card.appendChild(parentLink()); return card; }
+    if (qs.choosing) { card.appendChild(pickPanel(k)); card.appendChild(bigLine()); card.appendChild(parentLink()); return card; }
     var ul = el('ul', 'qlist');
     qs.list.forEach(function (q) {
       var li = el('li'), learn = q.id === 'learn';
@@ -3369,7 +3507,6 @@
       card.appendChild(btn('linkbtn', 'クエストを えらびなおす', function () { delete game.qpick[k]; pickSel = {}; save(); renderCharCard(); }));
     }
     card.appendChild(bigLine());
-    card.appendChild(moodRow(k));
     card.appendChild(parentLink());
     return card;
   }
@@ -3499,6 +3636,7 @@
       var n = sheetsOnDay(k);
       if (n) cell.appendChild(el('span', 'dots', new Array(Math.min(4, n) + 1).join('●')));
       plansOn(k).forEach(function (p) { cell.appendChild(el('span', 'pm', planIcon(p))); });
+      if (game.routine[k]) cell.appendChild(el('span', 'pm', '👑'));
       grid.appendChild(cell);
       if (i >= 34 && d.getMonth() !== calM.getMonth() && i % 7 === 6) break;
     }
@@ -3540,7 +3678,17 @@
       });
       p.appendChild(ul2);
     }
-    if (!plans.length && !logs.length) p.appendChild(el('p', 'muted', 'この日の きろくは まだ ありません。'));
+    var dd = game.diary[k];
+    if (dd && (dd.text || dd.note || dd.sign)) {
+      var dv = el('div', 'dview');
+      if (game.evening[k] !== undefined) dv.appendChild(el('p', null, MOODS[game.evening[k]][0] + ' きぶん：' + MOODS[game.evening[k]][1]));
+      if (dd.text) dv.appendChild(el('p', null, '📝 ' + dd.text));
+      if (dd.note) dv.appendChild(el('p', null, '👪 「' + dd.note + '」'));
+      if (dd.sign) dv.appendChild(html('div', 'signbox', signSVG(dd.sign)));
+      if (game.routine[k]) dv.appendChild(el('p', null, '👑 ルーティン コンプリート'));
+      p.appendChild(dv);
+    }
+    if (!plans.length && !logs.length && !(dd && (dd.text || dd.note))) p.appendChild(el('p', 'muted', 'この日の きろくは まだ ありません。'));
     if (calForm && calForm.date === k) p.appendChild(planForm(k));
     else p.appendChild(btn('btn sm', '📌 よていを 入れる', function () { calForm = { date: k, subject: 'math', scope: null, title: '' }; renderCal(); }));
     return p;
@@ -3619,6 +3767,10 @@
         + '<li>学校や おうちの もくひょうが ならんで います。できたら 四角を タップして ✓。</li>'
         + '<li>ぜんぶ できたら <b>ボーナス</b>。それが つづくと「おおきな もくひょう」も クリアです。</li>'
         + '<li>さいごに「きょうは どうだった？」で きぶんを えらびます。</li></ul>'],
+      ['📝', 'きょうの にっき と ルーティン', '<ul>'
+        + '<li>ホームの「きょうの にっき」に、きぶんと <b>ひとこと</b>を 書きます（+' + XP.diary + '）。</li>'
+        + '<li>そのあと おうちの人に <b>ひとことと サイン</b>を もらいます（+' + XP.sign + '）。</li>'
+        + '<li>上の 5つ（あいさつ・クエスト・ドリル・にっき・サイン）が ぜんぶ できた 日は <b>👑 ルーティン コンプリート</b>で +' + XP.routine + '。カレンダーにも 👑 が つきます。</li></ul>'],
       ['📅', 'カレンダー', '<ul>'
         + '<li>べんきょうした 日に <b>赤い まる</b>、やった まい数だけ 緑の 点が つきます。</li>'
         + '<li>テストの 日には しるしが つき、ホームに「あと ○日」と 出ます。</li>'
@@ -3628,7 +3780,8 @@
       ['🕐', '1日の ながれ（おすすめ）', '<ol>'
         + '<li><b>朝</b>：アプリを ひらく → ドリまるの ひとこと → 「おはよう！」で おみくじ → きょうの クエストを 見る。</li>'
         + '<li><b>学習</b>：「けいさん 1まい」（10問）＋「きょうの 5問」または「かんじ」。10〜20分が 目安です。</li>'
-        + '<li><b>夜</b>：できた クエストに ✓ → おうちの人が 👪 ✓ → ふりかえりの きぶんを えらぶ。</li></ol>'
+        + '<li><b>夜</b>：できた クエストに ✓ → 「きょうの にっき」で きぶんと ひとこと → おうちの人が ひとことと <b>サイン</b>（指で 書けます。定型文の ボタンも あります）。</li></ol>'
+        + '<p>あいさつ・クエスト・ドリル・にっき・サイン の 5つが そろうと 👑 ルーティン コンプリート（+' + XP.routine + '）。この 5つを 毎日の 型に すると、親子の やりとりが 自然に 1日 1回 入ります。</p>'
         + '<p>1日 2まいで だいたい 1レベル 上がります。</p>'],
       ['📷', 'テストから プリントを 作る（3つの 方法）', '<p><b>A. iPad だけで じどうに（おすすめ）</b>：1回だけ APIキーを 入れます。</p><ol>'
         + '<li>Safari で <b>console.anthropic.com</b> を ひらき、アカウントを 作る。</li>'
@@ -3839,6 +3992,7 @@
     card.appendChild(info);
     box.appendChild(card);
     box.appendChild(questCard());
+    box.appendChild(diaryCard(todayKey()));
     var soon = upcomingPlans(2, 14);
     if (soon.length) box.appendChild(planCard(soon));
   }
