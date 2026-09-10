@@ -669,6 +669,17 @@
   .dview p{margin:0 0 4px}
 
   /* えらびなおす・さいしょから／くく */
+  /* おぼえかたカード（コツ） */
+  .kotsu{margin:10px 0 0 39px; padding:11px 13px; border-radius:11px; background:var(--a2w); border:1.5px solid var(--a2); font-family:var(--f-round); line-height:1.75}
+  .kotsu .kb{display:block; font-size:11.5px; font-family:var(--f-kaku); color:var(--a2); letter-spacing:.06em}
+  .kotsu .kb em{font-style:normal; background:var(--a2); color:#fff; border-radius:99px; padding:1px 7px; margin-left:6px; font-size:10.5px; font-weight:700}
+  .kotsu .kb i{font-style:normal; margin-left:6px; color:var(--ink-faint)}
+  .kotsu b{display:block; font-size:16.5px; margin:3px 0 3px}
+  .kotsu p{margin:0; font-size:15px}
+  .kotsu small{display:block; margin-top:5px; font-size:12.5px; color:var(--ink-soft); font-family:var(--f-kaku)}
+  .kzlist .kotsu{margin:0 0 10px}
+  .kstar{margin:10px 0 0 39px; font-family:var(--f-kaku); font-size:13px; color:var(--ok-ink)}
+  .kzlock{color:var(--ink-faint); font-size:13px; background:var(--rule-soft); border-radius:9px; padding:9px 12px; margin:0 0 10px}
   .setnav{display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 10px}
   .kdans{display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin:8px 0 10px}
   .kdan{min-height:56px; border:1.5px solid var(--rule); border-radius:12px; background:var(--paper); font-family:var(--f-round); font-size:18px; font-weight:700; color:var(--ink)}
@@ -778,6 +789,10 @@
       <div id="dresult"></div>
       <div id="dqs"></div>
     </div>
+  </section>
+
+  <section id="v-kotsu" hidden>
+    <div class="wrap"><div id="ktz"></div></div>
   </section>
 
   <section id="v-lessons" hidden>
@@ -1504,7 +1519,7 @@
     card.classList.add('graded', ok ? 'ok' : 'ng');
     if (TYPES[item.key]) card.appendChild(el('span', 'q-type', TYPES[item.key].name + (item.gd ? '　むずかしさ Lv.' + (item.gd + 1) : '')));   // 型の名前は まるつけの後にだけ 見せる
     card.appendChild(el('span', 'mark ' + (ok ? 'o' : 'x'), ok ? '' : '✗'));
-    if (ok) return;
+    if (ok) { if (game && kotsuStar(item.key)) { kotsuHit++; card.appendChild(el('div', 'kstar', '⭐ おぼえかたカードの コツ、きいたね！')); } return; }
     var fix = el('div', 'fix');
     fix.appendChild(el('span', 'k', 'こたえ'));
     fix.appendChild(el('span', 'a', answerText(q.ans)));
@@ -1514,6 +1529,8 @@
     fix.appendChild(st2);
     if (TYPES[item.key]) fix.appendChild(btn('linkbtn shu go', '→ せんせいの ワンポイント「' + TYPES[item.key].name + '」', function () { openLesson(item.key); }));
     card.appendChild(fix);
+    var kz = game ? kotsuWrong(item.key) : null;   // まちがえた ところの「おぼえかた」を その場で 見せる
+    if (kz) { card.appendChild(kotsuCardEl(kz)); if (kz.isNew) kotsuNew.push(kz); }
   }
 
   // ---------- set runner (sheet mode / weak mode) ----------
@@ -1559,6 +1576,7 @@
   function gradeSet() {
     if (fingerPad) fingerPad.off();
     var o = cur, score = 0, blank = 0, wrong = [];
+    kotsuNew = []; kotsuHit = 0;
     o.items.forEach(function (it) {
       var v = judgeItem(it), ok = v === true;
       it.graded = true; it.answered = v !== null; it.ok = ok;
@@ -1621,9 +1639,257 @@
   $('btnMain').addEventListener('click', function () { if (!cur) return; if (!cur.graded) gradeSet(); else if (cur.mainAction) cur.mainAction(); else cur.next(); });
   $('btnAgain').addEventListener('click', function () { if (!cur) return; if (cur.againAction) cur.againAction(); else cur.again(); });
 
+  // ---------- おぼえかたカード（コツ）: まちがえた ところの「おぼえる こつ」を あつめる ----------
+  var KOTSU_BASE = [
+    ['まちがいは たからもの', 'ぜんぶ やり直すより、まちがえた ところ「だけ」を もう一度 やる ほうが 3ばい 早く おぼえられます。○の ついた ところは もう だいじょうぶ。'],
+    ['声に出す', '目で 見て いるだけでは あたまに のこりません。九九も 漢字も 読み方を 声に出して 言うと、耳からも 入って わすれにくく なります。'],
+    ['つぎの日に もう一度', 'おぼえた ことは 1日 たつと 半分 わすれます。同じ ところを つぎの日に もう一度、そして 1週間後に もう一度。3回 会えば 忘れません。'],
+    ['おうちの 人に せつめいする', 'ときかたを 声に出して せつめいすると、「わかって いた つもり」の ところが 自分で 見つかります。教えられる ものは、ほんとうに わかった もの。'],
+    ['手を うごかす', '見ているだけでは おぼえられません。漢字は 指で 空に 書く（空書き）、計算は しきを 書く。手を うごかすと 体が おぼえます。'],
+    ['3つ ずつ に 分ける', '一度に 10こ おぼえようと すると ぜんぶ ぼやけます。3つ おぼえて、言えたら つぎの 3つ。小さく 分ける ほうが 早い。'],
+    ['たんいは セットで おぼえる', '1cm＝10mm　1m＝100cm　1L＝10dL　1時間＝60分。小さい たんいほど たくさん いる、と おぼえます。'],
+    ['さいごの 一文に ○を つける', '文しょうだいは「なんこ？」「なん人？」と きいて いる ところに ○。何を もとめるのかを 先に きめると、しきを まちがえません。']
+  ];
+  var KK_PAIR = {
+    '3x7': 'さんしち にじゅういち。リズムで 言うと 出て きます。3の だんは 3ずつ ふえるので、3×6＝18 に 3を たしても 21。',
+    '3x8': 'さんぱ にじゅうし。8×3も 24。4×6 も 24 なので、24は 九九に 何回も 出て くる 数です。',
+    '3x9': '9の だんは「×10 から その数を ひく」。30−3＝27。こたえの 2と7を たすと 9に なるのも 9の だんの しるし。',
+    '4x6': '4の だんは 2の だんの 2ばい。2×6＝12、その 2ばいで 24。',
+    '4x7': '4の だんは 2の だんの 2ばい。2×7＝14、その 2ばいで 28。「しちし にじゅうはち」。',
+    '4x8': '4の だんは 2の だんの 2ばい。2×8＝16、その 2ばいで 32。',
+    '4x9': '40−4＝36。9の だんは ×10 から その数を ひくと すぐ 出ます。3+6＝9。',
+    '6x6': 'ろくろく さんじゅうろく。6の だんは 3の だんの 2ばい。3×6＝18 の 2ばいで 36。',
+    '6x7': 'ろくしち しじゅうに。6×6＝36 に 6を たすと 42。1つ 前の こたえに その だんの 数を たすと、つぎが 出ます。',
+    '6x8': 'ろくは しじゅうはち。「ロバ（6と8）は しわ（48）くちゃ」で おぼえます。8×6も 48。',
+    '6x9': '60−6＝54。9の だんは ×10 から その数を ひく。5+4＝9。',
+    '7x7': 'しちしち しじゅうく。7が 2つで 49。「なく（49）ほど がんばる 7」で おぼえます。',
+    '7x8': '九九で いちばん まちがえる ところ。7×7＝49 に 7を たすと 56。「しちは ごじゅうろく」より「はちしち ごじゅうろく」の ほうが 言いやすい人も います。言いやすい ほうで OK。',
+    '7x9': '70−7＝63。6+3＝9。7の だんが 出て こない ときは 9の だんの わざを つかいます。',
+    '8x8': 'はっぱ ろくじゅうし。「葉っぱ（8と8）が 64まい」で おぼえます。',
+    '8x9': '80−8＝72。7+2＝9。8×8＝64 に 8を たしても 72。',
+    '9x9': 'くく はちじゅういち。90−9＝81。8+1＝9。九九の さいごの もんだいです。'
+  };
+  var KK_DAN = {
+    1: '1の だんは かけた 数が そのまま こたえ。1×7＝7。まよったら「1つ分が 1こ」と 考えます。',
+    2: '2の だんは 2ずつ ふえます。2・4・6・8・10…。こたえは ぜんぶ ぐうすう（2で わりきれる 数）。',
+    3: '3の だんは 3ずつ。3・6・9・12・15…。声に出して リズムで 言うと 手が おぼえます。',
+    4: '4の だんは 2の だんの 2ばい。2×6＝12 → その 2ばいで 4×6＝24。',
+    5: '5の だんは 一の位が 5・0・5・0 の くりかえし。こたえは「×10 の 半分」。5×8 は 80の 半分で 40。',
+    6: '6の だんは 3の だんの 2ばい。3×7＝21 → その 2ばいで 6×7＝42。',
+    7: '7の だんは 九九の 山。1つ 前の こたえに 7を たすと つぎが 出ます（7×6＝42 → +7 → 7×7＝49）。',
+    8: '8の だんは 4の だんの 2ばい。一の位は 8・6・4・2・0…と 2ずつ へって いきます。',
+    9: '9の だんは「×10 から その数を ひく」。9×6 なら 60−6 で 54。こたえの 十の位と 一の位を たすと いつも 9。'
+  };
+  var KOTSU_T = {
+    awasete: ['あわせて・ぜんぶで・みんなで', 'この 3つの ことばが 出て きたら たし算。文の 中の ことばに ○を つけて から しきを 書くと まちがえません。'],
+    fueru: ['きた・もらった・のった は ふえる', 'うごきの ことばを さがします。「のって きた」「もらった」「さいた」は ふえる ので たし算。'],
+    nokori: ['のこりは ひき算', '「のこりは？」「つかった あとは？」は ひき算。ひっさんは 一の位から。ひけない ときは 上の位から 10を かりて、かりた位を 1 へらします。'],
+    chigai: ['ちがい は 大きい ほうから', 'くらべる ことばが 出たら ひき算。大きい 数を 上に 書くと ぜったい まちがえません。こたえに「どちらが」も 書きます。'],
+    mittsu: ['10の まとまりを 先に', '3つの 数は 前から じゅんばん。でも 10が 作れる 2つが あれば 先に たすと らく（12+8＝20 → +5）。'],
+    hajime: ['はじめは 反対の 計算', '「はじめは いくつ？」は、文の うごきと 反対に します。食べた のに たし算、もらった のに ひき算。テープ図を かくと 目で わかります。'],
+    ikutsu_tsukatta: ['つかった＝はじめ−のこり', 'へった 分を さがす ときは、大きい ほう（はじめ）から 小さい ほう（のこり）を ひきます。'],
+    kago: ['かごの 中を 先に', 'かご 1つ分を 先に 出して、かごの 数だけ たします。それから ばらを たし、食べた 分を ひきます。しきは 1つでは おわりません。'],
+    sorezore: ['「それぞれ」は 2回ある の しるし', '「あさと ひるに それぞれ 7こ」は 7こが 2回。しきも 2つ 書きます。'],
+    dochira: ['とちゅうの 数を こたえに しない', 'ひき算 2回。1回目で 出た 数は こたえでは なく とちゅうの 数。さいごに「どちらが どれだけ」を 書きます。'],
+    ookii_hou: ['もとめるのが 多い ほう なら たし算', '「〜より ○こ 多い」で、さがして いるのが 多い ほうなら たす。テープ図の 長い ほうを 書いて たしかめます。'],
+    chiisai_hou: ['「多い」の 字に だまされない', '同じ 文でも、もとめるのが 少ない ほうなら ひき算。「多い」と 書いて あるから たし算、では ありません。'],
+    toshi: ['今の 年に なおして から', '「きょ年」なら +1、「らい年」なら −1 して 今の 年に する。そこから とし上の 分を たします。'],
+    nanbanme: ['○ばんめ には 自分が 入って いる', '「まえから 7ばんめ」の 7には 自分が 入って います。だから +1 しません。'],
+    ryougawa: ['ダブった 自分を 1人 かえす', 'まえから＋うしろから では 自分を 2回 数えて います。だから さいごに −1。合言葉「ダブりを 1つ かえす」。'],
+    mae_ushiro: ['自分を わすれない', 'まえの 人＋うしろの 人 だけでは 自分が いません。さいごに +1。合言葉「自分を 入れる」。'],
+    aida: ['ゆびを 見て たしかめる', 'ゆびは 5本、あいだは 4つ。いちれつの あいだの 数は「人数−1」。手を 見れば いつでも たしかめられます。'],
+    wa: ['まるは そのまま', 'わ（丸）に なると さいごの 人と さいしょの 人が となり同士。あいだの 数は 人数と 同じ。いちれつ（−1）と ちがう ところ。'],
+    nagasa_tashi: ['10mm で 1cm に くり上げ', 'cmは cm、mmは mm どうし。mmが 10を こえたら 1cm に くり上げます。30cm12mm とは 書きません。'],
+    nagasa_hiki: ['0mm は 書かない', '同じ たんい どうしで ひきます。mmが 0に なったら「51cm」と だけ 書きます。'],
+    nagasa_chigai: ['長い ほうから ひく', 'こたえには「どちらが 何cm 長い」まで 書きます。数字だけでは まる が つきません。'],
+    m_cm_tashi: ['100cm で 1m', '1m＝100cm。cmが 100を こえたら 1m に くり上げ。1m115cm とは 書きません。'],
+    m_cm_hiki: ['1m を 100cm に くずす', 'cmが ひけない ときは、1m を くずして 100cm を たしてから ひきます。'],
+    kasa_tashi: ['10dL で 1L', '1L＝10dL。「デシ」は 10分の1 と いう いみ。dLが 10に なったら 1L に くり上げ。'],
+    kasa_hiki: ['1L を 10dL に くずす', 'dLが ひけない ときは 1L を くずして 10dL を たします。「2−5 は できない」で 止まらない。'],
+    jikoku_ato: ['60分 で 1時間', '分どうしを たして 60を こえたら 1時間 すすめます。9時70分 とは 言いません。'],
+    jikoku_mae: ['1時間 かりて 60分 たす', 'もどす ときに 分が ひけなければ、1時間 かりて 60分 を たしてから ひきます。'],
+    jikan: ['時こく は 点、時間 は ながさ', '「なん時なん分ですか」は 時こく、「なん分かかりましたか」は 時間。ちょうどの 時で 2つに 分けて 数えると かんたん。'],
+    kakezan: ['1つ分が 先', 'しきは（1つ分の 数）×（いくつ分）。「1はこ 4こが 5はこ」なら 4×5。こたえが 同じでも しきの じゅんばんに いみが あります。'],
+    bai: ['○ばい は ○つ分', '「4ばい」は 4つ分の こと。だから かけ算。たし算では ありません。'],
+    kakezan_tashi: ['かけ算 が 先、たし算 は あと', 'まず まとまりの 数を かけ算で 出す。ばらの 数は そのあと。ふくろの 数に ばらを たさない。'],
+    okane: ['はらった お金 から ひく', 'おつり＝はらった お金−ねだん。大きい ほう（はらった お金）が 上です。'],
+    hyaku: ['こ数 を そのまま たさない', '100円玉 3こは 300。10円玉 8こは 80。位に なおして から たします。'],
+    hanbun: ['同じ 数 2つ に 分ける', '半分は「○＋○＝もとの 数」に なる ○。16なら 8+8＝16 だから 8。']
+  };
+  var KOTSU_C = {
+    c_tashi2: ['ひっさんは 位を たてに そろえる', '一の位から 計算。10を こえたら 十の位の 上に 小さく 1 と メモします。書いて おけば たし忘れません。'],
+    c_tashi3: ['くり上がりの 1 は 小さく メモ', '3けたでも やる ことは 同じ。一の位 → 十の位 → 百の位 の じゅんに、くり上がりを 書きながら すすみます。'],
+    c_hiki2: ['かりたら 1 へらす', 'ひけない ときは 上の位から 10を かりる。かりた 位の 数を 1 へらして、小さく 書きなおして おきます。'],
+    c_hiki3: ['0 から かりる ときは となりの となり', '十の位が 0の ときは、百の位から かりて 十の位を 9に します。ゆっくり 1つずつ。'],
+    c_hissan3: ['位を そろえて 一の位から', '3けたの ひっさんも 一の位から。たてに まっすぐ そろえて 書くのが いちばんの コツ。'],
+    c_mittsu: ['10 の まとまりを 先に', '3つの 数は じゅんばんを かえても こたえは 同じ。10が 作れる 2つを 先に たすと あん算で できます。'],
+    c_kuku_a: ['入れかえても 同じ', '3×8 が 出て こない ときは 8×3。おぼえる 数は 半分で すみます。'],
+    c_kuku_b: ['1つ前 ＋ その だんの 数', '7×8 が 出て こない ときは 7×7＝49 に 7を たす。9の だんは ×10 から その数を ひく。'],
+    c_kuku_mix: ['出て こない ときの 2つの わざ', '①入れかえる（6×9→9×6）　②1つ 前の こたえに その だんの 数を たす。この 2つで だいたい 思い出せます。'],
+    c_bai: ['○ばい は かけ算', '「6の 4ばい」は 6が 4つ分。6×4。たし算に しない。'],
+    c_box_tashi: ['□ は「ぜんぶ から わかって いる ほう を ひく」', '□＋7＝20 なら、20−7＝13。図に かくと、長い ぼうから みじかい ぼうを ひく 形に なります。'],
+    c_box_hiki: ['へった 分を もどす', '□−6＝14 なら、14に 6を もどして 20。ひき算の □は たし算で 出ます。'],
+    c_box_kake: ['九九の 段を さがす', '□×4＝28 なら、4の だんで 28に なる ところを さがす。7×4＝28 だから 7。'],
+    c_len: ['cm は cm、mm は mm', '10mm で 1cm。たてに たんいを そろえて 書くと まざりません。'],
+    c_kasa: ['L は L、dL は dL', '10dL で 1L。dLが 10に なったら くり上げ、ひけない ときは 1L を くずします。']
+  };
+  var KOTSU_K = {
+    '曜': '「日」＋「羽」＋「隹（とり）」。日・はね・とり の 3つに 分けて 書くと おぼえられます。',
+    '週': 'しんにょう（すすむ）＋「周（まわり）」。ぐるっと ひとまわりで 1週間。',
+    '算': '「竹」＋「目」＋「両手」。竹の そろばんを 両手で はじく ようす。「答」も 竹かんむり。',
+    '答': '「竹」＋「合」。竹の ふだで こたえる。算数の「算」と おなじ 竹かんむり なかま。',
+    '親': '「立」＋「木」＋「見」。木の 上に 立って 見て いるのが 親。',
+    '新': '「立」＋「木」＋「斤（おの）」。親と そっくりだけど 右下が おの。おので 切って あたらしく する。',
+    '妹': '「女」＋「未（まだ）」。まだ 小さい 女の子が いもうと。',
+    '姉': '「女」＋「市」。妹と ならべて おぼえると まざりません。',
+    '顔': '「彦」＋「頁（おおがい）」。おおがい は あたま・かおの しるし。「頭」も 同じ なかま。',
+    '頭': '「豆」＋「頁（おおがい）」。まめの 形の あたま。「顔」と セットで おぼえます。',
+    '思': '「田」＋「心」。あたま（田）と 心 で 思う。',
+    '間': '「門」＋「日」。門の あいだから 日が さす。「聞」と ならべて おぼえます。',
+    '聞': '「門」＋「耳」。門の ところで 耳を すます。「間」は 門の 中が 日。',
+    '朝': '「十・日・十・月」の 4つに 分ける。十日十月 で 朝。',
+    '秋': '「禾（いね）」＋「火」。いねが 火の ような 色に なるのが 秋。',
+    '岩': '「山」＋「石」。山の 大きな 石が いわ。',
+    '米': '「八・十・八」に 分けられます。お米を 作るのに 八十八の 手間、と おぼえます。',
+    '時': '「日」＋「寺」。お寺の 日どけい で 時こく。',
+    '池': 'さんずい（水）＋「也」。土なら「地」、水なら「池」。そっくりな 2つは くらべて おぼえます。',
+    '地': 'つちへん（土）＋「也」。「池」と そっくり。土の ほうが 地めん。',
+    '語': 'ごんべん＋「五」＋「口」。五つの 口で 語る、と おぼえます。',
+    '話': 'ごんべん＋「舌」。舌を つかって 話す。',
+    '読': 'ごんべん＋「売」。「売」と 形が 同じ ところが あります。',
+    '記': 'ごんべん＋「己」。ごんべん（言）は 口で 言う なかま：話・語・読・記・計。',
+    '計': 'ごんべん＋「十」。ごんべん なかま で まとめて おぼえます。',
+    '買': '下が「貝」。むかしは 貝が お金でした。お金を 出すから 買う。',
+    '売': '「買」と ペアで おぼえます。売って お金を もらい、買って お金を はらう。',
+    '牛': '「午」と そっくり。牛は 上の 線が つき出ます（つの）。午（ごぜんの 午）は つき出ません。',
+    '午': '「牛」と くらべます。つのが 出て いない ほうが 午。午前・午後の 午。',
+    '太': '「大」に 点が 1つ。おなかに 点が ついて 太い。',
+    '細': 'いとへん＋「田」。糸のように 細い。いとへん なかま：紙・線・組・絵・細。',
+    '多': '「夕」が 2つ。夕方が かさなって 多い。',
+    '少': '「小」に はらいを 1本 たすと 少。「多」と はんたいの いみ。',
+    '東': '「木」に「日」が かさなる 形。木の あいだから 日が のぼる ほうが 東。',
+    '西': '地図は 上が 北。北から 時計まわりに 北→東→南→西。西は 日が しずむ ほう。',
+    '南': '地図は 上が 北、下が 南。北から 時計まわりに 北→東→南→西。',
+    '北': '地図の 上が 北。北・東・南・西 を 時計まわりに 言えると 方角は かんぺき。',
+    '国': 'くにがまえ（□）の 中に「玉」。かこいの 中が 国。',
+    '園': 'くにがまえ の なかま。かこわれた ところ が 公園。',
+    '野': '「里」＋「予」。里の そとに 広がるのが 野原。',
+    '歩': '上は「止」。止まる を 上に のせると 歩く。',
+    '切': '「七」＋「刀」。刀で 切る。',
+    '分': '「八」＋「刀」。刀で 八つに 分ける。',
+    '引': '「弓」＋たての 線。弓の つるを 引く。',
+    '弱': '「弓」が 2つ ならぶ。「強」も 弓の なかま。',
+    '雪': 'あめかんむり。空から くる なかま：雲・雪・電。',
+    '雲': 'あめかんむり＋「云」。雨の 上に ある もの。',
+    '電': 'あめかんむり＋「田」。雨の 日の かみなり から 電気。',
+    '海': 'さんずい（水）の なかま：海・池・汽・活。水に かんけいが あります。',
+    '晴': '「日」＋「青」。青い 空に 日が 出て いるから 晴れ。',
+    '明': '「日」＋「月」。日と 月、両方の 光で 明るい。',
+    '組': 'いとへん＋「且」。いとへん なかま：紙・線・細・絵・組。',
+    '線': 'いとへん＋「泉」。糸のように 細く まっすぐ。',
+    '紙': 'いとへん＋「氏」。むかしの 紙は 糸から 作りました。'
+  };
+  var KZ_CAT = [['kk', '九九'], ['ty', '文しょうだい'], ['ke', 'けいさん'], ['kj', 'かんじ']];
+  var kotsuNew = [], kotsuHit = 0;
+  function kanjiRow(ch) { for (var i = 0; i < KANJI.length; i++) { var rs = KANJI[i].rows; for (var j = 0; j < rs.length; j++) if (rs[j][0] === ch) return rs[j]; } return null; }
+  function kotsuIdFor(key) {   // もんだいの key → カードの id（＋その もんだい だけの メモ）
+    if (!key) return null;
+    if (key.indexOf('kk') === 0 && key.indexOf('x') > 0) {
+      var ab = key.slice(2).split('x'), a = +ab[0], b = +ab[1];
+      if (!a || !b || a > 9 || b > 9) return null;
+      var lo = Math.min(a, b), hi = Math.max(a, b), pk = lo + 'x' + hi;
+      var note = a + ' × ' + b + ' ＝ ' + (a * b) + '（' + KUKU_YOMI[a - 1][b - 1] + '）';
+      return { id: KK_PAIR[pk] ? 'kk' + pk : 'kkd' + a, note: note };
+    }
+    if (key.indexOf('k_') === 0) { var ch = key.slice(2); return kanjiRow(ch) ? { id: 'kj' + ch, note: null } : null; }
+    if (KOTSU_C[key]) return { id: 'ke' + key, note: null };
+    if (KOTSU_T[key]) return { id: 'ty' + key, note: null };
+    return null;
+  }
+  function kotsuById(id) {   // カードの id → 見せる ないよう
+    if (!id) return null;
+    if (id.indexOf('mb') === 0) { var b = KOTSU_BASE[+id.slice(2)]; return b ? { id: id, cat: 'mb', ttl: b[0], body: b[1], sub: '' } : null; }
+    if (id.indexOf('kkd') === 0) { var d = +id.slice(3); return KK_DAN[d] ? { id: id, cat: 'kk', ttl: d + 'の だん', body: KK_DAN[d], sub: '入れかえても こたえは 同じ。出て こない ときは 入れかえて みる。' } : null; }
+    if (id.indexOf('kk') === 0) {
+      var ab = id.slice(2).split('x'), lo = +ab[0], hi = +ab[1];
+      if (!KK_PAIR[lo + 'x' + hi]) return null;
+      return { id: id, cat: 'kk', ttl: lo + ' × ' + hi + ' ＝ ' + (lo * hi), body: KK_PAIR[lo + 'x' + hi], sub: lo === hi ? '同じ 数を かける 九九。おぼえて おくと 早く 出せます。' : '入れかえても 同じ。' + hi + ' × ' + lo + ' も ' + (lo * hi) + '。' };
+    }
+    if (id.indexOf('kj') === 0) {
+      var ch2 = id.slice(2), row = kanjiRow(ch2);
+      if (!row) return null;
+      var tip = KOTSU_K[ch2];
+      return { id: id, cat: 'kj', ttl: ch2 + '　' + row[1],
+        body: tip || ('よみは「' + row[1] + '」。ことばの かたまりで おぼえます。声に出して 言って、ゆびで 空に 3回 書いて みよう。'),
+        sub: 'ことばで おぼえる：' + row[2] + '（' + row[3] + '）・' + row[5] + '（' + row[6] + '）' };
+    }
+    if (id.indexOf('ke') === 0) { var c = KOTSU_C[id.slice(2)]; return c ? { id: id, cat: 'ke', ttl: c[0], body: c[1], sub: '' } : null; }
+    if (id.indexOf('ty') === 0) { var k = id.slice(2), t = KOTSU_T[k]; return t ? { id: id, cat: 'ty', ttl: t[0], body: t[1], sub: TYPES[k] ? '「' + TYPES[k].name + '」の コツ' : '' } : null; }
+    return null;
+  }
+  function kotsuStore() { if (!game.kotsu) game.kotsu = {}; return game.kotsu; }
+  function kotsuWrong(key) {   // まちがえた → カードを ゲット（はじめてなら NEW）
+    var f = kotsuIdFor(key); if (!f) return null;
+    var c = kotsuById(f.id); if (!c) return null;
+    var m = kotsuStore(), r = m[f.id] || (m[f.id] = { n: 0, s: 0 });
+    c.note = f.note; c.isNew = !r.at;
+    if (!r.at) r.at = new Date().toISOString();
+    r.n++;
+    return c;
+  }
+  function kotsuStar(key) {   // まえに まちがえた ところが できた → ⭐
+    var f = kotsuIdFor(key); if (!f) return false;
+    var m = game && game.kotsu; if (!m || !m[f.id] || !m[f.id].at) return false;
+    m[f.id].s = (m[f.id].s || 0) + 1;
+    return true;
+  }
+  function kotsuCardEl(c, plain, st) {
+    var d = el('div', 'kotsu');
+    var b = el('span', 'kb', '💡 おぼえかたカード');
+    if (!plain && c.isNew) b.appendChild(el('em', null, 'NEW'));
+    if (plain && st && st.s) b.appendChild(el('i', null, '⭐ ' + st.s));
+    d.appendChild(b);
+    d.appendChild(el('b', null, c.ttl));
+    d.appendChild(el('p', null, c.body));
+    var sub = [];
+    if (!plain && c.note) sub.push(c.note);
+    if (c.sub) sub.push(c.sub);
+    if (sub.length) d.appendChild(el('small', null, sub.join('　')));
+    return d;
+  }
+  function kzTotals() {
+    var t = { kk: Object.keys(KK_PAIR).length + 9, ty: Object.keys(KOTSU_T).length, ke: Object.keys(KOTSU_C).length, kj: 0 };
+    KANJI.forEach(function (g) { t.kj += g.rows.length; });
+    t.all = t.kk + t.ty + t.ke + t.kj;
+    return t;
+  }
+  function renderKotsu() {
+    var box = $('ktz'); box.innerHTML = '';
+    var m = kotsuStore(), tot = kzTotals(), ids = Object.keys(m).filter(function (id) { return kotsuById(id); });
+    var stars = 0; ids.forEach(function (id) { stars += m[id].s || 0; });
+    box.appendChild(html('p', 'hello', 'あつめた カード <b>' + ids.length + '</b>まい　／　ぜんぶで ' + tot.all + 'まい　　⭐ <b>' + stars + '</b>'));
+    box.appendChild(el('p', 'muted', 'まちがえた ところの コツが カードに なって たまります。つぎに その もんだいが できたら ⭐が つきます。⭐が ついた カードは、もう おぼえた しるし。'));
+    box.appendChild(el('h2', 'sec', 'おぼえかたの きほん'));
+    var g0 = el('div', 'kzlist');
+    KOTSU_BASE.forEach(function (b, i) { g0.appendChild(kotsuCardEl(kotsuById('mb' + i), true)); });
+    box.appendChild(g0);
+    KZ_CAT.forEach(function (cat) {
+      var mine = ids.filter(function (id) { return kotsuById(id).cat === cat[0]; });
+      mine.sort(function (x, y) { return (m[y].at || '') > (m[x].at || '') ? 1 : -1; });
+      box.appendChild(el('h2', 'sec', cat[1] + '　' + mine.length + ' / ' + tot[cat[0]]));
+      if (mine.length) {
+        var gg = el('div', 'kzlist');
+        mine.forEach(function (id) { gg.appendChild(kotsuCardEl(kotsuById(id), true, m[id])); });
+        box.appendChild(gg);
+      }
+      var left = tot[cat[0]] - mine.length;
+      if (left > 0) box.appendChild(el('p', 'kzlock', mine.length ? 'まだ ひみつの カード ' + left + 'まい' : 'まだ カードは ありません（' + left + 'まい ひみつ）。まちがえた ところが カードに なります。'));
+    });
+  }
+
   // ---------- views ----------
-  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kuku', 'kanji', 'solve', 'weak', 'cal', 'lessons', 'records', 'print', 'help'];
-  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', kuku: 'くく', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ', help: 'つかいかた' };
+  var VIEWS = ['home', 'grow', 'scan', 'daily', 'keisan', 'kuku', 'kanji', 'solve', 'weak', 'cal', 'kotsu', 'lessons', 'records', 'print', 'help'];
+  var TITLES = { home: 'すずドリル', grow: 'マイルーム', scan: 'テストを よみとる', kanji: 'かんじ', daily: 'きょうの 5問', keisan: 'けいさん 1まい', kuku: 'くく', solve: 'テストの プリント', weak: 'にがてを とく', cal: 'カレンダー', kotsu: 'おぼえかたカード', lessons: 'せんせいの ワンポイント', records: 'きろく', print: 'いんさつ', help: 'つかいかた' };
   var view = 'home';
   function show(v) {
     view = v;
@@ -1640,6 +1906,7 @@
   // ---------- home ----------
   var ICONS = {
     kuku: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/><rect x="2.5" y="2.5" width="19" height="19" rx="4"/></svg>',
+    kotsu: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.5.4.8 1 .8 1.6v.5h5.4v-.5c0-.6.3-1.2.8-1.6A6 6 0 0 0 12 3z"/></svg>',
     help: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.3 9.2a2.8 2.8 0 1 1 3.7 2.6c-.7.3-1 .9-1 1.6v.3"/><circle cx="12" cy="17.2" r="1.1" fill="currentColor" stroke="none"/></svg>',
     cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke-linecap="round"/><circle cx="8.5" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="13" cy="14.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="17" cy="14.5" r="1.4" fill="currentColor" stroke="none"/></svg>',
     keisan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3" width="17" height="18" rx="2"/><path d="M7 8h4M9 6v4M14 8h3.5M14.2 15.5h3.6M7.2 14.2l3.6 3.6M10.8 14.2l-3.6 3.6M14.2 18h3.6"/></svg>',
@@ -1683,6 +1950,7 @@
         ['cal', 'カレンダー', 'テストの よてい・やった日'],
         ['grow', 'マイルーム', 'ドリまる・なかま・もくひょう'],
         ['records', 'きろく', 'せいかいりつ・にがて'],
+        ['kotsu', 'おぼえかたカード', 'まちがえた ところの おぼえる コツ'],
         ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
         ['print', 'いんさつ', '紙の プリントを 作る・PDF'],
         ['help', 'つかいかた', 'この アプリの せつめい']
@@ -1721,6 +1989,7 @@
     if (v === 'weak') { if (!(cur && cur.view === 'weak')) renderWeakIntro(); }
     if (v === 'cal') renderCal();
     if (v === 'help') renderHelp();
+    if (v === 'kotsu') renderKotsu();
     if (v === 'lessons') renderLessons();
     if (v === 'records') renderRecords();
     if (v === 'print') renderPrint();
@@ -2859,7 +3128,7 @@
   // ---------- game: ポイント・レベル・もくひょう・スタンプ・メダル・なかま・マイルーム ----------
   var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20,
     quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100, hard: 2, fix: 3,
-    diary: 10, sign: 15, routine: 20 };   // にっき／おうちの人の サイン／1日の ルーティン ぜんぶ   // fix = なおせた 1問ぶん   // クエスト系（bigGoal=1レベルぶん）
+    diary: 10, sign: 15, routine: 20, card: 3, kotsu: 5 };   // card = おぼえかたカードを はじめて ゲット／kotsu = コツが きいて せいかい（1まいに 5問まで）   // にっき／おうちの人の サイン／1日の ルーティン ぜんぶ   // fix = なおせた 1問ぶん   // クエスト系（bigGoal=1レベルぶん）
   // レベルの スピード: はじめは すぐ 上がり、やがて「ふつうの 1日 ＝ 約1レベル」に おちつく
   // ふつうの 1日（あいさつ＋クエスト＋ドリル1まい＋ふりかえり）で だいたい 190ポイント
   var LV_SPEEDS = [['はやい', 140], ['ふつう', 180], ['ゆっくり', 240]];
@@ -3008,7 +3277,7 @@
     ['wear', 'lessonsRead', 'wasWeak', 'mates', 'decor', 'goalsDone'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     if (!game.bonus) game.bonus = { days: {}, weeks: {} };
     if (!game.goals) goals();
-    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear', 'qpick', 'learned', 'diary', 'routine'].forEach(function (k) { if (!game[k]) game[k] = {}; });
+    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear', 'qpick', 'learned', 'diary', 'routine', 'kotsu'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     keisan();
     if (!game.quests) { game.quests = { on: {}, custom: [] }; QUEST_DEFAULT.forEach(function (id) { game.quests.on[id] = 1; }); }
     if (!game.quests.custom) game.quests.custom = [];
@@ -3082,6 +3351,8 @@
     if (ws.sheets >= g.weekSheets && !wb.sheets) { wb.sheets = 1; lines.push(['📅 こんしゅう ' + g.weekSheets + 'まい たっせい！', XP.goalWeek]); flags.week = true; }
     questBonusLines(k).forEach(function (l) { lines.push(l); });
     routineBonusLines(k).forEach(function (l) { lines.push(l); });
+    if (kotsuNew.length) lines.push(['💡 カード ' + kotsuNew.length + 'まい ゲット', kotsuNew.length * XP.card]);
+    if (kotsuHit) lines.push(['⭐ コツが きいた ' + kotsuHit + '問', Math.min(kotsuHit, 5) * XP.kotsu]);
     var total = 0; lines.forEach(function (l) { total += l[1]; });
     return gameEvent(total, { stamp: first, lines: lines });
   }
@@ -3900,6 +4171,12 @@
         + '<li>ぜんぶ なおせたら「つぎ」に すすめます。</li>'
         + '<li>なおせると ポイントが もらえます。</li>'
         + '<li>2回 なおしても むずかしい ときは「つぎへ すすむ」が 出ます。むりを しなくて だいじょうぶ。</li></ul>'],
+      ['💡', 'おぼえかたカード', '<p>まちがえた ところは、<b>おぼえる コツ</b>が その場で 出て きます。</p><ul>'
+        + '<li>まるつけの あと、✗の もんだいの 下に <b>青い カード</b>が 出ます。「9の だんは ×10から その数を ひく」の ような、おぼえる ための コツです。</li>'
+        + '<li>はじめて 出た カードは <b>NEW</b>。ホームの <span class="k">おぼえかたカード</span>に たまって いきます。</li>'
+        + '<li>つぎに 同じ もんだいが できたら、その カードに <b>⭐</b>が つきます。⭐は「もう おぼえた」の しるし。</li>'
+        + '<li>カードは 九九・文しょうだい・けいさん・かんじ の 4つに 分かれて います。まだ 出て いない カードは ひみつ。</li>'
+        + '<li>いちばん 上の「おぼえかたの きほん」は いつでも 読めます（声に出す／つぎの日に もう一度／人に せつめいする など）。</li></ul>'],
       ['⭐', 'ポイントと レベル', '<ul>'
         + '<li>もんだいを といたり、クエストを クリアすると <b>ポイント</b>が たまります。</li>'
         + '<li>たまると <b>レベルアップ</b>。がんばった 日は 1レベルぐらい 上がります。</li>'
@@ -3920,6 +4197,12 @@
         + '<li>日を タップすると、その日 やった ことが 見られます。</li></ul>']
     ],
     oya: [
+      ['💡', 'おぼえかたカード（まちがい直しの しくみ）', '<p>まちがえた もんだいに、その場で <b>暗記の コツ</b>を 出します。答えを 教える ヒントでは なく、「どう おぼえるか」の 方法です。</p><ul>'
+        + '<li><b>出る タイミングは まるつけの あとだけ</b>です。とく 前には 出ないので、自分で 考える じゃまを しません。</li>'
+        + '<li>九九は「入れかえても 同じ」「1つ前＋その段の数」「9の段は ×10−その数」など、思い出す ための わざ。漢字は パーツに 分ける おぼえ方（親＝立つ・木・見る）。文しょうだいは まちがえやすい ところの 合言葉。</li>'
+        + '<li>カードは <b>あつめる</b> しくみです。はじめて 出ると +3ポイント、つぎに その もんだいが できると ⭐が ついて +5ポイント（1まいにつき 5問まで）。「まちがい＝損」では なく「まちがい＝カードが 増える」に なります。</li>'
+        + '<li>ぜんぶで 235まい（九九26・文しょうだい34・けいさん15・かんじ160）。かんじは 54字が オリジナルの 覚え方、のこりは 読みと ことばで おぼえる 形です。</li>'
+        + '<li>ホーム →「おぼえかたカード」で、いま あつめた ぶんが 読めます。にがてが どこかを 見る のにも つかえます。</li></ul>'],
       ['🕐', '1日の ながれ（おすすめ）', '<ol>'
         + '<li><b>朝</b>：アプリを ひらく → ドリまるの ひとこと → 「おはよう！」で おみくじ → きょうの クエストを 見る。</li>'
         + '<li><b>学習</b>：「けいさん 1まい」（10問）＋「きょうの 5問」または「かんじ」。10〜20分が 目安です。</li>'
