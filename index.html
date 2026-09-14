@@ -380,6 +380,10 @@
   .dressup .dprev small{color:var(--ink-soft); font-size:12px}
   .dressup h4{font-family:var(--f-round); font-size:14px; margin:14px 0 6px}
   .dressup h4:first-child{margin-top:0}
+  .dressup .dtabs{flex-wrap:wrap; gap:6px; margin:0 0 4px}
+  .dressup .dname{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; margin-top:10px}
+  .dressup .dname label{font-size:12px; color:var(--ink-soft); width:100%}
+  .dressup .dname input{width:110px; height:38px; font:inherit; font-family:var(--f-round); font-size:16px; text-align:center; border:1.5px solid var(--field-line); border-radius:10px; background:var(--field); color:var(--ink)}
   @media (max-width:560px){ .dressup{grid-template-columns:1fr} }
   .gtags .badge svg{width:34px; height:34px; vertical-align:middle; margin:-6px 4px -6px -4px}
   .accs{display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:8px}
@@ -3261,10 +3265,10 @@
     { id: 'robo', name: 'ロボまる', sp: 'robo', color: '#a9b6c9', need: 'スタンプカード 1まい', ok: function (c) { return c.stamps >= 30; } },
     { id: 'hiyo', name: 'ひよぴ', sp: 'hiyo', color: '#f9e07a', need: 'あいさつ 5日 れんぞく', ok: function (c) { return c.morningMax >= 5; } },
     { id: 'fukurou', name: 'ふくろう', sp: 'fukurou', color: '#b08968', need: 'クエスト ぜんぶクリア ×5', ok: function (c) { return c.allclears >= 5; } },
-    { id: 'hina', name: 'ひなちゃん', human: { hair: 'twin', hairColor: '#2b2620', dress: 'frill', dressColor: '#8fd18f' }, need: 'にっき 3日', ok: function (c) { return c.diaries >= 3; } },
-    { id: 'souta', name: 'そうたくん', human: { hair: 'short', hairColor: '#3b2a20', dress: 'shorts', dressColor: '#7ec8e3' }, need: 'クエスト 10こ', ok: function (c) { return c.quests >= 10; } },
+    { id: 'hina', name: 'ひなちゃん', human: { hair: 'twin', hairColor: '#2b2620', dress: 'frill', dressColor: '#8fd18f', hairAcc: 'sideribbon', accColor: '#f4c14d' }, need: 'にっき 3日', ok: function (c) { return c.diaries >= 3; } },
+    { id: 'souta', name: 'そうたくん', human: { hair: 'short', hairColor: '#3b2a20', dress: 'shorts', dressColor: '#7ec8e3', bag: 'backpack', bagColor: '#e2574c' }, need: 'クエスト 10こ', ok: function (c) { return c.quests >= 10; } },
     { id: 'koko', name: 'ここちゃん', human: { hair: 'odango', hairColor: '#a0673a', dress: 'onepiece', dressColor: '#ffb27a' }, need: 'ルーティン 3日', ok: function (c) { return c.routines >= 3; } },
-    { id: 'mirai', name: 'みらいさん', human: { hair: 'pony', hairColor: '#6b4a2f', dress: 'sailor', dressColor: '#4d6fb0' }, need: 'Lv.12', lv: 12, ok: function (c) { return c.level >= 12; } },
+    { id: 'mirai', name: 'みらいさん', human: { hair: 'pony', hairColor: '#6b4a2f', dress: 'sailor', dressColor: '#4d6fb0', bag: 'tote', bagColor: '#8a5a3c' }, need: 'Lv.12', lv: 12, ok: function (c) { return c.level >= 12; } },
     { id: 'hitsuji', name: 'もこすけ', sp: 'hitsuji', color: '#f3ece0', need: 'Lv.20', lv: 20, ok: function (c) { return c.level >= 20; } },
     { id: 'ryu', name: 'ドラごん', sp: 'ryu', color: '#7fc7a8', need: 'Lv.35', lv: 35, ok: function (c) { return c.level >= 35; } }
   ];
@@ -3316,8 +3320,7 @@
     var lv = levelOf().level, best = null;
     var cand = function (need, what) { if (need > lv && (!best || need < best.lv)) best = { lv: need, what: what }; };
     if (heroOn()) {
-      DRESSES.forEach(function (d) { cand(d[2], 'ふく「' + d[1] + '」が きられる'); });
-      HAIRS.forEach(function (x) { cand(x[2], 'かみがた「' + x[1] + '」に できる'); });
+      DRESS_PARTS.forEach(function (pt) { pt[1].forEach(function (x) { cand(x[2], pt[2] + '「' + x[1] + '」が きせかえに ふえる'); }); });
     } else STAGES.forEach(function (st) { cand(st[1], game.name + 'が ' + st[0] + 'に なる'); });
     DECOR.forEach(function (d) { if (d.lv && !game.decor[d.id]) cand(d.lv, 'へやに「' + d.name + '」'); });
     ACCS.forEach(function (a) { if (a.lv && !a.ok()) cand(a.lv, accName(a) + 'が つけられる'); });
@@ -3473,8 +3476,7 @@
     var tags = el('div', 'gtags');
     ev.mates.forEach(function (m) { tags.appendChild(html('span', 'badge', '<svg viewBox="0 0 200 200" aria-hidden="true">' + mateInner(m) + '</svg>🤝「' + m.name + '」が なかまに なった！')); });
     if (heroOn() && ev.up) {
-      DRESSES.forEach(function (d) { if (d[2] > ev.from && d[2] <= ev.level) tags.appendChild(html('span', 'badge', '👗 あたらしい ふく「' + d[1] + '」')); });
-      HAIRS.forEach(function (x) { if (x[2] > ev.from && x[2] <= ev.level) tags.appendChild(html('span', 'badge', '💇 かみがた「' + x[1] + '」')); });
+      DRESS_PARTS.forEach(function (pt) { pt[1].forEach(function (x) { if (x[2] > ev.from && x[2] <= ev.level) tags.appendChild(html('span', 'badge', '👗 きせかえ ' + pt[2] + '「' + x[1] + '」')); }); });
     }
     ev.badges.forEach(function (b) { tags.appendChild(html('span', 'badge', b.ic + ' メダル「' + b.name + '」')); });
     ev.decor.forEach(function (d) { tags.appendChild(html('span', 'badge', '🛋 へやに「' + d.name + '」が ふえた')); });
@@ -3586,13 +3588,17 @@
   }
   function charSVG(o) { return '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + charInner(o) + '</svg>'; }
   // しゅじんこう（女の子）／ひとの なかま の 絵（中身）。viewBox 200×200
-  // o: { hair, hairColor, dress, dressColor, skin, stage, mood, wear }
+  // o: { hair, hairColor, dress, dressColor, skin, shoes, shoesColor, bag, bagColor, hairAcc, accColor, neck, stage, mood, wear }
   var STAR_D = 'M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z';
+  function bowSVG(x, y, rot, sc, c) { return '<g transform="translate(' + x + ' ' + y + ') rotate(' + rot + ') scale(' + sc + ')"><path d="M0 0 l-17 -11 v22z M0 0 l17 -11 v22z" fill="' + c + '"/><circle r="4.5" fill="' + shade(c, -35) + '"/></g>'; }
   function heroInner(o) {
     var hc = o.hairColor || '#6b4a2f', hd = shade(hc, -30), dc = o.dressColor || '#f49ac1', dd = shade(dc, -35), dl = shade(dc, 55);
     var sk = o.skin || '#fbe0cc', skd = shade(sk, -28), w = o.wear || {}, m = o.mood || 'normal', st = o.stage || 0;
     var hair = o.hair || 'long', dress = o.dress || 'onepiece', s = '';
     var long = dress === 'princess' || dress === 'star';
+    var shoes = o.shoes || 'basic', shc = o.shoesColor || (dress === 'shorts' ? '#4b5b7a' : shade(dc, -55)), shd = shade(shc, -40);
+    var bag = o.bag || 'none', bc = o.bagColor || '#e2574c', bd = shade(bc, -45);
+    var ha = o.hairAcc || (w.ribbon ? 'ribbon' : 'none'), ac = o.accColor || '#f06b8a', neck = o.neck || 'none';
     // うしろの かざり（マント・かみの うしろ）
     if (w.cape) s += '<path d="M72 128 Q46 170 50 190 L150 190 Q154 170 128 128 Z" fill="#c0392f"/>';
     if (hair === 'long') s += '<path d="M52 82 Q46 150 60 168 Q100 178 140 168 Q154 150 148 82 Z" fill="' + hc + '"/>';
@@ -3601,11 +3607,29 @@
     if (hair === 'pony') s += '<path d="M132 50 Q182 52 172 112 Q168 140 150 152 Q164 118 150 84 Q144 66 132 50 Z" fill="' + hc + '"/><path d="M52 82 Q50 104 58 114 L62 84 Z M148 82 Q150 104 142 114 L138 84 Z" fill="' + hc + '"/><circle cx="140" cy="54" r="7.5" fill="' + dc + '"/>';
     if (hair === 'twin') s += '<ellipse cx="40" cy="112" rx="17" ry="38" fill="' + hc + '" transform="rotate(14 40 112)"/><ellipse cx="160" cy="112" rx="17" ry="38" fill="' + hc + '" transform="rotate(-14 160 112)"/><path d="M52 82 Q50 104 58 114 L62 84 Z M148 82 Q150 104 142 114 L138 84 Z" fill="' + hc + '"/><circle cx="52" cy="74" r="8" fill="' + dc + '"/><circle cx="148" cy="74" r="8" fill="' + dc + '"/>';
     if (hair === 'odango') s += '<circle cx="66" cy="38" r="17" fill="' + hc + '"/><circle cx="134" cy="38" r="17" fill="' + hc + '"/><path d="M52 44 q-4 -10 6 -16 M148 44 q4 -10 -6 -16" stroke="' + hd + '" stroke-width="2" fill="none" opacity=".5"/>';
+    if (ha === 'bigbow') s += '<g transform="translate(100 34)"><path d="M0 0 Q-30 -30 -46 -8 Q-44 16 0 0 Z M0 0 Q30 -30 46 -8 Q44 16 0 0 Z" fill="' + ac + '"/><path d="M-4 2 l-14 26 8 -2 4 8z M4 2 l14 26 -8 -2 -4 8z" fill="' + shade(ac, -30) + '"/></g>';
+    // せなかの バッグ（リュック・ランドセル）
+    if (bag === 'backpack') s += '<rect x="64" y="116" width="72" height="52" rx="14" fill="' + bc + '"/>';
+    if (bag === 'randoseru') s += '<rect x="60" y="112" width="80" height="62" rx="12" fill="' + bc + '"/><rect x="60" y="112" width="80" height="16" rx="8" fill="' + bd + '"/>';
     // うで・あし
     s += '<ellipse cx="66" cy="148" rx="8" ry="17" fill="' + sk + '" transform="rotate(16 66 148)"/><ellipse cx="134" cy="148" rx="8" ry="17" fill="' + sk + '" transform="rotate(-16 134 148)"/>';
     if (!long) s += '<rect x="85" y="164" width="10" height="24" rx="4" fill="' + sk + '"/><rect x="105" y="164" width="10" height="24" rx="4" fill="' + sk + '"/>';
-    var shoe = dress === 'shorts' ? '#4b5b7a' : shade(dc, -55);
-    s += '<ellipse cx="89" cy="191" rx="10" ry="5.5" fill="' + shoe + '"/><ellipse cx="111" cy="191" rx="10" ry="5.5" fill="' + shoe + '"/>';
+    var shoeSVG = function (tip) {   // tip: ながい ドレスの すそから つまさきだけ 出す
+      var y = tip ? 195 : 191, out = '';
+      [[tip ? 86 : 89, -1], [tip ? 114 : 111, 1]].forEach(function (f) {
+        var x = f[0];
+        if (!tip && shoes === 'boots') out += '<rect x="' + (x - 6) + '" y="172" width="12" height="18" rx="3" fill="' + shc + '"/>';
+        if (shoes === 'glass') { out += '<ellipse cx="' + x + '" cy="' + y + '" rx="10" ry="5.5" fill="#d8f0ff" stroke="#9fd0f0" stroke-width="1.5"/><path d="M' + (x - 5) + ' ' + (y - 2) + ' h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'; return; }
+        if (shoes === 'sandal') { out += '<ellipse cx="' + x + '" cy="' + (y + 2) + '" rx="10" ry="3.5" fill="' + shc + '"/><path d="M' + (x - 7) + ' ' + (y - 1) + ' h14 M' + (x - 5) + ' ' + (y - 4) + ' h10" stroke="' + shc + '" stroke-width="2.4" stroke-linecap="round"/>'; return; }
+        out += '<ellipse cx="' + x + '" cy="' + y + '" rx="10" ry="5.5" fill="' + shc + '"/>';
+        if (shoes === 'sneaker') out += '<path d="M' + (x - 10) + ' ' + (y + 2) + ' q10 5 20 0" stroke="#fff" stroke-width="2.4" fill="none"/><path d="M' + (x - 3) + ' ' + (y - 3) + ' l4 2 M' + (x + 1) + ' ' + (y - 4) + ' l4 2" stroke="#fff" stroke-width="1.6"/>';
+        if (shoes === 'strap' && !tip) out += '<path d="M' + (x - 6) + ' 184 h12" stroke="' + shc + '" stroke-width="3"/>';
+        if (shoes === 'ribbonshoe') out += bowSVG(x + f[1] * 2, y - 3, 0, .32, ac);
+        if (shoes === 'basic') out += '<ellipse cx="' + (x - 3) + '" cy="' + (y - 2) + '" rx="3.5" ry="1.6" fill="#fff" opacity=".45"/>';
+      });
+      return out;
+    };
+    if (!long) s += shoeSVG(false);
     // ふく
     if (dress === 'onepiece') {
       s += '<path d="M80 122 L120 122 L142 176 Q100 184 58 176 Z" fill="' + dc + '"/><path d="M88 122 L100 136 L112 122 Z" fill="#fff"/><circle cx="100" cy="150" r="3" fill="#fff"/><circle cx="100" cy="162" r="3" fill="#fff"/>';
@@ -3628,6 +3652,7 @@
       s += '<path d="M82 146 q18 10 36 0" stroke="' + dd + '" stroke-width="3" fill="none"/>';
       if (dress === 'star') [[70, 172], [100, 160], [128, 176], [88, 184], [116, 186]].forEach(function (p) { s += '<path transform="translate(' + p[0] + ' ' + p[1] + ') scale(.55)" d="' + STAR_D + '" fill="#ffd166"/>'; });
       else [[72, 176], [100, 168], [128, 178]].forEach(function (p) { s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="2.4" fill="#fff"/>'; });
+      s += shoeSVG(true);
     } else if (dress === 'shorts') {
       s += '<path d="M78 122 L122 122 L126 156 L74 156 Z" fill="' + dc + '"/><path d="M76 154 L124 154 L126 172 L103 172 L100 162 L97 172 L74 172 Z" fill="#4b5b7a"/>';
     }
@@ -3636,9 +3661,19 @@
     if (dress !== 'yukata') s += '<circle cx="76" cy="128" r="' + sl + '" fill="' + slc + '"/><circle cx="124" cy="128" r="' + sl + '" fill="' + slc + '"/>';
     else s += '<path d="M78 122 L58 150 L74 156 L84 132 Z M122 122 L142 150 L126 156 L116 132 Z" fill="' + dc + '"/>';
     if (w.star) s += '<path transform="translate(100 134) scale(.9)" d="' + STAR_D + '" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>';
+    // まえの バッグ
+    if (bag === 'backpack' || bag === 'randoseru') s += '<path d="M84 120 Q80 138 84 160 M116 120 Q120 138 116 160" stroke="' + bd + '" stroke-width="6" fill="none" stroke-linecap="round"/>';
+    if (bag === 'pochette') s += '<path d="M82 122 Q108 146 140 162" stroke="' + bd + '" stroke-width="2.6" fill="none"/><rect x="130" y="156" width="24" height="19" rx="6" fill="' + bc + '"/><path d="M130 163 q12 7 24 0" stroke="' + bd + '" stroke-width="2" fill="none"/><circle cx="142" cy="166" r="2" fill="#ffd166"/>';
+    if (bag === 'tote') s += '<path d="M138 170 Q146 150 154 170" stroke="' + bd + '" stroke-width="3" fill="none"/><path d="M132 170 h28 l-3 24 h-22 z" fill="' + bc + '"/><path d="M136 178 h20" stroke="#fff" stroke-width="2" opacity=".6"/>';
+    if (bag === 'heart') s += '<path d="M140 168 Q146 150 152 168" stroke="' + bd + '" stroke-width="2.6" fill="none"/><path d="M146 196 C126 182 128 166 139 166 C143 166 146 170 146 172 C146 170 149 166 153 166 C164 166 166 182 146 196 Z" fill="' + bc + '"/>';
+    if (bag === 'basket') s += '<path d="M136 172 Q147 150 158 172" stroke="#a97747" stroke-width="3" fill="none"/><path d="M132 172 h30 l-4 20 h-22 z" fill="#e2b96f"/><path d="M134 178 h26 M135 184 h24" stroke="#a97747" stroke-width="1.4"/>' + bowSVG(147, 173, 0, .35, bc);
+    if (bag === 'star') s += '<path d="M140 168 Q147 150 154 168" stroke="' + bd + '" stroke-width="2.6" fill="none"/><path transform="translate(147 182) scale(1.7)" d="' + STAR_D + '" fill="' + bc + '" stroke="' + bd + '" stroke-width=".8"/>';
     // くび・かお
     s += '<rect x="94" y="112" width="12" height="14" fill="' + skd + '"/>';
     s += '<circle cx="100" cy="80" r="44" fill="' + sk + '"/>';
+    if (neck === 'heart') s += '<path d="M88 122 Q100 136 112 122" stroke="#d9b44a" stroke-width="1.5" fill="none"/><path d="M100 140 C94 136 94 131 97 131 C98.5 131 100 132.5 100 133 C100 132.5 101.5 131 103 131 C106 131 106 136 100 140 Z" fill="#e2574c"/>';
+    if (neck === 'pearl') for (var pe = 0; pe < 7; pe++) { var t = pe / 6, px = 86 + t * 28, py = 123 + Math.sin(t * Math.PI) * 11; s += '<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="2.4" fill="#fff" stroke="#d6cfc2" stroke-width=".8"/>'; }
+    if (neck === 'star') s += '<path d="M88 122 Q100 136 112 122" stroke="#d9b44a" stroke-width="1.5" fill="none"/><path transform="translate(100 137) scale(.62)" d="' + STAR_D + '" fill="#ffd166" stroke="#e6a100" stroke-width="1.2"/>';
     // まえがみ（かみの 上）
     if (hair === 'short') s += '<path d="M56 86 Q50 30 100 30 Q150 30 144 86 Q140 62 124 56 Q112 68 96 60 Q80 70 66 62 Q58 70 56 86 Z" fill="' + hc + '"/>';
     else s += '<path d="M54 92 Q46 28 100 28 Q154 28 146 92 Q142 66 128 56 Q118 72 100 62 Q84 74 70 58 Q58 68 54 92 Z" fill="' + hc + '"/>';
@@ -3660,9 +3695,13 @@
     else if (m === 'hungry') s += '<path d="M93 106 q3.5 -3 7 0 q3.5 3 7 0" fill="none" stroke="#3a2a22" stroke-width="2.4" stroke-linecap="round"/>';
     else if (m === 'sleep') s += '<ellipse cx="100" cy="106" rx="3" ry="2.4" fill="#3a2a22" opacity=".7"/>';
     else s += '<path d="M94 103 q6 5 12 0" fill="none" stroke="#3a2a22" stroke-width="2.4" stroke-linecap="round"/>';
-    // アクセサリー
+    // アクセサリー・かみかざり
     if (w.glasses) s += '<circle cx="82" cy="86" r="12" fill="none" stroke="#6b3d8f" stroke-width="2.4"/><circle cx="118" cy="86" r="12" fill="none" stroke="#6b3d8f" stroke-width="2.4"/><path d="M94 86 h12" stroke="#6b3d8f" stroke-width="2.4"/>';
-    if (w.ribbon) s += '<g transform="translate(132 42) rotate(18)"><path d="M0 0 l-17 -11 v22z M0 0 l17 -11 v22z" fill="#f06b8a"/><circle r="4.5" fill="#d94b6b"/></g>';
+    if (ha === 'ribbon') s += bowSVG(132, 42, 18, 1, ac);
+    if (ha === 'sideribbon') s += bowSVG(58, 58, -24, .78, ac) + bowSVG(142, 58, 24, .78, ac);
+    if (ha === 'kachusha') s += '<path d="M58 66 Q60 26 100 24 Q140 26 142 66" stroke="' + ac + '" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M76 34 Q100 24 124 34" stroke="#fff" stroke-width="2" fill="none" opacity=".5"/>';
+    if (ha === 'flower') { [0, 72, 144, 216, 288].forEach(function (a) { var r = a * Math.PI / 180; s += '<circle cx="' + (134 + 7 * Math.cos(r)).toFixed(1) + '" cy="' + (46 + 7 * Math.sin(r)).toFixed(1) + '" r="6" fill="' + ac + '"/>'; }); s += '<circle cx="134" cy="46" r="4" fill="#ffd166"/>'; }
+    if (ha === 'starpin') s += '<path transform="translate(126 42) scale(.9)" d="' + STAR_D + '" fill="' + ac + '" stroke="' + shade(ac, -40) + '" stroke-width="1"/><path transform="translate(141 56) scale(.65)" d="' + STAR_D + '" fill="' + ac + '" stroke="' + shade(ac, -40) + '" stroke-width="1"/>';
     if (w.hat) s += '<ellipse cx="100" cy="38" rx="60" ry="11" fill="#f6e3b4"/><path d="M68 38 Q70 6 100 6 Q130 6 132 38 Z" fill="#f6e3b4"/><path d="M69 30 h62" stroke="#e2574c" stroke-width="6"/>';
     if (w.crown) s += '<path d="M76 36 l4 -18 10 10 10 -16 10 16 10 -10 4 18 Q100 42 76 36 Z" fill="#ffe08a" stroke="#e6a100" stroke-width="2" stroke-linejoin="round"/><circle cx="100" cy="24" r="3.5" fill="#f06b8a"/>';
     // きらきら（レベルが 上がると ふえる）
@@ -3675,6 +3714,15 @@
   var HAIR_COLORS = ['#6b4a2f', '#2b2620', '#a0673a', '#c98b4a', '#e9c46a', '#8a5a8f'];
   var DRESSES = [['onepiece', 'ワンピース', 1], ['frill', 'フリルスカート', 3], ['sailor', 'セーラーふく', 7], ['party', 'パーティードレス', 15], ['yukata', 'ゆかた', 30], ['princess', 'プリンセスドレス', 45], ['star', 'ほしの ドレス', 70]];
   var DRESS_COLORS = ['#f49ac1', '#7ec8e3', '#c9a3ff', '#8fd18f', '#ffb27a', '#e2574c', '#4d6fb0', '#f4c14d'];
+  var SHOES = [['basic', 'ローファー', 1], ['sneaker', 'スニーカー', 1], ['strap', 'ストラップシューズ', 4], ['sandal', 'サンダル', 9], ['boots', 'ブーツ', 14], ['ribbonshoe', 'リボンの くつ', 22], ['glass', 'ガラスの くつ', 50]];
+  var BAGS = [['none', 'なし', 1], ['randoseru', 'ランドセル', 1], ['pochette', 'ポシェット', 2], ['tote', 'トートバッグ', 6], ['backpack', 'リュック', 10], ['heart', 'ハートの バッグ', 16], ['basket', 'かごバッグ', 25], ['star', 'ほしの バッグ', 40]];
+  var HAIR_ACCS = [['none', 'なし', 1], ['ribbon', 'リボン', 1], ['sideribbon', 'りょうがわ リボン', 8], ['kachusha', 'カチューシャ', 11], ['flower', 'はなの かみかざり', 13], ['bigbow', 'おおきな リボン', 18], ['starpin', 'ほしの ピン', 35]];
+  var NECKS = [['none', 'なし', 1], ['heart', 'ハートの ネックレス', 9], ['pearl', 'パールの ネックレス', 20], ['star', 'ほしの ペンダント', 60]];
+  var ITEM_COLORS = ['#f06b8a', '#e2574c', '#ffb27a', '#f4c14d', '#8fd18f', '#7ec8e3', '#4d6fb0', '#c9a3ff', '#8a5a3c', '#2b2620', '#fffaf2'];
+  var DRESS_PARTS = [   // [key, データ, 名前]（レベルアップの おしらせ・つぎの ごほうび に つかう）
+    ['dress', DRESSES, 'ふく'], ['hair', HAIRS, 'かみがた'], ['hairAcc', HAIR_ACCS, 'かみかざり'], ['shoes', SHOES, 'くつ'], ['bag', BAGS, 'バッグ'], ['neck', NECKS, 'ネックレス']
+  ];
+  var dressTab = 'dress';
   var HERO_STAGES = ['はじめまして', 'おしゃれ さん', 'きらきら さん', 'スター', 'きらめき スター', 'プリンセス', 'でんせつの プリンセス'];
   var HERO_LINES = {
     happy: ['きょうも がんばったね！', 'いっしょに できて たのしい！', 'つぎも いっしょに やろうね', 'みんなも よろこんでるよ'],
@@ -3683,8 +3731,20 @@
     excited: ['レベルアップ！ やったー！', 'あたらしい ふくが きられるかも！']
   };
   function hero() {
-    if (!game.hero) game.hero = { on: true, name: 'ももか', hair: 'long', hairColor: HAIR_COLORS[0], dress: 'onepiece', dressColor: DRESS_COLORS[0] };
-    return game.hero;
+    if (!game.hero) game.hero = { on: true, name: 'すず', hair: 'long', hairColor: HAIR_COLORS[0], dress: 'onepiece', dressColor: DRESS_COLORS[0] };
+    var h = game.hero;
+    if (!h.v33) {   // v33: なまえを「すず」に（v32の はじめの なまえ だけ）・くつ／バッグ／かみかざり／ネックレス
+      if (h.name === 'ももか') h.name = 'すず';
+      if (!h.hairAcc) h.hairAcc = game.wear && game.wear.ribbon ? 'ribbon' : 'none';
+      if (!h.accColor) h.accColor = '#f06b8a';
+      if (!h.shoes) h.shoes = 'basic';
+      if (!h.shoesColor) h.shoesColor = '#8a5a3c';
+      if (!h.bag) h.bag = 'none';
+      if (!h.bagColor) h.bagColor = '#e2574c';
+      if (!h.neck) h.neck = 'none';
+      h.v33 = 1;
+    }
+    return h;
   }
   function heroOn() { return !!(game && hero().on); }
   function mainName() { return heroOn() ? hero().name : game.name; }
@@ -3692,15 +3752,18 @@
   function lvOpen(x) { return levelOf().level >= x[2]; }
   function findIn(arr, id) { for (var i = 0; i < arr.length; i++) if (arr[i][0] === id) return arr[i]; return arr[0]; }
   function heroOpts(o) {
-    var h = hero(), hr = findIn(HAIRS, h.hair), dr = findIn(DRESSES, h.dress);
-    return { hair: lvOpen(hr) ? hr[0] : 'long', hairColor: h.hairColor, dress: lvOpen(dr) ? dr[0] : 'onepiece', dressColor: h.dressColor, stage: o.stage, mood: o.mood, wear: o.wear };
+    var h = hero(), pick = function (arr, id) { var x = findIn(arr, id); return lvOpen(x) ? x[0] : arr[0][0]; }, w = {};
+    for (var k in (o.wear || {})) if (k !== 'ribbon') w[k] = o.wear[k];   // リボンは「かみかざり」で えらぶ
+    return { hair: pick(HAIRS, h.hair), hairColor: h.hairColor, dress: pick(DRESSES, h.dress), dressColor: h.dressColor,
+      shoes: pick(SHOES, h.shoes), shoesColor: h.shoesColor, bag: pick(BAGS, h.bag), bagColor: h.bagColor,
+      hairAcc: pick(HAIR_ACCS, h.hairAcc), accColor: h.accColor, neck: pick(NECKS, h.neck), stage: o.stage, mood: o.mood, wear: w };
   }
   function mainInner(o) { return heroOn() ? heroInner(heroOpts(o)) : charInner(o); }
   function mainSVG(o) { return '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + mainInner(o) + '</svg>'; }
   function mateInner(m, gray) {   // なかまの 絵（どうぶつ／ひと）
     if (m.human) {
       var hm = m.human;
-      return heroInner(gray ? { hair: hm.hair, hairColor: '#b9b1a1', dress: hm.dress, dressColor: '#cfc8b8', skin: '#e7e1d3', mood: 'normal' } : { hair: hm.hair, hairColor: hm.hairColor, dress: hm.dress, dressColor: hm.dressColor, mood: 'happy' });
+      return heroInner(gray ? { hair: hm.hair, hairColor: '#b9b1a1', dress: hm.dress, dressColor: '#cfc8b8', skin: '#e7e1d3', shoesColor: '#b9b1a1', mood: 'normal' } : { hair: hm.hair, hairColor: hm.hairColor, dress: hm.dress, dressColor: hm.dressColor, bag: hm.bag, bagColor: hm.bagColor, hairAcc: hm.hairAcc, accColor: hm.accColor, mood: 'happy' });
     }
     return charInner({ stage: 2, color: gray ? '#cfc8b8' : m.color, sp: m.sp, mood: gray ? 'normal' : 'happy', wear: {} });
   }
@@ -4408,9 +4471,9 @@
         + '<li>カードは 九九・文しょうだい・けいさん・かんじ の 4つに 分かれて います。まだ 出て いない カードは ひみつ。</li>'
         + '<li>いちばん 上の「おぼえかたの きほん」は いつでも 読めます（声に出す／つぎの日に もう一度／人に せつめいする など）。</li></ul>'],
       ['👧', 'しゅじんこうと なかま・きせかえ', '<ul>'
-        + '<li>しゅじんこうは 女の子の <b>ももか</b>（なまえは マイルームで かえられる）。ドリまるは <b>さいしょの なかま</b>です。</li>'
+        + '<li>しゅじんこうは 女の子（はじめの なまえは <b>すず</b>）。なまえは マイルームの「きせかえ」の <span class="k">なまえ</span> に 書いて <span class="k">きめる</span> で いつでも かえられます。ドリまるは <b>さいしょの なかま</b>です。</li>'
         + '<li>べんきょうや クエストを つづけると、<b>なかまが へやに あつまって きます</b>。どうぶつの なかまと、ひなちゃん・そうたくん・ここちゃん・みらいさん などの ともだち。だれが どうすると くるかは マイルームの「なかま」に 出ています。</li>'
-        + '<li><b>きせかえ</b>（マイルーム）で、ふく・ふくの いろ・かみがた・かみの いろ・アクセサリーを えらべます。レベルが 上がると ふくや かみがたが ふえます（パーティードレスは Lv.15、プリンセスドレスは Lv.45 など）。</li>'
+        + '<li><b>きせかえ</b>（マイルーム）は タブで えらびます：👗 ふく／💇 かみ／🎀 リボン・かみかざり／👟 くつ／👜 バッグ／💍 そのほか（ネックレス・ぼうし・めがね など）。くつ・バッグ・リボンは いろも かえられます。レベルが 上がると ふくや かみがたが ふえます（パーティードレスは Lv.15、プリンセスドレスは Lv.45 など）。</li>'
         + '<li>なかまが ふえた ときや、あたらしい ふくが きられる ときは、まるつけの あとに おしらせが 出ます。</li></ul>'],
       ['⭐', 'ポイントと レベル', '<ul>'
         + '<li>もんだいを といたり、クエストを クリアすると <b>ポイント</b>が たまります。</li>'
@@ -4678,6 +4741,7 @@
   function accGrid() {
     var ag = el('div', 'accs');
     ACCS.forEach(function (a) {
+      if (a.id === 'ribbon' && heroOn()) return;   // 女の子は「リボン」タブで えらぶ
       var un = a.ok(), b = btn('acc' + (un ? '' : ' lock'), null, function () { if (!un) return; game.wear[a.id] = !game.wear[a.id]; save(); renderGrow(); });
       b.setAttribute('aria-pressed', String(!!game.wear[a.id] && un));
       b.appendChild(el('span', null, (un ? '' : '🔒 ') + accName(a))); b.appendChild(el('small', null, un ? (game.wear[a.id] ? 'つけている' : 'タップで つける') : a.need + ' で ひらく'));
@@ -4685,19 +4749,34 @@
     });
     return ag;
   }
-  function renderDressup(box) {   // きせかえ（かみがた・かみの いろ・ふく・ふくの いろ・アクセサリー）
+  function renderDressup(box) {   // きせかえ（なまえ・ふく・かみ・リボン・くつ・バッグ・そのほか）
     var h = hero(), lv = levelOf().level;
-    box.appendChild(html('h2', 'sec', 'きせかえ <small>レベルが 上がると ふくや かみがたが ふえる</small>'));
+    box.appendChild(html('h2', 'sec', 'きせかえ <small>レベルが 上がると ふえる</small>'));
     var p = el('div', 'panel'), g = el('div', 'dressup'), pv = el('div', 'dprev'), ctl = el('div');
+    p.id = 'dressup';
     pv.appendChild(html('div', null, mainSVG({ stage: stageOf(lv), wear: game.wear, mood: 'happy' })));
     pv.appendChild(el('b', null, h.name));
     pv.appendChild(el('small', null, stageLabel(stageOf(lv))));
+    var nf = el('div', 'dname'), ni = el('input');
+    ni.type = 'text'; ni.maxLength = 10; ni.value = h.name; ni.setAttribute('aria-label', 'しゅじんこうの なまえ');
+    var setName = function () { var v = ni.value.trim(); if (!v) { ni.value = h.name; return; } h.name = v.slice(0, 10); save(); renderGrow(); renderCharCard(); toastText('なまえを「' + h.name + '」に したよ'); };
+    ni.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); setName(); } });
+    nf.appendChild(el('label', null, 'なまえ'));
+    nf.appendChild(ni);
+    nf.appendChild(btn('btn sm', 'きめる', setName));
+    pv.appendChild(nf);
     g.appendChild(pv);
+    var tabs = el('div', 'tabs inpage dtabs');
+    [['dress', '👗 ふく'], ['hair', '💇 かみ'], ['ribbon', '🎀 リボン'], ['shoes', '👟 くつ'], ['bag', '👜 バッグ'], ['other', '💍 そのほか']].forEach(function (t) {
+      var b = btn('tab', t[1], function () { dressTab = t[0]; renderGrow(); var d = $('dressup'); if (d) d.scrollIntoView({ block: 'start' }); });
+      b.setAttribute('aria-pressed', String(dressTab === t[0])); tabs.appendChild(b);
+    });
+    ctl.appendChild(tabs);
     var pickRow = function (title, arr, key) {
       ctl.appendChild(el('h4', null, title));
       var row = el('div', 'accs');
       arr.forEach(function (x) {
-        var un = lv >= x[2], b = btn('acc' + (un ? '' : ' lock'), null, function () { if (!un) return; h[key] = x[0]; save(); renderGrow(); renderCharCard(); });
+        var un = lv >= x[2], b = btn('acc' + (un ? '' : ' lock'), null, function () { if (!un) return; h[key] = x[0]; save(); renderGrow(); renderCharCard(); var d = $('dressup'); if (d) d.scrollIntoView({ block: 'start' }); });
         b.setAttribute('aria-pressed', String(un && h[key] === x[0]));
         b.appendChild(el('span', null, (un ? '' : '🔒 ') + x[1])); b.appendChild(el('small', null, un ? (h[key] === x[0] ? 'いま これ' : 'タップで かえる') : 'Lv.' + x[2] + ' で ひらく'));
         row.appendChild(b);
@@ -4707,15 +4786,19 @@
     var colorRow = function (title, arr, key) {
       ctl.appendChild(el('h4', null, title));
       var sws = el('div', 'swatches');
-      arr.forEach(function (c) { var b = btn('sw', null, function () { h[key] = c; save(); renderGrow(); renderCharCard(); }); b.style.background = c; b.setAttribute('aria-pressed', String(h[key] === c)); b.setAttribute('aria-label', title); sws.appendChild(b); });
+      arr.forEach(function (c) { var b = btn('sw', null, function () { h[key] = c; save(); renderGrow(); renderCharCard(); var d = $('dressup'); if (d) d.scrollIntoView({ block: 'start' }); }); b.style.background = c; if (c === '#fffaf2') b.style.boxShadow = 'inset 0 0 0 1px #cfc8b8'; b.setAttribute('aria-pressed', String(h[key] === c)); b.setAttribute('aria-label', title); sws.appendChild(b); });
       ctl.appendChild(sws);
     };
-    pickRow('ふく', DRESSES, 'dress');
-    colorRow('ふくの いろ', DRESS_COLORS, 'dressColor');
-    pickRow('かみがた', HAIRS, 'hair');
-    colorRow('かみの いろ', HAIR_COLORS, 'hairColor');
-    ctl.appendChild(el('h4', null, 'アクセサリー（メダルや レベルで ふえる）'));
-    ctl.appendChild(accGrid());
+    if (dressTab === 'dress') { pickRow('ふく', DRESSES, 'dress'); colorRow('ふくの いろ', DRESS_COLORS, 'dressColor'); }
+    if (dressTab === 'hair') { pickRow('かみがた', HAIRS, 'hair'); colorRow('かみの いろ', HAIR_COLORS, 'hairColor'); }
+    if (dressTab === 'ribbon') { pickRow('リボン・かみかざり', HAIR_ACCS, 'hairAcc'); colorRow('リボンの いろ', ITEM_COLORS, 'accColor'); }
+    if (dressTab === 'shoes') { pickRow('くつ', SHOES, 'shoes'); colorRow('くつの いろ', ITEM_COLORS, 'shoesColor'); }
+    if (dressTab === 'bag') { pickRow('バッグ', BAGS, 'bag'); colorRow('バッグの いろ', ITEM_COLORS, 'bagColor'); }
+    if (dressTab === 'other') {
+      pickRow('ネックレス', NECKS, 'neck');
+      ctl.appendChild(el('h4', null, 'ぼうし・めがね など（メダルや レベルで ふえる）'));
+      ctl.appendChild(accGrid());
+    }
     g.appendChild(ctl);
     p.appendChild(g);
     box.appendChild(p);
