@@ -373,6 +373,15 @@
   .swatches{display:flex; gap:10px; flex-wrap:wrap}
   .sw{width:40px; height:40px; border-radius:50%; border:3px solid transparent; padding:0}
   .sw[aria-pressed="true"]{border-color:var(--ink)}
+  .dressup{display:grid; grid-template-columns:160px 1fr; gap:16px; align-items:start}
+  .dressup .dprev{text-align:center}
+  .dressup .dprev .char{width:160px; height:160px}
+  .dressup .dprev b{display:block; font-family:var(--f-round); font-size:18px}
+  .dressup .dprev small{color:var(--ink-soft); font-size:12px}
+  .dressup h4{font-family:var(--f-round); font-size:14px; margin:14px 0 6px}
+  .dressup h4:first-child{margin-top:0}
+  @media (max-width:560px){ .dressup{grid-template-columns:1fr} }
+  .gtags .badge svg{width:34px; height:34px; vertical-align:middle; margin:-6px 4px -6px -4px}
   .accs{display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr)); gap:8px}
   .acc{border:1.5px solid var(--rule); border-radius:12px; padding:10px 8px; text-align:center; background:var(--paper); font-family:var(--f-round); font-size:14px; color:var(--ink)}
   .acc[aria-pressed="true"]{border-color:var(--shu); background:var(--shu-wash)}
@@ -1959,7 +1968,7 @@
       ] },
       { cls: 'g3', ic: '🔎', name: '見る・つかう', mini: true, items: [
         ['cal', 'カレンダー', 'テストの よてい・やった日'],
-        ['grow', 'マイルーム', 'ドリまる・なかま・もくひょう'],
+        ['grow', 'マイルーム', 'きせかえ・なかま・もくひょう'],
         ['records', 'きろく', 'せいかいりつ・にがて'],
         ['kotsu', 'おぼえかたカード', 'まちがえた ところの おぼえる コツ'],
         ['lessons', 'せんせいの ワンポイント', TYPE_ORDER.length + 'の 型の かんがえ方'],
@@ -3252,6 +3261,10 @@
     { id: 'robo', name: 'ロボまる', sp: 'robo', color: '#a9b6c9', need: 'スタンプカード 1まい', ok: function (c) { return c.stamps >= 30; } },
     { id: 'hiyo', name: 'ひよぴ', sp: 'hiyo', color: '#f9e07a', need: 'あいさつ 5日 れんぞく', ok: function (c) { return c.morningMax >= 5; } },
     { id: 'fukurou', name: 'ふくろう', sp: 'fukurou', color: '#b08968', need: 'クエスト ぜんぶクリア ×5', ok: function (c) { return c.allclears >= 5; } },
+    { id: 'hina', name: 'ひなちゃん', human: { hair: 'twin', hairColor: '#2b2620', dress: 'frill', dressColor: '#8fd18f' }, need: 'にっき 3日', ok: function (c) { return c.diaries >= 3; } },
+    { id: 'souta', name: 'そうたくん', human: { hair: 'short', hairColor: '#3b2a20', dress: 'shorts', dressColor: '#7ec8e3' }, need: 'クエスト 10こ', ok: function (c) { return c.quests >= 10; } },
+    { id: 'koko', name: 'ここちゃん', human: { hair: 'odango', hairColor: '#a0673a', dress: 'onepiece', dressColor: '#ffb27a' }, need: 'ルーティン 3日', ok: function (c) { return c.routines >= 3; } },
+    { id: 'mirai', name: 'みらいさん', human: { hair: 'pony', hairColor: '#6b4a2f', dress: 'sailor', dressColor: '#4d6fb0' }, need: 'Lv.12', lv: 12, ok: function (c) { return c.level >= 12; } },
     { id: 'hitsuji', name: 'もこすけ', sp: 'hitsuji', color: '#f3ece0', need: 'Lv.20', lv: 20, ok: function (c) { return c.level >= 20; } },
     { id: 'ryu', name: 'ドラごん', sp: 'ryu', color: '#7fc7a8', need: 'Lv.35', lv: 35, ok: function (c) { return c.level >= 35; } }
   ];
@@ -3302,9 +3315,12 @@
   function nextReward() {   // つぎに 何が もらえるか（レベルの ちかい ものを 1つ）
     var lv = levelOf().level, best = null;
     var cand = function (need, what) { if (need > lv && (!best || need < best.lv)) best = { lv: need, what: what }; };
-    STAGES.forEach(function (st) { cand(st[1], game.name + 'が ' + st[0] + 'に なる'); });
+    if (heroOn()) {
+      DRESSES.forEach(function (d) { cand(d[2], 'ふく「' + d[1] + '」が きられる'); });
+      HAIRS.forEach(function (x) { cand(x[2], 'かみがた「' + x[1] + '」に できる'); });
+    } else STAGES.forEach(function (st) { cand(st[1], game.name + 'が ' + st[0] + 'に なる'); });
     DECOR.forEach(function (d) { if (d.lv && !game.decor[d.id]) cand(d.lv, 'へやに「' + d.name + '」'); });
-    ACCS.forEach(function (a) { if (a.lv && !a.ok()) cand(a.lv, a.name + 'が つけられる'); });
+    ACCS.forEach(function (a) { if (a.lv && !a.ok()) cand(a.lv, accName(a) + 'が つけられる'); });
     MATES.forEach(function (m) { if (m.lv && !game.mates[m.id]) cand(m.lv, 'なかま「' + m.name + '」'); });
     cand((starsOf(lv) + 1) * 10, '★が ' + (starsOf(lv) + 1) + 'こに なる');
     return best;
@@ -3402,7 +3418,7 @@
     var lv = levelOf(), got = checkUnlocks();
     var starUp = starsOf(lv.level) > starsOf(before);
     rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
-    var ev = { xp: xp, lines: (meta && meta.lines) || [], level: lv.level, up: lv.level > before ? lv.level : 0, star: starUp ? starsOf(lv.level) : 0, stamp: !!(meta && meta.stamp), badges: got.badges, mates: got.mates, decor: got.decor, stampCount: Object.keys(game.stamps).length };
+    var ev = { xp: xp, from: before, lines: (meta && meta.lines) || [], level: lv.level, up: lv.level > before ? lv.level : 0, star: starUp ? starsOf(lv.level) : 0, stamp: !!(meta && meta.stamp), badges: got.badges, mates: got.mates, decor: got.decor, stampCount: Object.keys(game.stamps).length };
     if (ev.up || got.badges.length || got.mates.length) chime(ev.up ? 'up' : 'badge');
     return ev;
   }
@@ -3441,12 +3457,12 @@
   function gameResultPanel(ev) {
     var p = el('div', 'gres' + (ev.up ? ' up' : ''));
     var mood = ev.up ? 'excited' : 'happy';
-    p.appendChild(html('div', null, charSVG({ stage: stageOf(ev.level), color: game.color, wear: game.wear, mood: mood })));
+    p.appendChild(html('div', null, mainSVG({ stage: stageOf(ev.level), color: game.color, wear: game.wear, mood: mood })));
     var gx = el('div', 'gx');
     if (ev.up) {
       gx.textContent = 'レベルアップ！ Lv.' + ev.up;
       var st = stageOf(ev.level), nx = STAGES[st + 1];
-      gx.appendChild(el('small', null, st > stageOf(ev.level - 1) ? game.name + 'が ' + STAGES[st][0] + 'に なった！' : '+' + ev.xp + 'ポイント' + (nx ? '　Lv.' + nx[1] + 'で ' + nx[0] + 'に なるよ' : '')));
+      gx.appendChild(el('small', null, st > stageOf(ev.level - 1) ? mainName() + 'が ' + stageLabel(st) + 'に なった！' : '+' + ev.xp + 'ポイント' + (nx ? '　Lv.' + nx[1] + 'で ' + stageLabel(st + 1) + 'に なるよ' : '')));
     } else { gx.textContent = '+' + ev.xp + ' ポイント'; var lv = levelOf(); gx.appendChild(el('small', null, 'Lv.' + lv.level + '　つぎまで あと ' + (lv.need - lv.into))); }
     p.appendChild(gx);
     if (ev.lines && ev.lines.length > 1) {
@@ -3455,7 +3471,11 @@
       p.appendChild(ul);
     }
     var tags = el('div', 'gtags');
-    ev.mates.forEach(function (m) { tags.appendChild(html('span', 'badge', '🤝 なかまが ふえた！「' + m.name + '」')); });
+    ev.mates.forEach(function (m) { tags.appendChild(html('span', 'badge', '<svg viewBox="0 0 200 200" aria-hidden="true">' + mateInner(m) + '</svg>🤝「' + m.name + '」が なかまに なった！')); });
+    if (heroOn() && ev.up) {
+      DRESSES.forEach(function (d) { if (d[2] > ev.from && d[2] <= ev.level) tags.appendChild(html('span', 'badge', '👗 あたらしい ふく「' + d[1] + '」')); });
+      HAIRS.forEach(function (x) { if (x[2] > ev.from && x[2] <= ev.level) tags.appendChild(html('span', 'badge', '💇 かみがた「' + x[1] + '」')); });
+    }
     ev.badges.forEach(function (b) { tags.appendChild(html('span', 'badge', b.ic + ' メダル「' + b.name + '」')); });
     ev.decor.forEach(function (d) { tags.appendChild(html('span', 'badge', '🛋 へやに「' + d.name + '」が ふえた')); });
     if (ev.star) tags.appendChild(html('span', 'badge', '⭐ ★が ' + ev.star + 'こに なった！'));
@@ -3506,7 +3526,7 @@
     excited: ['レベルアップ！ やったー！', 'つよく なった！']
   };
   var MATE_LINES = ['いっしょに がんばろう！', 'ここ むずかしいね', 'つぎは なにを やる？', 'すごいね！', 'ぼくも やる！'];
-  function line(m) { var a = LINES[m] || LINES.normal; return a[Math.floor(Math.random() * a.length)]; }
+  function line(m) { var L = heroOn() ? HERO_LINES : LINES, a = L[m] || L.normal; return a[Math.floor(Math.random() * a.length)]; }
 
   // ドリまる／なかま の 絵（中身）。stage 0..4, mood, wear, sp（なかまの しゅるい）
   function charInner(o) {
@@ -3565,6 +3585,128 @@
     return out;
   }
   function charSVG(o) { return '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + charInner(o) + '</svg>'; }
+  // しゅじんこう（女の子）／ひとの なかま の 絵（中身）。viewBox 200×200
+  // o: { hair, hairColor, dress, dressColor, skin, stage, mood, wear }
+  var STAR_D = 'M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z';
+  function heroInner(o) {
+    var hc = o.hairColor || '#6b4a2f', hd = shade(hc, -30), dc = o.dressColor || '#f49ac1', dd = shade(dc, -35), dl = shade(dc, 55);
+    var sk = o.skin || '#fbe0cc', skd = shade(sk, -28), w = o.wear || {}, m = o.mood || 'normal', st = o.stage || 0;
+    var hair = o.hair || 'long', dress = o.dress || 'onepiece', s = '';
+    var long = dress === 'princess' || dress === 'star';
+    // うしろの かざり（マント・かみの うしろ）
+    if (w.cape) s += '<path d="M72 128 Q46 170 50 190 L150 190 Q154 170 128 128 Z" fill="#c0392f"/>';
+    if (hair === 'long') s += '<path d="M52 82 Q46 150 60 168 Q100 178 140 168 Q154 150 148 82 Z" fill="' + hc + '"/>';
+    if (hair === 'wavy') s += '<path d="M52 82 Q42 130 52 160 q8 12 16 4 q8 12 16 4 q8 12 16 4 q8 12 16 4 q8 12 16 4 q8 12 16 -4 Q158 130 148 82 Z" fill="' + hc + '"/>';
+    if (hair === 'bob') s += '<path d="M50 84 Q46 124 58 132 L142 132 Q154 124 150 84 Z" fill="' + hc + '"/>';
+    if (hair === 'pony') s += '<path d="M132 50 Q182 52 172 112 Q168 140 150 152 Q164 118 150 84 Q144 66 132 50 Z" fill="' + hc + '"/><path d="M52 82 Q50 104 58 114 L62 84 Z M148 82 Q150 104 142 114 L138 84 Z" fill="' + hc + '"/><circle cx="140" cy="54" r="7.5" fill="' + dc + '"/>';
+    if (hair === 'twin') s += '<ellipse cx="40" cy="112" rx="17" ry="38" fill="' + hc + '" transform="rotate(14 40 112)"/><ellipse cx="160" cy="112" rx="17" ry="38" fill="' + hc + '" transform="rotate(-14 160 112)"/><path d="M52 82 Q50 104 58 114 L62 84 Z M148 82 Q150 104 142 114 L138 84 Z" fill="' + hc + '"/><circle cx="52" cy="74" r="8" fill="' + dc + '"/><circle cx="148" cy="74" r="8" fill="' + dc + '"/>';
+    if (hair === 'odango') s += '<circle cx="66" cy="38" r="17" fill="' + hc + '"/><circle cx="134" cy="38" r="17" fill="' + hc + '"/><path d="M52 44 q-4 -10 6 -16 M148 44 q4 -10 -6 -16" stroke="' + hd + '" stroke-width="2" fill="none" opacity=".5"/>';
+    // うで・あし
+    s += '<ellipse cx="66" cy="148" rx="8" ry="17" fill="' + sk + '" transform="rotate(16 66 148)"/><ellipse cx="134" cy="148" rx="8" ry="17" fill="' + sk + '" transform="rotate(-16 134 148)"/>';
+    if (!long) s += '<rect x="85" y="164" width="10" height="24" rx="4" fill="' + sk + '"/><rect x="105" y="164" width="10" height="24" rx="4" fill="' + sk + '"/>';
+    var shoe = dress === 'shorts' ? '#4b5b7a' : shade(dc, -55);
+    s += '<ellipse cx="89" cy="191" rx="10" ry="5.5" fill="' + shoe + '"/><ellipse cx="111" cy="191" rx="10" ry="5.5" fill="' + shoe + '"/>';
+    // ふく
+    if (dress === 'onepiece') {
+      s += '<path d="M80 122 L120 122 L142 176 Q100 184 58 176 Z" fill="' + dc + '"/><path d="M88 122 L100 136 L112 122 Z" fill="#fff"/><circle cx="100" cy="150" r="3" fill="#fff"/><circle cx="100" cy="162" r="3" fill="#fff"/>';
+    } else if (dress === 'frill') {
+      s += '<path d="M82 122 L118 122 L122 146 L78 146 Z" fill="#fff"/><path d="M76 146 L124 146 L144 172 L56 172 Z" fill="' + dc + '"/>';
+      for (var f = 0; f < 6; f++) s += '<circle cx="' + (62 + f * 15.2) + '" cy="175" r="8" fill="' + dl + '"/>';
+      s += '<path d="M100 146 l-12 -7 v14z M100 146 l12 -7 v14z" fill="' + dd + '"/><circle cx="100" cy="146" r="3.5" fill="' + dd + '"/>';
+    } else if (dress === 'sailor') {
+      s += '<path d="M80 122 L120 122 L124 150 L76 150 Z" fill="#fff"/><path d="M80 122 L100 142 L120 122 L126 132 L100 150 L74 132 Z" fill="' + dd + '"/><path d="M95 142 l5 12 5 -12z" fill="#e2574c"/>';
+      s += '<path d="M76 150 L124 150 L142 176 L58 176 Z" fill="' + dc + '"/><path d="M86 152 L80 176 M100 152 V177 M114 152 L120 176" stroke="' + dd + '" stroke-width="1.6"/>';
+    } else if (dress === 'party') {
+      s += '<path d="M84 122 L116 122 L118 146 L82 146 Z" fill="' + dc + '"/><path d="M82 146 Q52 160 46 180 Q100 192 154 180 Q148 160 118 146 Z" fill="' + dc + '"/><path d="M82 146 Q66 162 64 182 Q100 190 136 182 Q134 162 118 146 Z" fill="' + dl + '" opacity=".55"/>';
+      s += '<rect x="80" y="142" width="40" height="7" rx="3" fill="' + dd + '"/><circle cx="100" cy="145.5" r="5" fill="#ffd166"/>';
+    } else if (dress === 'yukata') {
+      s += '<path d="M78 122 L122 122 L130 184 L70 184 Z" fill="' + dc + '"/><path d="M86 122 L104 150 M114 122 L100 142" stroke="#fff" stroke-width="3"/><rect x="74" y="146" width="52" height="11" fill="#ffd166"/><path d="M122 150 l14 -8 v18z" fill="#ffd166"/>';
+      [[86, 168], [112, 174], [96, 130]].forEach(function (p) { s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4" fill="#fff" opacity=".8"/><circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.6" fill="' + dd + '"/>'; });
+    } else if (long) {   // princess / star（あしまで とどく ドレス）
+      s += '<path d="M84 122 L116 122 L118 146 L82 146 Z" fill="' + dc + '"/><path d="M82 146 Q56 166 44 190 Q100 198 156 190 Q144 166 118 146 Z" fill="' + dc + '"/>';
+      for (var p2 = 0; p2 < 7; p2++) s += '<circle cx="' + (50 + p2 * 16.7) + '" cy="191" r="7" fill="' + (dress === 'star' ? '#fff8d6' : '#fff') + '"/>';
+      s += '<path d="M82 146 q18 10 36 0" stroke="' + dd + '" stroke-width="3" fill="none"/>';
+      if (dress === 'star') [[70, 172], [100, 160], [128, 176], [88, 184], [116, 186]].forEach(function (p) { s += '<path transform="translate(' + p[0] + ' ' + p[1] + ') scale(.55)" d="' + STAR_D + '" fill="#ffd166"/>'; });
+      else [[72, 176], [100, 168], [128, 178]].forEach(function (p) { s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="2.4" fill="#fff"/>'; });
+    } else if (dress === 'shorts') {
+      s += '<path d="M78 122 L122 122 L126 156 L74 156 Z" fill="' + dc + '"/><path d="M76 154 L124 154 L126 172 L103 172 L100 162 L97 172 L74 172 Z" fill="#4b5b7a"/>';
+    }
+    // そでの ふくらみ
+    var sl = dress === 'princess' || dress === 'star' || dress === 'party' ? 13 : 10, slc = dress === 'sailor' || dress === 'frill' ? '#fff' : dc;
+    if (dress !== 'yukata') s += '<circle cx="76" cy="128" r="' + sl + '" fill="' + slc + '"/><circle cx="124" cy="128" r="' + sl + '" fill="' + slc + '"/>';
+    else s += '<path d="M78 122 L58 150 L74 156 L84 132 Z M122 122 L142 150 L126 156 L116 132 Z" fill="' + dc + '"/>';
+    if (w.star) s += '<path transform="translate(100 134) scale(.9)" d="' + STAR_D + '" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>';
+    // くび・かお
+    s += '<rect x="94" y="112" width="12" height="14" fill="' + skd + '"/>';
+    s += '<circle cx="100" cy="80" r="44" fill="' + sk + '"/>';
+    // まえがみ（かみの 上）
+    if (hair === 'short') s += '<path d="M56 86 Q50 30 100 30 Q150 30 144 86 Q140 62 124 56 Q112 68 96 60 Q80 70 66 62 Q58 70 56 86 Z" fill="' + hc + '"/>';
+    else s += '<path d="M54 92 Q46 28 100 28 Q154 28 146 92 Q142 66 128 56 Q118 72 100 62 Q84 74 70 58 Q58 68 54 92 Z" fill="' + hc + '"/>';
+    s += '<path d="M72 44 q16 -10 34 -8" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".35"/>';
+    // め
+    var eye = function (x) {
+      var y = 86;
+      if (m === 'sleep') return '<path d="M' + (x - 8) + ' ' + y + ' q8 7 16 0" fill="none" stroke="#3a2a22" stroke-width="3" stroke-linecap="round"/>';
+      if (m === 'happy') return '<path d="M' + (x - 8) + ' ' + (y + 2) + ' q8 -10 16 0" fill="none" stroke="#3a2a22" stroke-width="3.2" stroke-linecap="round"/>';
+      if (m === 'excited') return '<path transform="translate(' + x + ' ' + y + ')" d="' + STAR_D + '" fill="#e6a100"/>';
+      if (m === 'hungry') return '<ellipse class="eye" cx="' + x + '" cy="' + (y + 2) + '" rx="6" ry="4" fill="#3a2a22"/>';
+      return '<g class="eye"><ellipse cx="' + x + '" cy="' + y + '" rx="6.5" ry="8.5" fill="#3a2a22"/><circle cx="' + (x + 2) + '" cy="' + (y - 3.5) + '" r="2.6" fill="#fff"/><circle cx="' + (x - 2) + '" cy="' + (y + 3) + '" r="1.2" fill="#fff" opacity=".8"/></g>';
+    };
+    s += eye(82) + eye(118);
+    if (m !== 'sleep' && m !== 'happy') s += '<path d="M74 76 q5 -3 10 -1 M116 75 q5 -2 10 1" stroke="#3a2a22" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".6"/>';
+    s += '<ellipse cx="70" cy="100" rx="8" ry="5" fill="#f4a0a0" opacity=".6"/><ellipse cx="130" cy="100" rx="8" ry="5" fill="#f4a0a0" opacity=".6"/>';
+    if (m === 'happy') s += '<path d="M92 102 q8 9 16 0" fill="#e8776f" stroke="#3a2a22" stroke-width="2" stroke-linejoin="round"/>';
+    else if (m === 'excited') s += '<ellipse cx="100" cy="106" rx="6" ry="7" fill="#3a2a22"/><ellipse cx="100" cy="109" rx="3.5" ry="3" fill="#e8776f"/>';
+    else if (m === 'hungry') s += '<path d="M93 106 q3.5 -3 7 0 q3.5 3 7 0" fill="none" stroke="#3a2a22" stroke-width="2.4" stroke-linecap="round"/>';
+    else if (m === 'sleep') s += '<ellipse cx="100" cy="106" rx="3" ry="2.4" fill="#3a2a22" opacity=".7"/>';
+    else s += '<path d="M94 103 q6 5 12 0" fill="none" stroke="#3a2a22" stroke-width="2.4" stroke-linecap="round"/>';
+    // アクセサリー
+    if (w.glasses) s += '<circle cx="82" cy="86" r="12" fill="none" stroke="#6b3d8f" stroke-width="2.4"/><circle cx="118" cy="86" r="12" fill="none" stroke="#6b3d8f" stroke-width="2.4"/><path d="M94 86 h12" stroke="#6b3d8f" stroke-width="2.4"/>';
+    if (w.ribbon) s += '<g transform="translate(132 42) rotate(18)"><path d="M0 0 l-17 -11 v22z M0 0 l17 -11 v22z" fill="#f06b8a"/><circle r="4.5" fill="#d94b6b"/></g>';
+    if (w.hat) s += '<ellipse cx="100" cy="38" rx="60" ry="11" fill="#f6e3b4"/><path d="M68 38 Q70 6 100 6 Q130 6 132 38 Z" fill="#f6e3b4"/><path d="M69 30 h62" stroke="#e2574c" stroke-width="6"/>';
+    if (w.crown) s += '<path d="M76 36 l4 -18 10 10 10 -16 10 16 10 -10 4 18 Q100 42 76 36 Z" fill="#ffe08a" stroke="#e6a100" stroke-width="2" stroke-linejoin="round"/><circle cx="100" cy="24" r="3.5" fill="#f06b8a"/>';
+    // きらきら（レベルが 上がると ふえる）
+    var tw = st >= 6 ? [[30, 60], [170, 54], [22, 140], [178, 150], [100, 14]] : st >= 5 ? [[30, 60], [170, 54], [178, 150]] : st >= 3 ? [[170, 54], [28, 120]] : [];
+    tw.forEach(function (p) { s += '<path transform="translate(' + p[0] + ' ' + p[1] + ') scale(.75)" d="' + STAR_D + '" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>'; });
+    return s;
+  }
+
+  var HAIRS = [['long', 'ロング', 1], ['twin', 'ツインテール', 1], ['bob', 'ボブ', 1], ['pony', 'ポニーテール', 5], ['odango', 'おだんご', 12], ['wavy', 'ふわふわロング', 20]];
+  var HAIR_COLORS = ['#6b4a2f', '#2b2620', '#a0673a', '#c98b4a', '#e9c46a', '#8a5a8f'];
+  var DRESSES = [['onepiece', 'ワンピース', 1], ['frill', 'フリルスカート', 3], ['sailor', 'セーラーふく', 7], ['party', 'パーティードレス', 15], ['yukata', 'ゆかた', 30], ['princess', 'プリンセスドレス', 45], ['star', 'ほしの ドレス', 70]];
+  var DRESS_COLORS = ['#f49ac1', '#7ec8e3', '#c9a3ff', '#8fd18f', '#ffb27a', '#e2574c', '#4d6fb0', '#f4c14d'];
+  var HERO_STAGES = ['はじめまして', 'おしゃれ さん', 'きらきら さん', 'スター', 'きらめき スター', 'プリンセス', 'でんせつの プリンセス'];
+  var HERO_LINES = {
+    happy: ['きょうも がんばったね！', 'いっしょに できて たのしい！', 'つぎも いっしょに やろうね', 'みんなも よろこんでるよ'],
+    normal: ['きょうも いっしょに がんばろう！', 'どれから やる？', '1もんだけでも やってみよう', 'なかまが まってるよ'],
+    hungry: ['ひさしぶり！ まってたよ', 'また いっしょに べんきょう しよう', 'みんな あいたがってたよ'],
+    excited: ['レベルアップ！ やったー！', 'あたらしい ふくが きられるかも！']
+  };
+  function hero() {
+    if (!game.hero) game.hero = { on: true, name: 'ももか', hair: 'long', hairColor: HAIR_COLORS[0], dress: 'onepiece', dressColor: DRESS_COLORS[0] };
+    return game.hero;
+  }
+  function heroOn() { return !!(game && hero().on); }
+  function mainName() { return heroOn() ? hero().name : game.name; }
+  function stageLabel(i) { return heroOn() ? HERO_STAGES[i] : STAGES[i][0]; }
+  function lvOpen(x) { return levelOf().level >= x[2]; }
+  function findIn(arr, id) { for (var i = 0; i < arr.length; i++) if (arr[i][0] === id) return arr[i]; return arr[0]; }
+  function heroOpts(o) {
+    var h = hero(), hr = findIn(HAIRS, h.hair), dr = findIn(DRESSES, h.dress);
+    return { hair: lvOpen(hr) ? hr[0] : 'long', hairColor: h.hairColor, dress: lvOpen(dr) ? dr[0] : 'onepiece', dressColor: h.dressColor, stage: o.stage, mood: o.mood, wear: o.wear };
+  }
+  function mainInner(o) { return heroOn() ? heroInner(heroOpts(o)) : charInner(o); }
+  function mainSVG(o) { return '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + mainInner(o) + '</svg>'; }
+  function mateInner(m, gray) {   // なかまの 絵（どうぶつ／ひと）
+    if (m.human) {
+      var hm = m.human;
+      return heroInner(gray ? { hair: hm.hair, hairColor: '#b9b1a1', dress: hm.dress, dressColor: '#cfc8b8', skin: '#e7e1d3', mood: 'normal' } : { hair: hm.hair, hairColor: hm.hairColor, dress: hm.dress, dressColor: hm.dressColor, mood: 'happy' });
+    }
+    return charInner({ stage: 2, color: gray ? '#cfc8b8' : m.color, sp: m.sp, mood: gray ? 'normal' : 'happy', wear: {} });
+  }
+  function mateCount() { return Object.keys(game.mates).length + (heroOn() ? 1 : 0); }   // しゅじんこうの ときは ドリまるも なかま
+  function accName(a) { return a.id === 'crown' && heroOn() ? 'ティアラ' : a.name; }
+
 
   // マイルーム の 絵。まど（じかんで 昼夜）・カレンダー・本だな（5まいで 1さつ）・つくえ・ドリまる・なかま・かざり
   function roomSVG() {
@@ -3595,7 +3737,7 @@
     var pose = (h >= 21 || h < 6) ? 'sleep' : (sheetsOnDay(todayKey()) >= goals().day ? 'rest' : 'study');
     s += '<rect x="406" y="152" width="88" height="58" rx="10" fill="#e2b96f"/><rect x="442" y="196" width="16" height="26" fill="#d3a95c"/>';   // いすの せもたれ と あし
     s += '<g class="dori ' + pose + '"><svg x="374" y="58" width="152" height="152" viewBox="0 0 200 200">'
-      + charInner({ stage: st, color: game.color, wear: game.wear, mood: pose === 'sleep' ? 'sleep' : pose === 'rest' ? 'happy' : mood() })
+      + mainInner({ stage: st, color: game.color, wear: game.wear, mood: pose === 'sleep' ? 'sleep' : pose === 'rest' ? 'happy' : mood() })
       + '</svg></g>';
     s += '<rect x="330" y="205" width="220" height="14" rx="3" fill="#a97747"/><rect x="340" y="219" width="12" height="60" fill="#8f6a3e"/><rect x="528" y="219" width="12" height="60" fill="#8f6a3e"/>';
     if (d.lamp) s += '<rect x="500" y="170" width="4" height="36" fill="#6f695d"/><path d="M484 172 h36 l-6 -18 h-24z" fill="#f2c94c"/>';
@@ -3616,11 +3758,15 @@
     if (d.fish) s += '<ellipse cx="530" cy="194" rx="15" ry="12" fill="#cfe9f8" stroke="#8fc7e8" stroke-width="1.5"/><path d="M524 196 l7 -4 0 8z" fill="#f2803a"/><circle cx="533" cy="196" r="3.5" fill="#f2803a"/><path d="M515 200 q15 6 30 0" stroke="#8fc7e8" stroke-width="1.5" fill="none"/>';
     var stn = starsOf(lv);
     if (stn) { s += '<rect x="60" y="196" width="128" height="6" fill="#c9a36f"/>'; for (var si = 0; si < Math.min(6, stn); si++) s += '<path transform="translate(' + (72 + si * 21) + ' 186) scale(1.05)" d="M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>'; if (stn > 6) s += '<text x="196" y="194" font-size="11" font-family="sans-serif" fill="#6f695d">×' + stn + '</text>'; }
-    var spots = [[150, 262], [230, 292], [70, 290], [470, 292], [560, 296], [300, 250], [390, 300], [600, 270]], k = 0, mates = MATES.filter(function (m) { return game.mates[m.id]; });
+    var spots = [[150, 262], [230, 292], [70, 290], [470, 292], [560, 296], [300, 250], [390, 300], [600, 270], [110, 336], [520, 340]], k = 0, mates = MATES.filter(function (m) { return game.mates[m.id]; });
+    if (heroOn()) {   // しゅじんこうの ときは、ドリまるが いつも そばに いる（さいしょの なかま）
+      spots.splice(5, 1);
+      s += '<svg x="262" y="234" width="76" height="76" viewBox="0 0 200 200">' + charInner({ stage: st, color: game.color, wear: {}, mood: pose === 'sleep' ? 'sleep' : 'happy' }) + '</svg>';
+    }
     var talker = mates.length ? Math.floor(Math.random() * mates.length) : -1;
     mates.forEach(function (m, i) {
       var p = spots[k++ % spots.length];
-      s += '<svg x="' + (p[0] - 34) + '" y="' + (p[1] - 60) + '" width="68" height="68" viewBox="0 0 200 200">' + charInner({ stage: 2, color: m.color, sp: m.sp, mood: 'happy', wear: {} }) + '</svg>';
+      s += '<svg x="' + (p[0] - 34) + '" y="' + (p[1] - 60) + '" width="68" height="68" viewBox="0 0 200 200">' + mateInner(m) + '</svg>';
       if (i === talker) { var tx = MATE_LINES[Math.floor(Math.random() * MATE_LINES.length)]; s += '<rect x="' + (p[0] - 50) + '" y="' + (p[1] - 88) + '" width="100" height="20" rx="10" fill="#fff" stroke="#c9c2b4"/><text x="' + p[0] + '" y="' + (p[1] - 74) + '" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + tx + '</text>'; }
     });
     return '<svg class="room" viewBox="0 0 640 360" aria-hidden="true">' + s + '</svg>';
@@ -3828,7 +3974,7 @@
       var ps = questDefs().slice(), ids = [];
       while (ids.length < n && ps.length) ids.push(ps.splice(Math.floor(Math.random() * ps.length), 1)[0].id);
       game.qpick[k] = ids; pickSel = {}; save(); renderCharCard();
-      toastText('ドリまるが えらんだよ！');
+      toastText(mainName() + 'が えらんだよ！');
     }));
     box.appendChild(ft);
     return box;
@@ -3952,13 +4098,13 @@
   function questCard() {
     var k = todayKey(), qs = questState(k), f = fortune(k), checked = !!game.morning[k], card = el('div', 'qcard');
     var hd = el('div', 'qhead');
-    hd.appendChild(html('div', null, charSVG({ stage: stageOf(levelOf().level), color: game.color, wear: game.wear, mood: qs.all && checked ? 'excited' : checked ? 'happy' : 'normal' })));
+    hd.appendChild(html('div', null, mainSVG({ stage: stageOf(levelOf().level), color: game.color, wear: game.wear, mood: qs.all && checked ? 'excited' : checked ? 'happy' : 'normal' })));
     var say = el('div', 'say');
     if (checked) {
       say.appendChild(el('span', null, qs.choosing ? 'きょう やる クエストを えらんでね！' : qs.all ? 'きょうの クエスト ぜんぶ クリア！ すごい！' : qs.done > 1 ? 'いいちょうし！ のこり ' + (qs.total - qs.done) + 'こ' : 'きょうの クエスト、いっしょに がんばろう！'));
       say.appendChild(el('small', null, 'あいさつ れんぞく ' + streakIn(game.morning) + '日'));
     } else {
-      say.appendChild(el('span', null, greet() + '　' + game.name + 'に あいさつしよう'));
+      say.appendChild(el('span', null, greet() + '　' + mainName() + 'に あいさつしよう'));
       say.appendChild(el('small', null, 'タップすると きょうの おみくじが ひける（+' + XP.morning + (new Date().getHours() < 8 ? '、はやおき +' + XP.early : '') + '）'));
     }
     hd.appendChild(say);
@@ -4228,7 +4374,7 @@
   var HELP = {
     suzu: [
       ['🏠', 'ホームの 見かた', '<p>ホームは 上から こう ならんで います。</p><ul>'
-        + '<li><b>マイルーム</b>の カード…ドリまるの レベルと、いまの ようす。タップすると へやに 入れます。</li>'
+        + '<li><b>マイルーム</b>の カード…しゅじんこうの レベルと、へやに あつまった なかま。タップすると へやに 入れます。</li>'
         + '<li><b>きょうの クエスト</b>…あいさつ・おみくじ・きょう やること。</li>'
         + '<li><b>つぎの テスト</b>…テストが 近いと「あと ○日」と 出ます。</li>'
         + '<li>その下の <b>ボタン</b>…べんきょうを えらぶ ところ。</li></ul>'],
@@ -4261,11 +4407,16 @@
         + '<li>つぎに 同じ もんだいが できたら、その カードに <b>⭐</b>が つきます。⭐は「もう おぼえた」の しるし。</li>'
         + '<li>カードは 九九・文しょうだい・けいさん・かんじ の 4つに 分かれて います。まだ 出て いない カードは ひみつ。</li>'
         + '<li>いちばん 上の「おぼえかたの きほん」は いつでも 読めます（声に出す／つぎの日に もう一度／人に せつめいする など）。</li></ul>'],
+      ['👧', 'しゅじんこうと なかま・きせかえ', '<ul>'
+        + '<li>しゅじんこうは 女の子の <b>ももか</b>（なまえは マイルームで かえられる）。ドリまるは <b>さいしょの なかま</b>です。</li>'
+        + '<li>べんきょうや クエストを つづけると、<b>なかまが へやに あつまって きます</b>。どうぶつの なかまと、ひなちゃん・そうたくん・ここちゃん・みらいさん などの ともだち。だれが どうすると くるかは マイルームの「なかま」に 出ています。</li>'
+        + '<li><b>きせかえ</b>（マイルーム）で、ふく・ふくの いろ・かみがた・かみの いろ・アクセサリーを えらべます。レベルが 上がると ふくや かみがたが ふえます（パーティードレスは Lv.15、プリンセスドレスは Lv.45 など）。</li>'
+        + '<li>なかまが ふえた ときや、あたらしい ふくが きられる ときは、まるつけの あとに おしらせが 出ます。</li></ul>'],
       ['⭐', 'ポイントと レベル', '<ul>'
         + '<li>もんだいを といたり、クエストを クリアすると <b>ポイント</b>が たまります。</li>'
         + '<li>たまると <b>レベルアップ</b>。がんばった 日は 1レベルぐらい 上がります。</li>'
         + '<li><b>10レベルごとに ★</b>が 1つ ふえます。</li>'
-        + '<li>レベルが 上がると、へやの かざり・なかま・ドリまるの すがたが ふえます。つぎに 何が もらえるかは「つぎの ごほうび」に 出ています。</li></ul>'],
+        + '<li>レベルが 上がると、へやの かざり・なかま・きせかえの ふくや かみがたが ふえます。つぎに 何が もらえるかは「つぎの ごほうび」に 出ています。</li></ul>'],
       ['✅', 'きょうの クエスト', '<ul>'
         + '<li>あさ いちばんに <span class="k">おはよう！</span> を おすと、きょうの <b>おみくじ</b>が ひけます。</li>'
         + '<li>学校や おうちの もくひょうが ならんで います。できたら 四角を タップして ✓。</li>'
@@ -4281,6 +4432,9 @@
         + '<li>日を タップすると、その日 やった ことが 見られます。</li></ul>']
     ],
     oya: [
+      ['👧', 'しゅじんこうの きりかえ', '<p>v32 から、しゅじんこうが オリジナルの 女の子に なりました（ドリまるは さいしょの なかま）。</p><ul>'
+        + '<li>もとの ドリまるに もどしたい ときは、マイルーム →「しゅじんこう」で <span class="k">🥚 ドリまる</span> を えらびます。レベル・ポイント・なかま・メダルは どちらでも 同じで、きえません。</li>'
+        + '<li>女の子の キャラクターは この アプリの オリジナルです（市販の 人形や キャラクターの 名前・見た目は つかっていません）。</li></ul>'],
       ['💡', 'おぼえかたカード（まちがい直しの しくみ）', '<p>まちがえた もんだいに、その場で <b>暗記の コツ</b>を 出します。答えを 教える ヒントでは なく、「どう おぼえるか」の 方法です。</p><ul>'
         + '<li><b>出る タイミングは まるつけの あとだけ</b>です。とく 前には 出ないので、自分で 考える じゃまを しません。</li>'
         + '<li>九九は「入れかえても 同じ」「1つ前＋その段の数」「9の段は ×10−その数」など、思い出す ための わざ。漢字は パーツに 分ける おぼえ方（親＝立つ・木・見る）。文しょうだいは まちがえやすい ところの 合言葉。</li>'
@@ -4288,7 +4442,7 @@
         + '<li>ぜんぶで 235まい（九九26・文しょうだい34・けいさん15・かんじ160）。かんじは 54字が オリジナルの 覚え方、のこりは 読みと ことばで おぼえる 形です。</li>'
         + '<li>ホーム →「おぼえかたカード」で、いま あつめた ぶんが 読めます。にがてが どこかを 見る のにも つかえます。</li></ul>'],
       ['🕐', '1日の ながれ（おすすめ）', '<ol>'
-        + '<li><b>朝</b>：アプリを ひらく → ドリまるの ひとこと → 「おはよう！」で おみくじ → きょうの クエストを 見る。</li>'
+        + '<li><b>朝</b>：アプリを ひらく → しゅじんこうの ひとこと → 「おはよう！」で おみくじ → きょうの クエストを 見る。</li>'
         + '<li><b>学習</b>：「けいさん 1まい」（10問）＋「きょうの 5問」または「かんじ」。10〜20分が 目安です。</li>'
         + '<li><b>夜</b>：できた クエストに ✓ → 「きょうの にっき」で きぶんと ひとこと → おうちの人が ひとことと <b>サイン</b>（指で 書けます。定型文の ボタンも あります）。</li></ol>'
         + '<p>あいさつ・クエスト・ドリル・にっき・サイン の 5つが そろうと 👑 ルーティン コンプリート（+' + XP.routine + '）。この 5つを 毎日の 型に すると、親子の やりとりが 自然に 1日 1回 入ります。</p>'
@@ -4452,9 +4606,15 @@
     var last = new Date(ks[ks.length - 1] + 'T00:00:00'), now = new Date(todayKey() + 'T00:00:00');
     return Math.round((now - last) / 86400000);
   }
-  function welcomePool() {   // そのときの がんばりに あわせた ことばを あつめる
+  function welcomePool() {   // しゅじんこうの ときは「ぼく」→「わたし」
+    var pool = welcomePool0();
+    return heroOn() ? pool.map(function (t) { return t.replace(/ぼく/g, 'わたし'); }) : pool;
+  }
+  function welcomePool0() {   // そのときの がんばりに あわせた ことばを あつめる
     var k = todayKey(), h = new Date().getHours(), lv = levelOf(), ds = daysSinceLast(), pool = [];
-    if (ds < 0) return ['はじめまして！ ぼくは ' + game.name + '。きみと いっしょに つよく なりたいな'];
+    if (heroOn() && !hero().met) { hero().met = k; save(); }
+    if (heroOn() && hero().met === k && ds >= 0) return ['はじめまして！ わたしは ' + hero().name + '。ドリまるも なかまに なったよ。べんきょうすると なかまが あつまって くるんだって！'];
+    if (ds < 0) return ['はじめまして！ ぼくは ' + mainName() + '。きみと いっしょに ' + (heroOn() ? 'なかまを あつめたいな' : 'つよく なりたいな')];
     var qs = questState(k), today = sheetsOnDay(k), s = streakIn(game.stamps), todayDone = !!game.stamps[k];
     if (ds >= 4) pool.push('おかえり！ また あえて うれしいよ', 'まってたよ！ きょう あえて うれしいな');
     if (qs.all && qs.total > 1) pool.push('きょうは クエスト ぜんぶ クリア！ かっこいいね', 'きょうは もう ばっちり。ゆっくり しても いいよ');
@@ -4470,9 +4630,9 @@
   function welcomeCard() {
     var c = el('div', 'wel'); c.setAttribute('role', 'status');
     var body = el('button', 'welbody'); body.type = 'button';
-    body.appendChild(html('div', null, charSVG({ stage: stageOf(levelOf().level), color: game.color, wear: game.wear, mood: 'happy' })));
+    body.appendChild(html('div', null, mainSVG({ stage: stageOf(levelOf().level), color: game.color, wear: game.wear, mood: 'happy' })));
     var tx = el('div', 'weltxt'), main = el('div', 'welmain', pick(welcomePool())), sub = el('div', 'welsub', pick(CHEER));
-    tx.appendChild(main); tx.appendChild(sub); tx.appendChild(el('div', 'welhint', 'タップすると ' + game.name + 'が もう ひとこと 言うよ'));
+    tx.appendChild(main); tx.appendChild(sub); tx.appendChild(el('div', 'welhint', 'タップすると ' + mainName() + 'が もう ひとこと 言うよ'));
     body.appendChild(tx);
     body.addEventListener('click', function () {
       main.textContent = pick(welcomePool()); sub.textContent = pick(CHEER);
@@ -4492,7 +4652,7 @@
     var lab = el('div', 'clabel'); lab.appendChild(el('b', null, '🏠 マイルーム')); lab.appendChild(el('span', null, 'ひらく →'));
     card.insertBefore(lab, card.firstChild);
     var info = el('div', 'cinfo');
-    var nm = el('div', 'cname', game.name); nm.appendChild(el('small', null, 'Lv.' + lv.level + '　' + STAGES[stageOf(lv.level)][0] + '　なかま ' + Object.keys(game.mates).length + 'びき'));
+    var nm = el('div', 'cname', mainName()); nm.appendChild(el('small', null, 'Lv.' + lv.level + '　' + stageLabel(stageOf(lv.level)) + '　なかま ' + mateCount()));
     info.appendChild(nm);
     var bar = el('div', 'xpbar'), fill = el('i'); fill.style.width = Math.round(lv.into / lv.need * 100) + '%'; bar.appendChild(fill); info.appendChild(bar);
     var tx = el('div', 'xptxt'); tx.appendChild(el('span', null, 'あと ' + (lv.need - lv.into) + ' ポイントで Lv.' + (lv.level + 1)));
@@ -4515,6 +4675,51 @@
     row.appendChild(btn('tool', '＋', function () { set(Math.min(max, get() + sp)); save(); renderGrow(); }));
     return row;
   }
+  function accGrid() {
+    var ag = el('div', 'accs');
+    ACCS.forEach(function (a) {
+      var un = a.ok(), b = btn('acc' + (un ? '' : ' lock'), null, function () { if (!un) return; game.wear[a.id] = !game.wear[a.id]; save(); renderGrow(); });
+      b.setAttribute('aria-pressed', String(!!game.wear[a.id] && un));
+      b.appendChild(el('span', null, (un ? '' : '🔒 ') + accName(a))); b.appendChild(el('small', null, un ? (game.wear[a.id] ? 'つけている' : 'タップで つける') : a.need + ' で ひらく'));
+      ag.appendChild(b);
+    });
+    return ag;
+  }
+  function renderDressup(box) {   // きせかえ（かみがた・かみの いろ・ふく・ふくの いろ・アクセサリー）
+    var h = hero(), lv = levelOf().level;
+    box.appendChild(html('h2', 'sec', 'きせかえ <small>レベルが 上がると ふくや かみがたが ふえる</small>'));
+    var p = el('div', 'panel'), g = el('div', 'dressup'), pv = el('div', 'dprev'), ctl = el('div');
+    pv.appendChild(html('div', null, mainSVG({ stage: stageOf(lv), wear: game.wear, mood: 'happy' })));
+    pv.appendChild(el('b', null, h.name));
+    pv.appendChild(el('small', null, stageLabel(stageOf(lv))));
+    g.appendChild(pv);
+    var pickRow = function (title, arr, key) {
+      ctl.appendChild(el('h4', null, title));
+      var row = el('div', 'accs');
+      arr.forEach(function (x) {
+        var un = lv >= x[2], b = btn('acc' + (un ? '' : ' lock'), null, function () { if (!un) return; h[key] = x[0]; save(); renderGrow(); renderCharCard(); });
+        b.setAttribute('aria-pressed', String(un && h[key] === x[0]));
+        b.appendChild(el('span', null, (un ? '' : '🔒 ') + x[1])); b.appendChild(el('small', null, un ? (h[key] === x[0] ? 'いま これ' : 'タップで かえる') : 'Lv.' + x[2] + ' で ひらく'));
+        row.appendChild(b);
+      });
+      ctl.appendChild(row);
+    };
+    var colorRow = function (title, arr, key) {
+      ctl.appendChild(el('h4', null, title));
+      var sws = el('div', 'swatches');
+      arr.forEach(function (c) { var b = btn('sw', null, function () { h[key] = c; save(); renderGrow(); renderCharCard(); }); b.style.background = c; b.setAttribute('aria-pressed', String(h[key] === c)); b.setAttribute('aria-label', title); sws.appendChild(b); });
+      ctl.appendChild(sws);
+    };
+    pickRow('ふく', DRESSES, 'dress');
+    colorRow('ふくの いろ', DRESS_COLORS, 'dressColor');
+    pickRow('かみがた', HAIRS, 'hair');
+    colorRow('かみの いろ', HAIR_COLORS, 'hairColor');
+    ctl.appendChild(el('h4', null, 'アクセサリー（メダルや レベルで ふえる）'));
+    ctl.appendChild(accGrid());
+    g.appendChild(ctl);
+    p.appendChild(g);
+    box.appendChild(p);
+  }
   function renderGrow() {
     var box = $('grow'); box.innerHTML = ''; cur = null; $('bar').hidden = true;
     if (!game) initGame();
@@ -4522,10 +4727,10 @@
     box.appendChild(html('div', 'roomwrap', roomSVG()));
     var big = el('div', 'gbig');
     big.appendChild(el('div', 'bubble', line(m)));
-    var nm = btn('cname', game.name + ' ✎', function () { var v = prompt('なまえを つけよう', game.name); if (v && v.trim()) { game.name = v.trim().slice(0, 10); save(); renderGrow(); } });
+    var nm = btn('cname', mainName() + ' ✎', function () { var v = prompt('なまえを つけよう', mainName()); if (v && v.trim()) { if (heroOn()) hero().name = v.trim().slice(0, 10); else game.name = v.trim().slice(0, 10); save(); renderGrow(); } });
     nm.style.cssText = 'background:none;border:0;color:inherit'; big.appendChild(nm);
     var next = STAGES[st + 1];
-    big.appendChild(el('div', 'stage', 'Lv.' + lv.level + '　' + STAGES[st][0] + (next ? '　→ Lv.' + next[1] + 'で ' + next[0] + 'に' : '　（さいこう）')));
+    big.appendChild(el('div', 'stage', 'Lv.' + lv.level + '　' + stageLabel(st) + (next ? '　→ Lv.' + next[1] + 'で ' + stageLabel(st + 1) + 'に' : '　（さいこう）')));
     var bar = el('div', 'xpbar'); bar.style.cssText = 'width:min(320px,90%);margin-top:8px'; var fill = el('i'); fill.style.width = Math.round(lv.into / lv.need * 100) + '%'; bar.appendChild(fill); big.appendChild(bar);
     big.appendChild(el('div', 'xptxt', 'あと ' + (lv.need - lv.into) + ' ポイントで Lv.' + (lv.level + 1) + '（ぜんぶで ' + game.xp + '）'));
     box.appendChild(big);
@@ -4533,6 +4738,7 @@
     var stn = starsOf(lv.level);
     box.appendChild(html('div', 'stars', (stn ? new Array(stn + 1).join('★') : '☆') + '<small>' + (stn ? '★ ' + stn + 'こ' : 'Lv.10で ★が 1つ もらえる') + '　（10レベルごとに 1つ ふえる）</small>'));
     var nrl2 = nextRewardLine(); if (nrl2) box.appendChild(html('p', 'nextrw', nrl2));
+    if (heroOn()) renderDressup(box);
     box.appendChild(html('h2', 'sec', 'レベルの スピード <small>ポイントの たまり方</small>'));
     var lp2 = el('div', 'panel');
     lp2.appendChild(stepper('スピード', lvSpeedIdx, function (v) { setLvSpeed(LV_SPEEDS[v][1]); }, 0, LV_SPEEDS.length - 1, '', function (v) { return LV_SPEEDS[v][0] + '（1レベル ' + LV_SPEEDS[v][1] + 'ポイント）'; }));
@@ -4549,30 +4755,38 @@
     renderQuestSettings(box);
     renderSchoolPanel(box);
 
-    box.appendChild(html('h2', 'sec', 'なかま <small>' + Object.keys(game.mates).length + ' / ' + MATES.length + '</small>'));
+    box.appendChild(html('h2', 'sec', 'なかま <small>' + mateCount() + ' / ' + (MATES.length + (heroOn() ? 1 : 0)) + '　べんきょうすると あつまって くる</small>'));
     var mg = el('div', 'medals');
+    if (heroOn()) {
+      var dm = el('div', 'medal');
+      dm.appendChild(html('div', 'mate', charSVG({ stage: st, color: game.color, mood: 'happy', wear: {} })));
+      dm.appendChild(btn('linkbtn', game.name + ' ✎', function () { var v = prompt('ドリまるの なまえ', game.name); if (v && v.trim()) { game.name = v.trim().slice(0, 10); save(); renderGrow(); } }));
+      dm.appendChild(el('small', null, 'さいしょの なかま'));
+      mg.appendChild(dm);
+    }
     MATES.forEach(function (mt) {
       var got = game.mates[mt.id], d = el('div', 'medal' + (got ? '' : ' lock'));
-      d.appendChild(html('div', 'mate', charSVG({ stage: 2, color: got ? mt.color : '#cfc8b8', sp: mt.sp, mood: got ? 'happy' : 'normal', wear: {} })));
+      d.appendChild(html('div', 'mate', '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + mateInner(mt, !got) + '</svg>'));
       d.appendChild(el('b', null, got ? mt.name : '？？？')); d.appendChild(el('small', null, got ? fmtDay(dayKey(got)) + 'に なかまに' : mt.need + ' で なかまに'));
       mg.appendChild(d);
     });
     box.appendChild(mg);
 
-    box.appendChild(html('h2', 'sec', 'ドリまるの いろ'));
+    box.appendChild(html('h2', 'sec', heroOn() ? game.name + '（なかま）の いろ' : 'ドリまるの いろ'));
     var sws = el('div', 'swatches');
     COLORS.forEach(function (c) { var b = btn('sw', null, function () { game.color = c; save(); renderGrow(); }); b.style.background = c; b.setAttribute('aria-pressed', String(c === game.color)); b.setAttribute('aria-label', 'いろ'); sws.appendChild(b); });
     box.appendChild(sws);
 
-    box.appendChild(html('h2', 'sec', 'アクセサリー <small>メダルや レベルで ふえる</small>'));
-    var ag = el('div', 'accs');
-    ACCS.forEach(function (a) {
-      var un = a.ok(), b = btn('acc' + (un ? '' : ' lock'), null, function () { if (!un) return; game.wear[a.id] = !game.wear[a.id]; save(); renderGrow(); });
-      b.setAttribute('aria-pressed', String(!!game.wear[a.id] && un));
-      b.appendChild(el('span', null, (un ? '' : '🔒 ') + a.name)); b.appendChild(el('small', null, un ? (game.wear[a.id] ? 'つけている' : 'タップで つける') : a.need + ' で ひらく'));
-      ag.appendChild(b);
+    if (!heroOn()) { box.appendChild(html('h2', 'sec', 'アクセサリー <small>メダルや レベルで ふえる</small>')); box.appendChild(accGrid()); }
+    box.appendChild(html('h2', 'sec', 'しゅじんこう'));
+    var hp = el('div', 'panel'), ht = el('div', 'tabs inpage');
+    [[true, '👧 女の子（' + hero().name + '）'], [false, '🥚 ドリまる']].forEach(function (o) {
+      var b = btn('tab', o[1], function () { hero().on = o[0]; save(); renderGrow(); renderCharCard(); });
+      b.setAttribute('aria-pressed', String(heroOn() === o[0])); ht.appendChild(b);
     });
-    box.appendChild(ag);
+    hp.appendChild(ht);
+    hp.appendChild(el('p', 'muted', heroOn() ? '女の子が しゅじんこう。ドリまるは さいしょの なかまとして いっしょに います。きせかえは 上の「きせかえ」で。' : 'ドリまるが しゅじんこう（v31までと 同じ）。レベルも なかまも そのままです。'));
+    box.appendChild(hp);
 
     box.appendChild(html('h2', 'sec', 'へやの かざり <small>レベルで ふえる</small>'));
     var dg = el('div', 'accs');
