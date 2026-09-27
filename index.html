@@ -130,6 +130,11 @@
     font-family:var(--f-round); font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:center; line-height:1;
   }
   .q-t{font-family:var(--f-round); font-size:16.5px; line-height:1.85; line-break:strict; flex:1; margin:0}
+  .clockp{display:block; width:154px; height:154px; margin:10px 0 2px}
+  .rulerp{display:block; width:100%; max-width:420px; height:auto; margin:10px 0 2px}
+  .q-t .qq{display:block}
+  .psheet .clockp{width:30mm; height:30mm; margin:1.5mm 0}
+  .psheet .rulerp{width:78mm; margin:1.5mm 0}
   .q-type{position:absolute; top:-9px; left:14px; font-size:11px; color:var(--ink-soft); background:var(--paper); padding:0 6px; border-radius:6px}
   .row{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:13px 0 0 39px}
   .row .lbl{font-family:var(--f-round); font-size:15px; color:var(--ink-soft); flex:none}
@@ -870,6 +875,28 @@
     ['kake_gyaku', '1つ分を もとめる']
   ];
   CHOSEN_TYPES.forEach(function (c) { TYPES[c[0]] = { name: c[1], unit: 'chosen' }; TYPE_ORDER.push(c[0]); });
+  // v35: 学校の 宿題プリント（9/14・9/16・9/17・9/18）から ふやした 型
+  var ADD_TYPES = [
+    ['tokei_yomi', '時計を よむ', 'toki'],
+    ['tokei_mae', '時計を 見て ○分前', 'toki'],
+    ['tokei_ato', '時計を 見て ○時間後', 'toki'],
+    ['tokei_zure', 'おくれて いる 時計', 'toki'],
+    ['jikan_ade', 'あと なん分で ○時', 'toki'],
+    ['cm_mm', 'cmと mmの かんけい', 'nagasa'],
+    ['monosashi', 'ものさしを よむ', 'nagasa']
+  ];
+  ADD_TYPES.forEach(function (t) {
+    TYPES[t[0]] = { name: t[1], unit: t[2] };
+    TYPE_ORDER.push(t[0]);
+    for (var i = 0; i < UNITS.length; i++) if (UNITS[i].id === t[2]) UNITS[i].keys.push(t[0]);
+  });
+  LESSONS.tokei_yomi = { title: '時計を よむ', why: 'みじかい はりが「なん時」、長い はりが「なん分」。長い はりの 小さい めもりは 1分、数字の ところは 5分ずつ すすみます（1が 5分、2が 10分…）。みじかい はりは 数字と 数字の あいだに あることが 多いので、<b>すぎた ほうの 数字</b>を よみます。', ex: ['長い はりが 6 → <em>30分</em>', 'みじかい はりが 8と9の あいだ → <em>8時</em>', 'こたえ <em>8時30分</em>'], ng: 'みじかい はりが 9に 近いからと <b>9時</b>と しない。まだ 8時を すぎた ところ。', try: { gen: true } };
+  LESSONS.tokei_mae = { title: '時計を 見て「○分前」', why: 'まず 時計を よんで 時こくを 出します。それから 分を ひきます。ひけない ときは 1時間 もどして 60分 たしてから ひきます。', ex: ['時計が 10時10分、35分前', '10から 35は ひけないので <em>9時70分</em>と 考える', '<em>70-35=35</em> → こたえ <em>9時35分</em>'], ng: '時計を よみまちがえない。長い はりの 数字は ×5。', try: { gen: true } };
+  LESSONS.tokei_ato = { title: '時計を 見て「○時間はん後」', why: '「1時間はん」は <b>1時間30分</b>の こと。時間を 先に たして、そのあと 分を たします。分が 60を こえたら 1時間 くり上げます。', ex: ['時計が 10時30分、2時間はん後', '時間 → <em>10+2=12時</em>', '分 → <em>30+30=60分</em> = 1時間 くり上げ', 'こたえ <em>1時</em>'], ng: '「はん」を 50分だと しない。はんは 30分。', try: { gen: true } };
+  LESSONS.tokei_zure = { title: 'おくれて いる・すすんで いる 時計', why: '<b>おくれて いる</b> 時計は、本当の 時こくより 前を さして います。だから 正しい 時こくは <b>時計＋おくれた 分</b>。<b>すすんで いる</b> 時計は 先を さして いるので <b>時計−すすんだ 分</b>です。', ex: ['時計が 2時23分で 11分 おくれて いる', '<em>2時23分 + 11分 = 2時34分</em>', 'すすんで いる ときは <em>2時23分 − 11分 = 2時12分</em>'], ng: 'おくれて いるのに ひいて しまわない。「おくれ＝まだ 足りない → たす」と おぼえる。', try: { gen: true } };
+  LESSONS.jikan_ade = { title: '「あと なん分で ○時」', why: '1時間は 60分。いまの 分を 60から ひくと、つぎの ちょうどの 時までの 時間が 出ます。', ex: ['いま 5時10分', '<em>60-10=50</em>', 'こたえ <em>50分</em>'], ng: '「あと なん分」と きかれて 時こくを こたえない。こたえは 分の 長さ。', try: { gen: true } };
+  LESSONS.cm_mm = { title: 'cmと mmの かんけい', why: '<b>1cm = 10mm</b>。cmを mmに するときは ×10、mmを cmに するときは 10の まとまりが いくつ あるかを 見ます。2cm8mm なら 20mm と 8mm で 28mm。', ex: ['<em>5cm = 50mm</em>', '<em>29mm = 2cm9mm</em>', '<em>6cm8mm = 68mm</em>'], ng: '6cm8mm を <b>14mm</b>（6+8）と しない。cmは 10ばいして から たす。', try: { gen: true } };
+  LESSONS.monosashi = { title: 'ものさしを よむ', why: '大きい めもり（数字）が cm、その あいだの 小さい めもりが mm で、1cmの 中に 10こ あります。線の はしが どの めもりに あるかを 見て、cmを よんでから のこりの 小さい めもりを 数えます。', ex: ['数字の 7を すぎて 小さい めもり 5つめ', '→ <em>7cm5mm</em>'], ng: '0から はかりはじめて いるかを たしかめる。めもりの まん中の 長い 線（5mm）を 1cmと まちがえない。', try: { gen: true } };
   UNITS.push({ id: 'chosen', name: 'ちょうせん（はってん）', keys: CHOSEN_TYPES.map(function (c) { return c[0]; }) });
   var DEFAULT_WEAK = ['dochira', 'aida', 'sorezore'];   // the paper tests' misses, used until records exist
   var MARKS = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
@@ -914,11 +941,101 @@
   function pk(opts, pick, v, u, tail) { return { k: 'pick', opts: opts, pick: pick, v: v, u: u, tail: tail || '多い' }; }
   function P(t, s, ans) { return { t: t, s: s, ans: ans }; }
   function tm(h, m) { return h + '時' + (m ? m + '分' : ''); }
+  var TMIN5 = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+  function tmod(h, m) { var t = ((h * 60 + m) % 720 + 720) % 720, hh = Math.floor(t / 60); return { h: hh === 0 ? 12 : hh, m: t % 60 }; }
+  function tmt(t) { return tm(t.h, t.m); }
+  function clockSVG(h, m) {   // アナログ時計の え（h 1〜12, m 0〜59）
+    var cx = 65, cy = 65, s = '<svg class="clockp" viewBox="0 0 130 130" role="img" aria-label="時計の え">';
+    s += '<circle cx="65" cy="65" r="60" fill="#fffdf7" stroke="#2b2620" stroke-width="3"/>';
+    for (var i = 0; i < 60; i++) {
+      var a = i * 6 * Math.PI / 180, big = i % 5 === 0, r1 = big ? 47 : 51;
+      s += '<path d="M' + (cx + r1 * Math.sin(a)).toFixed(1) + ' ' + (cy - r1 * Math.cos(a)).toFixed(1) + ' L' + (cx + 56 * Math.sin(a)).toFixed(1) + ' ' + (cy - 56 * Math.cos(a)).toFixed(1) + '" stroke="#2b2620" stroke-width="' + (big ? 2.4 : 1) + '"/>';
+    }
+    for (var n = 1; n <= 12; n++) {
+      var an = n * 30 * Math.PI / 180;
+      s += '<text x="' + (cx + 39 * Math.sin(an)).toFixed(1) + '" y="' + (cy - 39 * Math.cos(an) + 4.6).toFixed(1) + '" font-size="13" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + n + '</text>';
+    }
+    var ha = ((h % 12) + m / 60) * 30 * Math.PI / 180, ma = m * 6 * Math.PI / 180;
+    s += '<path d="M65 65 L' + (cx + 30 * Math.sin(ha)).toFixed(1) + ' ' + (cy - 30 * Math.cos(ha)).toFixed(1) + '" stroke="#2b2620" stroke-width="5" stroke-linecap="round"/>';
+    s += '<path d="M65 65 L' + (cx + 45 * Math.sin(ma)).toFixed(1) + ' ' + (cy - 45 * Math.cos(ma)).toFixed(1) + '" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/>';
+    return s + '<circle cx="65" cy="65" r="3.5" fill="#2b2620"/></svg>';
+  }
+  function rulerSVG(mm) {   // ものさし（線の 長さに あわせて めもりを 大きく する）
+    var cmMax = Math.min(13, Math.max(4, Math.ceil(mm / 10) + 2)), x0 = 14, px = 268 / (cmMax * 10), W = 292;
+    var s = '<svg class="rulerp" viewBox="0 0 ' + W + ' 92" role="img" aria-label="ものさしと 線">';
+    s += '<path d="M' + x0 + ' 28 H' + (x0 + mm * px).toFixed(1) + '" stroke="#c0392f" stroke-width="5"/>';
+    s += '<path d="M' + x0 + ' 19 v18 M' + (x0 + mm * px).toFixed(1) + ' 19 v18" stroke="#c0392f" stroke-width="2"/>';
+    s += '<rect x="10" y="46" width="276" height="36" rx="2" fill="#fffdf7" stroke="#2b2620" stroke-width="2"/>';
+    for (var i = 0; i <= cmMax * 10; i++) {
+      var x = (x0 + i * px).toFixed(1), big = i % 10 === 0, mid = i % 5 === 0;
+      s += '<path d="M' + x + ' 46 v' + (big ? 16 : mid ? 11 : 7) + '" stroke="#2b2620" stroke-width="' + (big ? 1.8 : 1) + '"/>';
+      if (big) s += '<text x="' + x + '" y="78" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + (i / 10) + '</text>';
+    }
+    return s + '</svg>';
+  }
+  function qpic(txt, pic) { var q = { t: txt }; q.html = '<span class="qq">' + txt + '</span>' + pic; return q; }
   // ---------- もんだいの むずかしさ（型ごとに 自動で 上がる） ----------
   // GD 0=きほん / 1=すこし むずかしい / 2=もっと むずかしい。makeProblem が その型の 記録から きめる
   var GD = 0;
   function gd(a, b, c) { return GD >= 2 && c !== undefined ? c : GD >= 1 && b !== undefined ? b : a; }
   var GEN = {};
+
+  // --- 時計（学校の 宿題プリント 9/14・時計プリント より） ---
+  GEN.tokei_yomi = function (r) {
+    var h = ri(r, 1, 12), m = gd(ch(r, TMIN5), ri(r, 0, 59), ri(r, 0, 59));
+    var q = qpic('この 時計の 時こくは なん時なん分ですか。', clockSVG(h, m));
+    q.s = ['みじかい はり → ' + h + '時　長い はり → ' + m + '分']; q.ans = pair(h, m, '時', '分');
+    return q;
+  };
+  GEN.tokei_mae = function (r) {
+    var back = ch(r, gd([10, 15, 20, 30], [25, 30, 40, 45], [35, 40, 50, 55]));
+    var h = ri(r, 1, 12), m = gd(ch(r, TMIN5), ch(r, TMIN5), ri(r, 0, 59)), t = tmod(h, -back + m);
+    var txt = 'この 時計の 時こくを よんで、その ' + back + '分前の 時こくを こたえましょう。';
+    var q = qpic(txt, clockSVG(h, m));
+    q.s = ['いまは ' + tm(h, m), tm(h, m) + ' の ' + back + '分前 = ' + tmt(t)]; q.ans = pair(t.h, t.m, '時', '分');
+    return q;
+  };
+  GEN.tokei_ato = function (r) {
+    var add = ch(r, gd([60, 90, 120], [90, 120, 150], [105, 135, 165]));
+    var lab = add % 60 === 0 ? (add / 60) + '時間' : add % 60 === 30 ? Math.floor(add / 60) + '時間はん' : Math.floor(add / 60) + '時間' + (add % 60) + '分';
+    var h = ri(r, 1, 12), m = gd(ch(r, TMIN5), ch(r, TMIN5), ri(r, 0, 59)), t = tmod(h, m + add);
+    var txt = 'この 時計の 時こくを よんで、その ' + lab + '後の 時こくを こたえましょう。';
+    var q = qpic(txt, clockSVG(h, m));
+    q.s = ['いまは ' + tm(h, m), tm(h, m) + ' の ' + lab + '後 = ' + tmt(t)]; q.ans = pair(t.h, t.m, '時', '分');
+    return q;
+  };
+  GEN.tokei_zure = function (r) {
+    var d = ch(r, gd([5, 10, 11, 15], [7, 12, 13, 18], [14, 17, 23, 26])), slow = r() < 0.5;
+    var h = ri(r, 1, 12), m = gd(ch(r, TMIN5), ri(r, 0, 59), ri(r, 0, 59)), t = tmod(h, slow ? m + d : m - d);
+    var txt = 'この 時計は ' + d + '分 ' + (slow ? 'おくれて' : 'すすんで') + ' います。正しい 時こくは なん時なん分ですか。';
+    var q = qpic(txt, clockSVG(h, m));
+    q.s = ['時計は ' + tm(h, m), (slow ? 'おくれて いるので ' + d + '分 たす' : 'すすんで いるので ' + d + '分 ひく') + ' → ' + tmt(t)];
+    q.ans = pair(t.h, t.m, '時', '分');
+    return q;
+  };
+  GEN.jikan_ade = function (r) {
+    var h = ri(r, 1, 11), m = ch(r, gd(TMIN5.slice(1), TMIN5.slice(1), [7, 13, 22, 38, 47, 53])), mins = 60 - m;
+    var txt = 'いま ' + tm(h, m) + 'です。あと なん分で ' + tm(h + 1 > 12 ? 1 : h + 1, 0) + 'に なりますか。';
+    var q = qpic(txt, clockSVG(h, m));
+    q.s = ['1時間は 60分', '60 - ' + m + ' = ' + mins]; q.ans = num(mins, '分');
+    return q;
+  };
+
+  // --- 長さ（学校の 宿題プリント 9/16・9/17・作図プリント より） ---
+  GEN.cm_mm = function (r) {
+    var kind = ri(r, 0, 2), cm = ri(r, 1, gd(9, 15, 19)), mm = ri(r, 1, 9);
+    if (kind === 0) return P(cm + 'cm は なんmm ですか。', ['1cm = 10mm', cm + 'cm = ' + (cm * 10) + 'mm'], num(cm * 10, 'mm'));
+    if (kind === 1) return P((cm * 10 + mm) + 'mm は なんcmなんmm ですか。', ['10mmで 1cm', (cm * 10 + mm) + 'mm = ' + cm + 'cm' + mm + 'mm'], pair(cm, mm, 'cm', 'mm'));
+    return P(cm + 'cm' + mm + 'mm は なんmm ですか。', [cm + 'cm = ' + (cm * 10) + 'mm', (cm * 10) + '+' + mm + '=' + (cm * 10 + mm)], num(cm * 10 + mm, 'mm'));
+  };
+  GEN.monosashi = function (r) {
+    var cm = ri(r, 1, gd(9, 12, 12)), mm = gd(ch(r, [0, 5]), ri(r, 0, 9), ri(r, 0, 9)), L = cm * 10 + mm;
+    var txt = 'ものさしで はかりました。この 線の 長さは なんcmなんmm ですか。';
+    var q = qpic(txt, rulerSVG(L));
+    q.s = ['大きい めもり ' + cm + 'つで ' + cm + 'cm' + (mm ? '、小さい めもり ' + mm + 'つで ' + mm + 'mm' : ''), 'こたえ ' + cm + 'cm' + (mm ? mm + 'mm' : '')];
+    q.ans = pair(cm, mm, 'cm', 'mm');
+    return q;
+  };
 
   // --- たし算と ひき算 ---
   GEN.awasete = function (r) {
@@ -1761,6 +1878,7 @@
     c_box_hiki: ['へった 分を もどす', '□−6＝14 なら、14に 6を もどして 20。ひき算の □は たし算で 出ます。'],
     c_box_kake: ['九九の 段を さがす', '□×4＝28 なら、4の だんで 28に なる ところを さがす。7×4＝28 だから 7。'],
     c_len: ['cm は cm、mm は mm', '10mm で 1cm。たてに たんいを そろえて 書くと まざりません。'],
+    c_cmmm: ['1cm＝10mm', 'cm→mm は ×10、mm→cm は 10の かたまりが いくつ。6cm8mm は 60＋8 で 68mm。'],
     c_kasa: ['L は L、dL は dL', '10dL で 1L。dLが 10に なったら くり上げ、ひけない ときは 1L を くずします。']
   };
   var KOTSU_K = {
@@ -1819,6 +1937,14 @@
     '線': 'いとへん＋「泉」。糸のように 細く まっすぐ。',
     '紙': 'いとへん＋「氏」。むかしの 紙は 糸から 作りました。'
   };
+  // v35: あたらしい 型の おぼえかたカード
+  KOTSU_T.tokei_yomi = ['はりは みじかい→時、長い→分', '長い はりの 数字は ×5（1が5分、2が10分…）。みじかい はりは あいだに あったら <b>すぎた ほう</b>の 数字を よむ。'];
+  KOTSU_T.tokei_mae = ['ひけない ときは 1時間 くずす', '分が ひけない ときは、1時間 もどして 60分 たしてから ひく。9時70分 と 考えると らく。'];
+  KOTSU_T.tokei_ato = ['「はん」は 30分', '1時間はん＝1時間30分。時間どうし・分どうしを たして、分が 60に なったら 1時間 くり上げる。'];
+  KOTSU_T.tokei_zure = ['おくれ＝たす、すすみ＝ひく', 'おくれて いる 時計は まだ 足りないから <b>たす</b>。すすんで いる 時計は 行きすぎだから <b>ひく</b>。合言葉「おくれは たす」。'];
+  KOTSU_T.jikan_ade = ['60から いまの 分を ひく', '「あと なん分で つぎの 時か」は 60−（いまの 分）。こたえは 時こくでは なく 分の 長さ。'];
+  KOTSU_T.cm_mm = ['1cm＝10mm', 'cm→mm は ×10。mm→cm は 10の かたまりが いくつ。6cm8mm＝60mm＋8mm＝68mm。'];
+  KOTSU_T.monosashi = ['小さい めもりは 1mm', '1cmの 中に 小さい めもりが 10こ。5つめの 少し 長い 線が 5mm。0から はかれて いるかも かくにん。'];
   var KZ_CAT = [['kk', '九九'], ['ty', '文しょうだい'], ['ke', 'けいさん'], ['kj', 'かんじ']];
   var kotsuNew = [], kotsuHit = 0;
   function kanjiRow(ch) { for (var i = 0; i < KANJI.length; i++) { var rs = KANJI[i].rows; for (var j = 0; j < rs.length; j++) if (rs[j][0] === ch) return rs[j]; } return null; }
@@ -2420,7 +2546,7 @@
     var probs = el('div', 'probs');
     items.forEach(function (it, i) {
       var p = el('div', 'p'), pt = el('div', 'pt');
-      pt.appendChild(el('span', 'pn', MARKS[i] || String(i + 1))); pt.appendChild(el('span', null, it.q.t)); p.appendChild(pt);
+      pt.appendChild(el('span', 'pn', MARKS[i] || String(i + 1))); pt.appendChild(it.q.html ? html('span', null, it.q.html) : el('span', null, it.q.t)); p.appendChild(pt);
       var lines = el('div', 'lines');
       lines.appendChild(html('div', 'ln', '<span class="lbl">（しき）</span><span class="rule"></span>'));
       lines.appendChild(html('div', 'ln ans', '<span class="lbl">こたえ</span><span class="rule"></span>'));
@@ -2917,6 +3043,12 @@
       C2 -= sm;
       return CP(big + 'cm' + bm + 'mm − ' + sm + 'cm' + smm + 'mm ＝', ['mm ' + bm + '-' + smm, 'cm ' + big + '-' + sm], pair(C2, M2, 'cm', 'mm'));
     },
+    c_cmmm: function (r) {
+      var k = ri(r, 0, 2), cm = ri(r, 1, 15), mm = ri(r, 1, 9);
+      if (k === 0) return CP(cm + 'cm ＝', ['1cm=10mm', cm + 'cm=' + (cm * 10) + 'mm'], num(cm * 10, 'mm'));
+      if (k === 1) return CP((cm * 10 + mm) + 'mm ＝', [(cm * 10 + mm) + 'mm=' + cm + 'cm' + mm + 'mm'], pair(cm, mm, 'cm', 'mm'));
+      return CP(cm + 'cm' + mm + 'mm ＝', [cm + 'cm=' + (cm * 10) + 'mm', (cm * 10) + '+' + mm + '=' + (cm * 10 + mm)], num(cm * 10 + mm, 'mm'));
+    },
     c_kasa: function (r) {
       var l1 = ri(r, 1, 6), d1 = ri(r, 1, 9), l2 = ri(r, 1, 4), d2 = ri(r, 1, 9);
       if (r() < 0.5) { var dd = d1 + d2, L = l1 + l2 + (dd >= 10 ? 1 : 0), D = dd % 10; return CP(l1 + 'L' + d1 + 'dL ＋ ' + l2 + 'L' + d2 + 'dL ＝', ['dL ' + d1 + '+' + d2 + '=' + dd, 'L ' + l1 + '+' + l2 + '=' + (l1 + l2)], pair(L, D, 'L', 'dL')); }
@@ -2934,7 +3066,7 @@
     [38, ['c_kuku_mix', 'c_bai'], '九九 ぜんぶ・○ばい'],
     [44, ['c_hissan3'], '3けたの ひっさん'],
     [50, ['c_box_tashi', 'c_box_hiki', 'c_box_kake'], '□を もとめる（先どり）'],
-    [56, ['c_len', 'c_kasa'], '長さ・かさの 計算'],
+    [56, ['c_len', 'c_cmmm', 'c_kasa'], '長さ・かさの 計算・たんい'],
     [60, ['c_tashi2', 'c_hiki2', 'c_kuku_mix', 'c_box_kake', 'c_tashi3'], 'まとめ']
   ];
   var KAI_MAX = 60;
@@ -4479,6 +4611,7 @@
         + '<li><b>ペンで 書きます</b>。指は 画面を うごかす ため。指で 書きたい ときは、わくの 上の <span class="k">指で かく</span> を おします。</li>'
         + '<li>（しき）（こたえ）（ひっさん）の ところに 書きます。ここは まるつけには つかいません。じゆうに つかって いいです。</li>'
         + '<li>下の 白い ますに <b>数字で こたえを 入れます</b>。ここを 見て まるつけを します。</li>'
+        + '<li><b>時計や ものさしの 絵</b>が 出る もんだいも あります。時計は「なん時」「なん分」の 2つの ますに、ものさしは「なんcm」「なんmm」の 2つの ますに 入れます。0の ときは からっぽの ままで OK。</li>'
         + '<li>ぜんぶ 書けたら、いちばん下の <span class="k">まるつけ</span> を おします。</li>'
         + '<li>まちがえた ときは、その もんだいの 下に <b>こたえと しき</b>が 出ます。「せんせいの ワンポイント」も よめます。</li></ul>'],
       ['✖️', 'くく（九九）', '<ul>'
@@ -4530,6 +4663,11 @@
         + '<li>日を タップすると、その日 やった ことが 見られます。</li></ul>']
     ],
     oya: [
+      ['🏫', '学校の 宿題プリントから ふやした もんだい（v35）', '<p>いただいた 宿題プリント（9/14 時計・9/16・9/17 長さ・9/18 九九と ひっさん・作図）を 見て、アプリに なかった 7つの 型を 足しました。</p><ul>'
+        + '<li><b>時こくと 時間</b>：時計の 絵を よむ／時計を 見て ○分前／○時間はん後／おくれて いる・すすんで いる 時計／あと なん分で ○時。時計は アプリの 中で えがくので、まいかい ちがう 時こくが 出ます。</li>'
+        + '<li><b>長さ</b>：cmと mmの かんけい（2cm＝20mm、29mm＝2cm9mm、6cm8mm＝68mm）／ものさしの 絵を よむ。</li>'
+        + '<li>「けいさん 1まい」の 56回目あたりにも cm・mm の たんいを 足しました。九九と 2けたの ひっさん（9/18のプリント）は、これまでの「くく」「けいさん 1まい」で できます。</li>'
+        + '<li>いんさつ →「型から 作る」→ 時こくと 時間／長さ で、<b>時計や ものさしの 絵が 入った 紙の プリント</b>も 作れます。</li></ul>'],
       ['👧', 'しゅじんこうの きりかえ', '<p>v32 から、しゅじんこうが オリジナルの 女の子に なりました（ドリまるは さいしょの なかま）。</p><ul>'
         + '<li>もとの ドリまるに もどしたい ときは、マイルーム →「しゅじんこう」で <span class="k">🥚 ドリまる</span> を えらびます。レベル・ポイント・なかま・メダルは どちらでも 同じで、きえません。</li>'
         + '<li>女の子の キャラクターは この アプリの オリジナルです（市販の 人形や キャラクターの 名前・見た目は つかっていません）。</li></ul>'],
