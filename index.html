@@ -88,6 +88,15 @@
   .tabs.inpage .tab[aria-pressed="true"]{color:#fff; opacity:1}
 
   /* ---------- home ---------- */
+  .gres .buddy{display:flex; align-items:center; gap:10px; width:100%; background:var(--ground); border-radius:12px; padding:8px 12px; margin-top:4px}
+  .gres .buddy .bface .char{width:46px; height:46px; display:block}
+  .gres .buddy .btxt b{font-family:var(--f-round); font-size:15px; display:block}
+  .gres .buddy .btxt small{font-size:12px; color:var(--ink-soft)}
+  .cday .cstar{position:absolute; top:2px; right:4px; font-size:11px; color:#c9a227}
+  .nowcard{background:var(--paper); border:2px solid var(--shu); border-radius:16px; padding:14px 16px 16px; margin:16px 0 0; text-align:center}
+  .nowcard .nowlead{font-family:var(--f-round); font-size:14px; color:var(--ink-soft); margin-bottom:10px}
+  .nowcard .nowgo{width:100%; font-size:19px; padding:16px 12px; margin:0}
+  .nowcard .nowsub{display:inline-block; margin-top:10px; font-size:14.5px}
   .hello{font-family:var(--f-round); font-size:15px; color:var(--ink-soft); margin:18px 0 12px}
   .hello b{color:var(--ink); font-size:17px}
   .tiles{display:grid; grid-template-columns:repeat(auto-fit, minmax(215px, 1fr)); gap:12px}
@@ -135,6 +144,8 @@
   .q-t .qq{display:block}
   .psheet .clockp{width:30mm; height:30mm; margin:1.5mm 0}
   .psheet .rulerp{width:78mm; margin:1.5mm 0}
+  .q.star{border-color:#c9a227; border-width:2px}
+  .startag{position:absolute; top:-10px; right:58px; font-family:var(--f-round); font-size:11.5px; font-weight:700; color:#a8851f; background:var(--paper); border-radius:6px; padding:0 7px}
   .q-type{position:absolute; top:-9px; left:14px; font-size:11px; color:var(--ink-soft); background:var(--paper); padding:0 6px; border-radius:6px}
   .row{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:13px 0 0 39px}
   .row .lbl{font-family:var(--f-round); font-size:15px; color:var(--ink-soft); flex:none}
@@ -181,9 +192,22 @@
   /* ---------- marking ---------- */
   .q.ok{border-color:var(--ok-ink)}
   .q.ng{border-color:var(--shu); background:var(--shu-wash)}
-  .mark{position:absolute; top:10px; right:12px; font-size:34px; line-height:1; font-weight:700}
-  .mark.o{width:32px; height:32px; border:4px solid var(--ok-ink); border-radius:50%; top:12px}
-  .mark.x{color:var(--shu-ink)}
+  .mark{position:absolute; top:8px; right:10px; width:42px; height:42px}
+  .mark svg{display:block; width:100%; height:100%}
+  .mark.o circle{animation:drawO .38s ease-out}
+  @keyframes drawO{from{stroke-dashoffset:104} to{stroke-dashoffset:0}}
+  .mark.x path{animation:drawX .3s ease-out}
+  @keyframes drawX{from{opacity:0; transform:scale(.6); transform-origin:center} to{opacity:1; transform:scale(1)}}
+  .combo{margin:10px 0 0 39px; font-family:var(--f-round); font-size:13.5px; color:var(--shu-ink); font-weight:700}
+  .cheer{position:fixed; inset:0; z-index:60; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; overflow:hidden; transition:opacity .4s}
+  .cheer.out{opacity:0}
+  .cheer b{font-family:var(--f-round); font-size:44px; color:var(--shu); background:var(--paper); border:4px solid var(--shu); border-radius:22px; padding:14px 30px; box-shadow:0 10px 34px rgba(0,0,0,.22); animation:cheerPop .5s cubic-bezier(.2,1.4,.5,1)}
+  .cheer span{margin-top:12px; font-family:var(--f-round); font-size:17px; color:var(--ink); background:var(--paper); border-radius:999px; padding:6px 16px; box-shadow:0 4px 14px rgba(0,0,0,.14)}
+  @keyframes cheerPop{from{transform:scale(.5) rotate(-6deg); opacity:0} to{transform:scale(1) rotate(0); opacity:1}}
+  @media (max-width:560px){ .cheer b{font-size:34px; padding:12px 22px} }
+  .kktime.flash b{animation:goldFlash .7s ease-out 2}
+  @keyframes goldFlash{0%,100%{color:inherit} 40%{color:#e6a100; text-shadow:0 0 12px rgba(230,161,0,.6)}}
+  .bar button:disabled{opacity:.5}
   .q.graded .num, .q.graded .opt{pointer-events:none}
   .q.ng .num, .q.ng .opt{border-color:var(--shu); opacity:.75}
   .fix{margin:12px 0 0 39px; padding:11px 13px; border-radius:9px; background:var(--paper); border:1px dashed var(--shu); font-family:var(--f-round); font-size:15px; line-height:1.8}
@@ -582,7 +606,7 @@
   .calgrid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
   .cwd{text-align:center; font-family:var(--f-round); font-size:11.5px; color:var(--ink-soft); padding:2px 0}
   .cwd.sat{color:#4d8fd6} .cwd.sun{color:var(--shu-ink)}
-  .cday{min-height:58px; padding:3px 2px; border:1.5px solid var(--rule); border-radius:10px; background:var(--paper); color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:2px}
+  .cday{position:relative; min-height:58px; padding:3px 2px; border:1.5px solid var(--rule); border-radius:10px; background:var(--paper); color:var(--ink); display:flex; flex-direction:column; align-items:center; gap:2px}
   .cday b{font-family:var(--f-round); font-size:13px; font-weight:700; line-height:1.1}
   .cday.out{opacity:.3}
   .cday.today{border-color:var(--shu); border-width:2.5px}
@@ -1289,6 +1313,9 @@
     var pool = POOL[key] || []; var it = pool[Math.floor(r() * pool.length)];
     return { q: it.q, key: key, ref: it.ref };
   }
+  function fullSet(keys, n, r) {   // 型が 少ない 単元（かさ＝2型）でも n問 そろえる
+    return makeSet(keys, n, r, Math.max(2, Math.ceil(n / Math.max(1, (keys || []).length))));
+  }
   function makeSet(keys, n, r, maxPer) {
     r = r || R; maxPer = maxPer || 2;
     var pick = [], counts = {}, ks = shuffle(keys.slice()), guard = 0;
@@ -1651,7 +1678,8 @@
 
   // ---------- problem cards ----------
   function makeCard(item, idx, padKey, showType) {
-    var card = el('div', 'q' + (item.q.pad === 'calc' || item.q.big ? ' calc' : '')), q = item.q;
+    var card = el('div', 'q' + (item.q.pad === 'calc' || item.q.big ? ' calc' : '') + (item.star ? ' star' : '')), q = item.q;
+    if (item.star) card.appendChild(el('span', 'startag', '☆ きょうだけ'));
     var hd = el('div', 'q-hd');
     hd.appendChild(el('span', 'q-n', MARKS[idx] || String(idx + 1)));
     hd.appendChild(q.html ? html('p', 'q-t', q.html) : el('p', 'q-t', q.t));
@@ -1661,12 +1689,24 @@
     item.card = card; item.pick = null; item.graded = false;
     return card;
   }
-  function decorate(item, ok) {
+  var MARK_O = '<svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="16.5" fill="none" stroke="var(--shu)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="104" stroke-dashoffset="0" transform="rotate(-24 22 22)"/></svg>';
+  var MARK_X = '<svg viewBox="0 0 44 44" aria-hidden="true"><path d="M12 12 L32 32 M32 12 L12 32" fill="none" stroke="var(--shu-ink)" stroke-width="3.2" stroke-linecap="round"/></svg>';
+  function decorateState(item, ok) {   // 記録に かかわる ぶん。まるつけと 同時に 同期で 走らせる（save より 前）
+    if (ok) { item.kstar = !!(game && kotsuStar(item.key)); if (item.kstar) kotsuHit++; return; }
+    item.kz = game ? kotsuWrong(item.key) : null;   // まちがえた ところの「おぼえかた」
+    if (item.kz && item.kz.isNew) kotsuNew.push(item.kz);
+  }
+  function decorate(item, ok) { decorateState(item, ok); decoratePaint(item, ok, 0); }   // ワンポイントの「ためして みよう」用（すぐ 出す）
+  function decoratePaint(item, ok, combo) {
     var card = item.card, q = item.q;
     card.classList.add('graded', ok ? 'ok' : 'ng');
     if (TYPES[item.key]) card.appendChild(el('span', 'q-type', TYPES[item.key].name + (item.gd ? '　むずかしさ Lv.' + (item.gd + 1) : '')));   // 型の名前は まるつけの後にだけ 見せる
-    card.appendChild(el('span', 'mark ' + (ok ? 'o' : 'x'), ok ? '' : '✗'));
-    if (ok) { if (game && kotsuStar(item.key)) { kotsuHit++; card.appendChild(el('div', 'kstar', '⭐ おぼえかたカードの コツ、きいたね！')); } return; }
+    card.appendChild(html('span', 'mark ' + (ok ? 'o' : 'x'), ok ? MARK_O : MARK_X));
+    if (ok) {
+      if (item.kstar) card.appendChild(el('div', 'kstar', '⭐ おぼえかたカードの コツ、きいたね！'));
+      if (combo >= 2) card.appendChild(el('div', 'combo', combo + 'もん つづけて ○'));
+      return;
+    }
     var fix = el('div', 'fix');
     fix.appendChild(el('span', 'k', 'こたえ'));
     fix.appendChild(el('span', 'a', answerText(q.ans)));
@@ -1676,12 +1716,54 @@
     fix.appendChild(st2);
     if (TYPES[item.key]) fix.appendChild(btn('linkbtn shu go', '→ せんせいの ワンポイント「' + TYPES[item.key].name + '」', function () { openLesson(item.key); }));
     card.appendChild(fix);
-    var kz = game ? kotsuWrong(item.key) : null;   // まちがえた ところの「おぼえかた」を その場で 見せる
-    if (kz) { card.appendChild(kotsuCardEl(kz)); if (kz.isNew) kotsuNew.push(kz); }
+    if (item.kz) card.appendChild(kotsuCardEl(item.kz));
+  }
+
+  // ---------- まるつけの 演出（朱ペンで 1問ずつ ○を 描く） ----------
+  var markT = [], markSkip = null;
+  function clearMarks() { markT.forEach(clearTimeout); markT = []; if (markSkip) { document.removeEventListener('pointerdown', markSkip, true); markSkip = null; } }
+  function animateMarks(o, seq, onEnd) {
+    clearMarks();
+    var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    var n = o.items.length, step = reduce ? 0 : Math.min(220, Math.round(1300 / Math.max(1, n)));
+    var paint = function (k, silent) {
+      var it = o.items[k]; if (!it || it.painted) return;
+      it.painted = true; decoratePaint(it, it.ok, seq[k]);
+      if (it.ok && !silent) chime('o' + Math.min(seq[k], 5));
+    };
+    var finish = function () {
+      clearMarks();
+      for (var k = 0; k < n; k++) paint(k, true);
+      $('btnMain').disabled = false; o.animating = false;
+      onEnd();
+    };
+    if (!step) { finish(); return; }
+    o.animating = true; $('btnMain').disabled = true;
+    if (o.items[0] && o.items[0].card) { try { o.items[0].card.scrollIntoView({ block: 'start' }); } catch (e) {} }
+    markSkip = function () { finish(); };   // まちがって 待たされないように、画面を タップしたら ぜんぶ 出す
+    document.addEventListener('pointerdown', markSkip, true);
+    for (var i = 0; i < n; i++) (function (k) { markT.push(setTimeout(function () { paint(k); }, k * step)); })(i);
+    markT.push(setTimeout(finish, n * step + 80));
+  }
+  function cheerOverlay(main, sub) {   // ぜんぶ○・ぜんぶ なおせた の お祝い
+    var w = el('div', 'cheer');
+    w.appendChild(el('b', null, main));
+    if (sub) w.appendChild(el('span', null, sub));
+    for (var i = 0; i < 20; i++) {
+      var c = el('i', 'confetti');
+      c.style.left = (3 + Math.random() * 94) + '%'; c.style.background = COLORS[i % COLORS.length];
+      c.style.animationDelay = (Math.random() * .5) + 's'; c.style.animationDuration = (1.3 + Math.random() * .8) + 's';
+      w.appendChild(c);
+    }
+    document.body.appendChild(w);
+    setTimeout(function () { w.classList.add('out'); }, 1050);
+    setTimeout(function () { if (w.parentNode) w.remove(); }, 1600);
   }
 
   // ---------- set runner (sheet mode / weak mode) ----------
   var cur = null;
+  function leftCount(o) { var n = 0; o.items.forEach(function (it) { if (judgeItem(it) === null) n++; }); return n; }   // 空いている 数だけ（あって いるかは 見ない）
+  function markLabel(o) { var n = leftCount(o); return n ? 'まるつけ（あと ' + n + 'もん）' : 'まるつけ'; }
   function setBar(mainText, again, againText) {
     $('btnMain').textContent = mainText;
     $('btnAgain').hidden = !again;
@@ -1699,7 +1781,13 @@
     }
     o.items.forEach(function (it, i) { o.box.appendChild(makeCard(it, i, o.mode + '/' + o.tag + '/' + i, o.mode !== 'sheet')); });
     cur = o;
-    setBar('まるつけ', false);
+    if (!o.box.__barBound) {   // 1つの はこに 1回だけ（セットを 作りなおしても ふえない）
+      o.box.__barBound = 1;
+      var upd = function () { if (cur && !cur.graded && cur.box === o.box) setBar(markLabel(cur), false); };
+      o.box.addEventListener('input', upd);
+      o.box.addEventListener('click', upd);
+    }
+    setBar(markLabel(o), false);
     $('bar').hidden = false;
   }
   // まちがえた もんだいだけを もう一度（記録には ひびかせない。ぜんぶ なおせたら つぎへ）
@@ -1707,7 +1795,7 @@
     var wrongItems = o.items.filter(function (it) { return !it.ok; });
     if (!wrongItems.length) { o.next(); return; }
     var round = (o.fixRound || 0) + 1;
-    var items = wrongItems.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; });
+    var items = wrongItems.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref, star: it.star }; });
     startSet({
       view: o.view, mode: o.mode, unit: o.unit, keys: o.keys, kai: o.kai, test: o.test, sheet: o.sheet,
       items: items, box: o.box, result: o.result, tag: o.tag + '/f' + round,
@@ -1722,25 +1810,37 @@
   }
   function gradeSet() {
     if (fingerPad) fingerPad.off();
+    audioWake();   // 音は タップの 中で 目ざめさせる（あとの setTimeout では 目ざめない）
     var o = cur, score = 0, blank = 0, wrong = [];
     kotsuNew = []; kotsuHit = 0;
+    var seq = [], combo = 0;
     o.items.forEach(function (it) {
       var v = judgeItem(it), ok = v === true;
       it.graded = true; it.answered = v !== null; it.ok = ok;
       if (v === null) blank++;
       if (ok) score++; else wrong.push(it.key);
-      decorate(it, ok); if (!o.fixing) bump(it.key, ok);
+      decorateState(it, ok); if (!o.fixing) bump(it.key, ok);
+      combo = ok ? combo + 1 : 0; seq.push(combo);
     });
+    var allOk = score === o.items.length;
+    var endAnim = function (ev, cheerMain, cheerSub, sound) {
+      animateMarks(o, seq, function () {
+        if (sound) chime(sound);
+        if (cheerMain) cheerOverlay(cheerMain, cheerSub);
+        if (ev && (ev.up || (ev.badges && ev.badges.length) || (ev.mates && ev.mates.length))) setTimeout(function () { chime(ev.up ? 'up' : 'badge'); }, cheerMain ? 620 : 120);
+        window.scrollTo(0, 0);
+      });
+    };
     var now = new Date().toISOString();
     if (o.fixing) {   // なおしの ラウンド: 記録・まい数には かぞえず、なおせた ぶんだけ ポイント
-      var ev = score ? gameEvent(score * XP.fix, { lines: [['なおせた ' + score + '問', score * XP.fix]] }) : null;
+      var ev = score ? gameEvent(score * XP.fix, { quiet: true, lines: [['なおせた ' + score + '問', score * XP.fix]] }) : null;
       save();
       var fres = el('div', 'score fix' + (score === o.items.length ? ' all' : ''));
       var fbig = el('div', 'big', String(score)); fbig.appendChild(el('i', null, ' / ' + o.items.length));
       fres.appendChild(fbig);
-      fres.appendChild(el('div', 'msg', score === o.items.length ? 'ぜんぶ なおせた！ よく がんばったね。' : 'あと ' + (o.items.length - score) + '問。しきを 見て、もういちど。'));
+      fres.appendChild(el('div', 'msg', allOk ? 'ぜんぶ なおせた！ ここが いちばん すごいよ。' : 'あと ' + (o.items.length - score) + '問。しきを 見て、もういちど。'));
       o.result.appendChild(fres);
-      if (ev) o.result.appendChild(gameResultPanel(ev));
+      if (ev) o.result.appendChild(gameResultPanel(ev, { score: score, total: o.items.length }));
       o.graded = true;
       if (score === o.items.length) { o.mainAction = null; o.againAction = null; setBar(o.nextLabel(), false); }
       else {
@@ -1748,7 +1848,7 @@
         o.againAction = function () { o.next(); };
         setBar('まちがえた ' + (o.items.length - score) + '問を なおす', o.fixRound >= 2, 'つぎへ すすむ');
       }
-      window.scrollTo(0, 0);
+      endAnim(ev, allOk ? 'ぜんぶ なおせた！' : '', allOk ? 'ここが いちばん すごいよ' : '', allOk ? 'fixed' : '');
       return;
     }
     if (o.mode === 'sheet') {
@@ -1774,14 +1874,14 @@
       : '✗の しきを 見て、かんがえ方を たしかめよう。まちがえた ' + (o.items.length - score) + '問を なおそう。'));
     o.result.appendChild(res);
     if (o.afterGrade) o.afterGrade(score, o.result);
-    o.result.appendChild(gameResultPanel(gev));
+    o.result.appendChild(gameResultPanel(gev, { score: score, total: o.items.length }));
     o.graded = true;
     var miss = o.items.length - score;
     o.mainAction = null; o.againAction = null;
     if (miss) { o.mainAction = function () { startFix(o); }; setBar('まちがえた ' + miss + '問を なおす', true); }
     else setBar(o.nextLabel(), true);
     if (o.mode === 'sheet') renderChips();
-    window.scrollTo(0, 0);
+    endAnim(gev, allOk && o.items.length >= 4 ? 'ぜんぶ ○！' : '', allOk && o.items.length >= 4 ? 'よく できました' : '', allOk && o.items.length >= 4 ? 'perfect' : '');
   }
   $('btnMain').addEventListener('click', function () { if (!cur) return; if (!cur.graded) gradeSet(); else if (cur.mainAction) cur.mainAction(); else cur.next(); });
   $('btnAgain').addEventListener('click', function () { if (!cur) return; if (cur.againAction) cur.againAction(); else cur.again(); });
@@ -2058,6 +2158,10 @@
   }
   $('back').addEventListener('click', function () { renderHome(); show('home'); });
   $('helpBtn').addEventListener('click', function () { renderHelp(); show('help'); });
+  document.addEventListener('visibilitychange', function () {   // 日を またいでも クエスト・にっき・声かけが 前の日の ままに ならないように
+    if (document.hidden || !game) return;
+    if (lastRenderKey && lastRenderKey !== todayKey()) { welcomeGone = false; welEl = null; renderHome(); }
+  });
 
   // ---------- home ----------
   var ICONS = {
@@ -2197,7 +2301,7 @@
 
   // ---------- weak mode ----------
   var lastWeakItems = null;
-  function buildWeakItems(keys) { return makeSet(keys, 5); }
+  function buildWeakItems(keys) { return fullSet(keys, 5); }
   function renderWeakIntro(fixedKey) {
     var keys = fixedKey ? [fixedKey] : weakKeys(), box = $('wintro');
     box.hidden = false; $('wqs').innerHTML = ''; $('wresult').innerHTML = '';
@@ -2220,11 +2324,28 @@
       view: 'weak', mode: 'weak', items: items, keys: keys, box: $('wqs'), result: $('wresult'), tag: tag, back: function () { renderWeakIntro(); },
       nextLabel: function () { return 'べつの 5問 →'; },
       next: function () { startWeak(keys); },
-      again: function () { dropPads('weak/' + tag + '/'); startWeak(keys, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
+      again: function () { dropPads('weak/' + tag + '/'); startWeak(keys, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref, star: it.star }; })); }
     });
     show('weak');
   }
 
+  // ---------- ☆ きょうだけの もんだい（1日に 1問だけ・その日の 1まいめ） ----------
+  function starKeyOf(k, unitKeys) {
+    var pool = (unitKeys || []).slice();
+    if (game && game.unitNow) pool = pool.concat(learnedKeys());
+    var uniq = [];
+    pool.forEach(function (x) { if (TYPES[x] && GEN[x] && TYPES[x].unit !== 'chosen' && uniq.indexOf(x) < 0) uniq.push(x); });
+    return uniq.length ? uniq[hashStr(k + '|star') % uniq.length] : null;
+  }
+  function addStar(items, unitKeys) {
+    if (!game || !items.length) return items;
+    var k = todayKey();
+    if (game.star && game.star[k]) return items;   // その日は もう 出した
+    var key = starKeyOf(k, unitKeys); if (!key) return items;
+    var it = makeProblem(key); it.star = true;
+    items[hashStr(k + '|pos') % items.length] = it;
+    return items;
+  }
   // ---------- daily: きょうの 5問 ----------
   var dst = { unit: null }, lastDailyItems = null;
   try { dst.unit = localStorage.getItem('suzu.unit'); } catch (e) {}
@@ -2248,7 +2369,7 @@
   }
   function startSchoolSet(items) {
     var keys = learnedKeys();
-    items = items || makeSet(keys, 5);
+    items = items || addStar(fullSet(keys, 5), keys);
     lastDailyItems = items;
     $('dintro').hidden = true;
     var tag = String(Date.now());
@@ -2256,7 +2377,7 @@
       view: 'daily', mode: 'daily', unit: 'school', keys: keys, items: items, box: $('dqs'), result: $('dresult'), tag: tag, back: function () { renderDailyIntro(); },
       nextLabel: function () { return 'つぎの 5問 →'; },
       next: function () { startSchoolSet(); },
-      again: function () { dropPads('daily/' + tag + '/'); startSchoolSet(items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
+      again: function () { dropPads('daily/' + tag + '/'); startSchoolSet(items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref, star: it.star }; })); }
     });
     show('daily');
   }
@@ -2294,7 +2415,7 @@
   }
   function startDaily(unitId, items) {
     var u = unitById(unitId);
-    items = items || makeSet(u.keys, 5);
+    items = items || addStar(fullSet(u.keys, 5), u.keys);
     lastDailyItems = items; dst.unit = u.id;
     $('dintro').hidden = true;
     var tag = String(Date.now());
@@ -2302,7 +2423,7 @@
       view: 'daily', mode: 'daily', unit: u.id, keys: u.keys, items: items, box: $('dqs'), result: $('dresult'), tag: tag, back: function () { renderDailyIntro(); },
       nextLabel: function () { return 'つぎの 5問 →'; },
       next: function () { startDaily(u.id); },
-      again: function () { dropPads('daily/' + tag + '/'); startDaily(u.id, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
+      again: function () { dropPads('daily/' + tag + '/'); startDaily(u.id, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref, star: it.star }; })); }
     });
     show('daily');
   }
@@ -2536,7 +2657,7 @@
   }
   function buildGenSets(u, n, r) {
     var sets = [];
-    for (var i = 0; i < n; i++) sets.push({ title: '2年　文しょうだい　きほん（' + u.name + '）', no: 'No.' + (i + 1), items: makeSet(u.keys, 5, r) });
+    for (var i = 0; i < n; i++) sets.push({ title: '2年　文しょうだい　きほん（' + u.name + '）', no: 'No.' + (i + 1), items: fullSet(u.keys, 5, r) });
     return sets;
   }
   function buildPSheet(title, no, items) {
@@ -2647,7 +2768,7 @@
       pst.src = 'kanji'; pst.kg = kg === 'all' ? 'all' : kg; genSets = null;
     } else if (QS.gen.indexOf('keys:') === 0) {
       var ks = QS.gen.slice(5).split(',').filter(function (k) { return GEN[k]; });
-      genSets = []; for (var gi = 0; gi < gn; gi++) genSets.push({ title: '2年　文しょうだい　れんしゅう', no: 'No.' + (gi + 1), items: makeSet(ks, 5, gr) });
+      genSets = []; for (var gi = 0; gi < gn; gi++) genSets.push({ title: '2年　文しょうだい　れんしゅう', no: 'No.' + (gi + 1), items: fullSet(ks, 5, gr) });
     } else {
       genSets = buildGenSets(unitById(QS.gen), gn, gr);
     }
@@ -3106,7 +3227,7 @@
       view: 'keisan', mode: 'keisan', kai: kai, unit: 'keisan', keys: c[1], items: items, box: $('cqs'), result: $('cresult'), tag: tag, back: function () { renderKeisan(); },
       nextLabel: function () { return kai < KAI_MAX ? (kai + 1) + '回目 →' : 'さいしょに もどる'; },
       next: function () { var nx = kai < KAI_MAX ? kai + 1 : 1; dropPads('keisan/k' + nx + '/'); startKeisan(nx); window.scrollTo(0, 0); },
-      again: function () { dropPads('keisan/' + tag + '/'); startKeisan(kai, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
+      again: function () { dropPads('keisan/' + tag + '/'); startKeisan(kai, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref, star: it.star }; })); }
     });
     show('keisan');
   }
@@ -3222,9 +3343,12 @@
       again: function () { dropPads('kuku/' + tag + '/'); startKuku(dans, items.map(function (it) { return { q: it.q, key: it.key, ref: it.ref }; })); },
       afterGrade: function (score, box) {
         var sec = Math.round((Date.now() - this.startedAt) / 100) / 10, best = kkBest(), prev = best[keyName], line = 'タイム <b>' + sec + '</b> びょう';
-        if (score === items.length) { if (!prev || sec < prev) { best[keyName] = sec; save(); line += '　🎉 あたらしい さいこう！'; } else line += '　（さいこう ' + prev + ' びょう）'; }
+        var isBest = false;
+        if (score === items.length) { if (!prev || sec < prev) { best[keyName] = sec; save(); line += '　🎉 あたらしい さいこう！'; isBest = true; } else line += '　（さいこう ' + prev + ' びょう）'; }
         else line += '　ぜんもん せいかいの タイムだけ きろくします';
-        box.appendChild(html('div', 'kktime', line));
+        var kt = html('div', 'kktime' + (isBest ? ' flash' : ''), line);
+        box.appendChild(kt);
+        if (isBest) setTimeout(function () { chime('best'); }, 900);
       }
     });
     show('kuku');
@@ -3322,7 +3446,7 @@
       view: 'kanji', mode: 'kanji', unit: g.id, keys: keys.map(function (k) { return 'k_' + k; }), items: items, box: $('kqs'), result: $('kresult'), tag: tag, back: function () { renderKanji(); },
       nextLabel: function () { return kind === 'weak' ? 'にがてを もう一度 →' : 'べつの ことばで もう一度 →'; },
       next: function () { startKanji(kind, kind === 'weak' ? null : keys); },
-      again: function () { dropPads('kanji/' + tag + '/'); startKanji(kind, keys, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref }; })); }
+      again: function () { dropPads('kanji/' + tag + '/'); startKanji(kind, keys, items.map(function (it) { return { q: it.q, key: it.key, gd: it.gd, ref: it.ref, star: it.star }; })); }
     });
     show('kanji');
   }
@@ -3361,7 +3485,7 @@
   // ---------- game: ポイント・レベル・もくひょう・スタンプ・メダル・なかま・マイルーム ----------
   var XP = { attempt: 2, correct: 3, weakBonus: 1, perfect: 10, sheet: 5, day: 10, goalDay: 30, goalWeek: 60, lesson: 3, scan: 20,
     quest: 10, parentOk: 10, allClear: 30, morning: 10, early: 5, evening: 10, bigGoal: 100, hard: 2, fix: 3,
-    diary: 10, sign: 15, routine: 20, card: 3, kotsu: 5 };   // card = おぼえかたカードを はじめて ゲット／kotsu = コツが きいて せいかい（1まいに 5問まで）   // にっき／おうちの人の サイン／1日の ルーティン ぜんぶ   // fix = なおせた 1問ぶん   // クエスト系（bigGoal=1レベルぶん）
+    diary: 10, sign: 15, routine: 20, card: 3, kotsu: 5, star: 5, starOk: 10 };   // card = おぼえかたカードを はじめて ゲット／kotsu = コツが きいて せいかい（1まいに 5問まで）   // にっき／おうちの人の サイン／1日の ルーティン ぜんぶ   // fix = なおせた 1問ぶん   // クエスト系（bigGoal=1レベルぶん）
   // レベルの スピード: はじめは すぐ 上がり、やがて「ふつうの 1日 ＝ 約1レベル」に おちつく
   // ふつうの 1日（あいさつ＋クエスト＋ドリル1まい＋ふりかえり）で だいたい 190ポイント
   var LV_SPEEDS = [['はやい', 140], ['ふつう', 180], ['ゆっくり', 240]];
@@ -3432,6 +3556,8 @@
     { id: 'streak7', ic: '⭐', name: '7日 つづけた', desc: '1しゅうかん れんぞく', ok: function (c) { return c.streakMax >= 7; } },
     { id: 'streak30', ic: '👑', name: '30日 つづけた', desc: '1か月 れんぞく', ok: function (c) { return c.streakMax >= 30; } },
     { id: 'card1', ic: '📮', name: 'スタンプカード 1まい', desc: '30日 れんしゅうした', ok: function (c) { return c.stamps >= 30; } },
+    { id: 'card2', ic: '📯', name: 'スタンプカード 2まい', desc: '60日 れんしゅうした', ok: function (c) { return c.stamps >= 60; } },
+    { id: 'card3', ic: '🏵', name: 'スタンプカード 3まい', desc: '90日 れんしゅうした', ok: function (c) { return c.stamps >= 90; } },
     { id: 's10', ic: '📚', name: '10まい', desc: 'プリント 10まい', ok: function (c) { return c.sheets >= 10; } },
     { id: 's50', ic: '🎉', name: '50まい', desc: 'プリント 50まい', ok: function (c) { return c.sheets >= 50; } },
     { id: 's100', ic: '💯', name: '100まい', desc: 'プリント 100まい', ok: function (c) { return c.sheets >= 100; } },
@@ -3466,7 +3592,30 @@
     cand((starsOf(lv) + 1) * 10, '★が ' + (starsOf(lv) + 1) + 'こに なる');
     return best;
   }
-  function nextRewardLine() { var n = nextReward(); return n ? 'つぎの ごほうび：<b>Lv.' + n.lv + '</b>で ' + n.what : ''; }
+  function nearReward() {   // レベル いがいの「あと すこし」（レベルの 解放が 空く 帯を うめる）
+    var c = gameCtx(), best = null;
+    var cand = function (left, what) { if (left > 0 && (!best || left < best.left)) best = { left: left, what: what }; };
+    [['streak3', 3, '3日 つづけた'], ['streak7', 7, '7日 つづけた'], ['streak30', 30, '30日 つづけた']].forEach(function (b) {
+      if (!game.badges[b[0]] && c.streak < b[1]) cand(b[1] - c.streak, 'あと ' + (b[1] - c.streak) + '日 つづけると メダル「' + b[2] + '」');
+    });
+    [['s10', 10, '10まい'], ['s50', 50, '50まい'], ['s100', 100, '100まい']].forEach(function (b) {
+      if (!game.badges[b[0]] && c.sheets < b[1]) cand(b[1] - c.sheets, 'あと ' + (b[1] - c.sheets) + 'まいで メダル「' + b[2] + '」');
+    });
+    var cn = c.stamps, nx = (Math.floor(cn / 30) + 1) * 30;
+    cand(nx - cn, 'あと ' + (nx - cn) + '日で スタンプカード ' + (nx / 30) + 'まいめ かんせい');
+    var bd = buddyOf(todayKey());
+    if (bd) {
+      var n = buddyCount(bd.id), tg = [5, 10, 20, 30, 50, 80, 120, 200].filter(function (x) { return x > n; })[0];
+      if (tg) cand(tg - n, bd.name + 'と あと ' + (tg - n) + 'かい いっしょに とくと ' + tg + 'かいめ');
+    }
+    return best;
+  }
+  function nextRewardLine() {
+    var nr = nearReward();
+    if (nr && nr.left <= 3) return 'つぎの ごほうび：' + nr.what;
+    var n = nextReward();
+    return n ? 'つぎの ごほうび：<b>Lv.' + n.lv + '</b>で ' + n.what : (nr ? 'つぎの ごほうび：' + nr.what : '');
+  }
   function levelOf() {
     var xp = game ? game.xp : 0, c = cumTable(), lv = 1;
     while (lv < 999 && xp >= c[lv + 1]) lv++;
@@ -3516,7 +3665,7 @@
     ['wear', 'lessonsRead', 'wasWeak', 'mates', 'decor', 'goalsDone'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     if (!game.bonus) game.bonus = { days: {}, weeks: {} };
     if (!game.goals) goals();
-    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear', 'qpick', 'learned', 'diary', 'routine', 'kotsu'].forEach(function (k) { if (!game[k]) game[k] = {}; });
+    ['qdone', 'qok', 'qpaid', 'morning', 'evening', 'allclear', 'qpick', 'learned', 'diary', 'routine', 'kotsu', 'star', 'buddyN', 'buddyDay'].forEach(function (k) { if (!game[k]) game[k] = {}; });
     keisan();
     if (!game.quests) { game.quests = { on: {}, custom: [] }; QUEST_DEFAULT.forEach(function (id) { game.quests.on[id] = 1; }); }
     if (!game.quests.custom) game.quests.custom = [];
@@ -3560,7 +3709,7 @@
     var starUp = starsOf(lv.level) > starsOf(before);
     rates().forEach(function (r) { if (isWeak(r)) game.wasWeak[r.key] = true; });
     var ev = { xp: xp, from: before, lines: (meta && meta.lines) || [], level: lv.level, up: lv.level > before ? lv.level : 0, star: starUp ? starsOf(lv.level) : 0, stamp: !!(meta && meta.stamp), badges: got.badges, mates: got.mates, decor: got.decor, stampCount: Object.keys(game.stamps).length };
-    if (ev.up || got.badges.length || got.mates.length) chime(ev.up ? 'up' : 'badge');
+    if (!(meta && meta.quiet) && (ev.up || got.badges.length || got.mates.length)) chime(ev.up ? 'up' : 'badge');
     return ev;
   }
   function gameAfterSet(o, score) {
@@ -3590,12 +3739,22 @@
     if (ws.sheets >= g.weekSheets && !wb.sheets) { wb.sheets = 1; lines.push(['📅 こんしゅう ' + g.weekSheets + 'まい たっせい！', XP.goalWeek]); flags.week = true; }
     questBonusLines(k).forEach(function (l) { lines.push(l); });
     routineBonusLines(k).forEach(function (l) { lines.push(l); });
+    if (!game.buddyDay[k]) {   // きょうの あいぼうと いっしょに といた かず（ポイントは 足さない）
+      var bud = buddyOf(k);
+      if (bud) { game.buddyDay[k] = bud.id; game.buddyN[bud.id] = buddyCount(bud.id) + 1; }
+    }
+    var stIt = null; o.items.forEach(function (it) { if (it.star) stIt = it; });
+    if (stIt && !game.star[k]) {   // ☆は 1日1回。まちがえても へらさない
+      game.star[k] = { key: stIt.key, ok: !!stIt.ok };
+      lines.push(['☆ きょうだけの もんだいに ちょうせん', XP.star]);
+      if (stIt.ok) lines.push(['☆ せいかい！', XP.starOk]);
+    }
     if (kotsuNew.length) lines.push(['💡 カード ' + kotsuNew.length + 'まい ゲット', kotsuNew.length * XP.card]);
     if (kotsuHit) lines.push(['⭐ コツが きいた ' + kotsuHit + '問', Math.min(kotsuHit, 5) * XP.kotsu]);
     var total = 0; lines.forEach(function (l) { total += l[1]; });
-    return gameEvent(total, { stamp: first, lines: lines });
+    return gameEvent(total, { stamp: first, quiet: true, lines: lines });
   }
-  function gameResultPanel(ev) {
+  function gameResultPanel(ev, sc) {
     var p = el('div', 'gres' + (ev.up ? ' up' : ''));
     var mood = ev.up ? 'excited' : 'happy';
     p.appendChild(html('div', null, mainSVG({ stage: stageOf(ev.level), color: game.color, wear: game.wear, mood: mood })));
@@ -3620,6 +3779,19 @@
     ev.decor.forEach(function (d) { tags.appendChild(html('span', 'badge', '🛋 へやに「' + d.name + '」が ふえた')); });
     if (ev.star) tags.appendChild(html('span', 'badge', '⭐ ★が ' + ev.star + 'こに なった！'));
     if (tags.children.length) p.appendChild(tags);
+    if (sc) {   // きょうの あいぼうが ひとこと（まるつけの あとだけ）
+      var b = buddyOf(todayKey());
+      if (b) {
+        var miss = sc.total - sc.score, say = miss === 0 ? pick(BUDDY_ALL) : miss <= 2 ? pick(BUDDY_SOME) : pick(BUDDY_FEW);
+        var bd = el('div', 'buddy');
+        bd.appendChild(html('div', 'bface', '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + buddyInner(b) + '</svg>'));
+        var bt = el('div', 'btxt');
+        bt.appendChild(el('b', null, say));
+        bt.appendChild(el('small', null, b.name + (b.own ? '' : '（きょうは あそびに きた）') + '　いっしょに ' + buddyCount(b.id) + 'かいめ'));
+        bd.appendChild(bt);
+        p.appendChild(bd);
+      }
+    }
     var nrl = nextRewardLine(); if (nrl) p.appendChild(html('div', 'nextrw', nrl));
     p.appendChild(btn('linkbtn', 'マイルームを 見る →', function () { renderGrow(); show('grow'); }));
     if (ev.up) for (var i = 0; i < 18; i++) { var c = el('i', 'confetti'); c.style.left = (5 + Math.random() * 90) + '%'; c.style.background = COLORS[i % COLORS.length]; c.style.animationDelay = (Math.random() * .6) + 's'; p.appendChild(c); }
@@ -3636,16 +3808,25 @@
     setTimeout(function () { t.remove(); }, 3200);
   }
   var actx = null;
+  var O_NOTES = [523, 587, 659, 698, 784];   // ○が つづくほど 1つずつ 高い 音
+  function audioWake() { try { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; actx = actx || new AC(); if (actx.state === 'suspended') actx.resume(); } catch (e) {} }
   function chime(kind) {
     if (!game || game.sound === false) return;
     try {
       var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
       actx = actx || new AC(); var now = actx.currentTime;
-      var notes = kind === 'up' ? [523, 659, 784, 1047] : [784, 1047];
+      var soft = kind.charAt(0) === 'o' && kind.length === 2;
+      var notes = soft ? [O_NOTES[Math.min(4, Math.max(1, parseInt(kind.slice(1), 10) || 1) - 1)]]
+        : kind === 'up' ? [523, 659, 784, 1047]
+        : kind === 'perfect' ? [523, 659, 784, 1047, 1319]
+        : kind === 'fixed' ? [659, 784, 1047]
+        : kind === 'best' ? [784, 1047, 1319]
+        : [784, 1047];
+      var gap = soft ? 0 : .12, vol = soft ? 0.10 : 0.25, len = soft ? .14 : .3;
       notes.forEach(function (f, i) {
         var o = actx.createOscillator(), g = actx.createGain(); o.type = 'triangle'; o.frequency.value = f;
-        g.gain.setValueAtTime(0.0001, now + i * .12); g.gain.exponentialRampToValueAtTime(0.25, now + i * .12 + .02); g.gain.exponentialRampToValueAtTime(0.0001, now + i * .12 + .3);
-        o.connect(g); g.connect(actx.destination); o.start(now + i * .12); o.stop(now + i * .12 + .32);
+        g.gain.setValueAtTime(0.0001, now + i * gap); g.gain.exponentialRampToValueAtTime(vol, now + i * gap + .02); g.gain.exponentialRampToValueAtTime(0.0001, now + i * gap + len);
+        o.connect(g); g.connect(actx.destination); o.start(now + i * gap); o.stop(now + i * gap + len + .02);
       });
     } catch (e) {}
   }
@@ -3665,7 +3846,22 @@
     hungry: ['おなか すいた…', 'ひさしぶり！ まってたよ', 'もんだいを 食べたいな'],
     excited: ['レベルアップ！ やったー！', 'つよく なった！']
   };
-  var MATE_LINES = ['いっしょに がんばろう！', 'ここ むずかしいね', 'つぎは なにを やる？', 'すごいね！', 'ぼくも やる！'];
+  var MATE_LINES = ['いっしょに がんばろう！', 'ここ むずかしいね', 'つぎは なにを やる？', 'すごいね！', 'ぼくも やる！',
+    'きょうも 来たんだね', 'その ちょうし！', 'あとで あそぼう', 'ぼく、見てたよ', 'じょうずに なったね',
+    'つかれたら やすもう', 'きょうは なに する？', 'いっしょなら できるよ', 'その えんぴつ いいね', 'まるつけ たのしみ',
+    'きのうより すごい', 'ゆっくりでも いいよ', 'なかまが ふえて うれしい', 'また あした ね', 'えらいなあ'];
+  var BUDDY_ALL = ['ぜんぶ ○！ かっこよかった', 'すごい！ わたしも うれしい', 'ぜんぶ あってる。やったね！', 'むずかしかったのに すごい'];
+  var BUDDY_SOME = ['○が たくさん！ いいね', 'おしかった！ つぎ いっしょに やろう', 'よく がんばったね', 'ここまで できたら じゅうぶん'];
+  var BUDDY_FEW = ['なおしも いっしょに やろう', 'ゆっくりで だいじょうぶ', 'いっしょに 見て みよう', 'きょうも やったね。えらい'];
+  function buddyOf(k) {   // きょう となりに いる なかま（毎日 かわる）
+    var pool = MATES.slice();
+    if (heroOn()) pool.push({ id: 'dori', name: game.name, dori: true });
+    if (!pool.length) return null;
+    var m = pool[hashStr(k + '|buddy') % pool.length];
+    return { id: m.id, name: m.name, m: m, dori: !!m.dori, own: m.dori ? true : !!game.mates[m.id] };
+  }
+  function buddyInner(b) { return b.dori ? doriInner(stageOf(levelOf().level), 'happy') : mateInner(b.m); }
+  function buddyCount(id) { return (game.buddyN && game.buddyN[id]) || 0; }
   function line(m) { var L = heroOn() ? HERO_LINES : LINES, a = L[m] || L.normal; return a[Math.floor(Math.random() * a.length)]; }
 
   // ドリまる／なかま の 絵（中身）。stage 0..4, mood, wear, sp（なかまの しゅるい）
@@ -3959,8 +4155,10 @@
     if (d.clock) { var mn = new Date().getMinutes(), ha = ((h % 12) + mn / 60) * 30, ma = mn * 6; s += '<circle cx="530" cy="72" r="21" fill="#fff" stroke="#6f695d" stroke-width="3"/><path d="M530 72 l' + (11 * Math.sin(ha * Math.PI / 180)) + ' ' + (-11 * Math.cos(ha * Math.PI / 180)) + '" stroke="#2b2620" stroke-width="3" stroke-linecap="round"/><path d="M530 72 l' + (16 * Math.sin(ma * Math.PI / 180)) + ' ' + (-16 * Math.cos(ma * Math.PI / 180)) + '" stroke="#2b2620" stroke-width="2" stroke-linecap="round"/>'; }
     s += '<rect x="560" y="60" width="72" height="190" fill="#b98a58"/>';
     [100, 150, 200].forEach(function (y) { s += '<rect x="560" y="' + y + '" width="72" height="6" fill="#8f6a3e"/>'; });
-    var books = Math.min(21, Math.floor(game.sets / 5));
-    for (var b = 0; b < books; b++) { var sh = Math.floor(b / 7), bx = 566 + (b % 7) * 9, by = 62 + sh * 50 + (b % 3) * 2; s += '<rect x="' + bx + '" y="' + by + '" width="8" height="' + (36 - (b % 3) * 2) + '" rx="1" fill="' + COLORS[(b * 5) % 6] + '"/>'; }
+    var books = Math.min(42, Math.floor(game.sets / 5)), wideB = books <= 21, perB = wideB ? 7 : 14, bwB = wideB ? 8 : 4, gapB = wideB ? 9 : 4.7;
+    for (var b = 0; b < books; b++) { var sh = Math.floor(b / perB), bx = 566 + (b % perB) * gapB, by = 62 + sh * 50 + (b % 3) * 2; s += '<rect x="' + bx.toFixed(1) + '" y="' + by + '" width="' + bwB + '" height="' + (36 - (b % 3) * 2) + '" rx="1" fill="' + COLORS[(b * 5) % 6] + '"/>'; }
+    var walk = Math.min(90, Math.floor(game.sets / 5));   // あるいた 道（5まいごとに 1こ・ずっと のびる）
+    for (var wk = 0; wk < walk; wk++) { var wr = Math.floor(wk / 30), wx = 14 + (wk % 30) * 21, wy = 354 - wr * 10; s += '<circle cx="' + wx + '" cy="' + wy + '" r="3.2" fill="#c9a36f" opacity=".85"/>'; }
     if (d.plant) s += '<path d="M28 215 h34 l-4 36 h-26z" fill="#c76b4a"/><ellipse cx="45" cy="205" rx="14" ry="24" fill="#5fae5f" transform="rotate(-20 45 205)"/><ellipse cx="50" cy="200" rx="12" ry="26" fill="#6cbf6c" transform="rotate(20 50 200)"/>';
     // いす → ドリまる → つくえ の じゅんに 描く（顔が かくれないように）
     var pose = (h >= 21 || h < 6) ? 'sleep' : (sheetsOnDay(todayKey()) >= goals().day ? 'rest' : 'study');
@@ -3987,16 +4185,16 @@
     if (d.fish) s += '<ellipse cx="530" cy="194" rx="15" ry="12" fill="#cfe9f8" stroke="#8fc7e8" stroke-width="1.5"/><path d="M524 196 l7 -4 0 8z" fill="#f2803a"/><circle cx="533" cy="196" r="3.5" fill="#f2803a"/><path d="M515 200 q15 6 30 0" stroke="#8fc7e8" stroke-width="1.5" fill="none"/>';
     var stn = starsOf(lv);
     if (stn) { s += '<rect x="60" y="196" width="128" height="6" fill="#c9a36f"/>'; for (var si = 0; si < Math.min(6, stn); si++) s += '<path transform="translate(' + (72 + si * 21) + ' 186) scale(1.05)" d="M0 -9 l2.6 6 6.4.6 -4.8 4.3 1.5 6.3 -5.7 -3.4 -5.7 3.4 1.5 -6.3 -4.8 -4.3 6.4 -.6z" fill="#ffd166" stroke="#e6a100" stroke-width="1"/>'; if (stn > 6) s += '<text x="196" y="194" font-size="11" font-family="sans-serif" fill="#6f695d">×' + stn + '</text>'; }
-    var spots = [[150, 262], [230, 292], [70, 290], [470, 292], [560, 296], [300, 250], [390, 300], [600, 270], [110, 336], [520, 340]], k = 0, mates = MATES.filter(function (m) { return game.mates[m.id]; });
+    var spots = [[150, 262], [230, 292], [70, 290], [470, 292], [560, 296], [300, 250], [390, 300], [600, 270], [110, 336], [520, 340], [40, 262], [260, 336], [355, 336], [450, 336], [612, 336]], k = 0, mates = MATES.filter(function (m) { return game.mates[m.id]; });
     if (heroOn()) {   // しゅじんこうの ときは、ドリまるが いつも そばに いる（さいしょの なかま）
       spots.splice(5, 1);
       s += '<svg x="262" y="234" width="76" height="76" viewBox="0 0 200 200">' + doriInner(st, pose === 'sleep' ? 'sleep' : 'happy') + '</svg>';
     }
-    var talker = mates.length ? Math.floor(Math.random() * mates.length) : -1;
+    var talker = mates.length ? hashStr(todayKey() + '|talk') % mates.length : -1;
     mates.forEach(function (m, i) {
       var p = spots[k++ % spots.length];
       s += '<svg x="' + (p[0] - 34) + '" y="' + (p[1] - 60) + '" width="68" height="68" viewBox="0 0 200 200">' + mateInner(m) + '</svg>';
-      if (i === talker) { var tx = MATE_LINES[Math.floor(Math.random() * MATE_LINES.length)]; s += '<rect x="' + (p[0] - 50) + '" y="' + (p[1] - 88) + '" width="100" height="20" rx="10" fill="#fff" stroke="#c9c2b4"/><text x="' + p[0] + '" y="' + (p[1] - 74) + '" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + tx + '</text>'; }
+      if (i === talker) { var tx = MATE_LINES[hashStr(todayKey() + '|say') % MATE_LINES.length]; s += '<rect x="' + (p[0] - 50) + '" y="' + (p[1] - 88) + '" width="100" height="20" rx="10" fill="#fff" stroke="#c9c2b4"/><text x="' + p[0] + '" y="' + (p[1] - 74) + '" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">' + tx + '</text>'; }
     });
     return '<svg class="room" viewBox="0 0 640 360" aria-hidden="true">' + s + '</svg>';
   }
@@ -4494,6 +4692,7 @@
       var cell = btn('cday' + (out ? ' out' : '') + (k === tk ? ' today' : '') + (k === calSel ? ' sel' : ''), null, (function (key) { return function () { calSel = key; calForm = null; renderCal(); }; })(k));
       cell.appendChild(el('b', null, String(d.getDate())));
       if (game.stamps[k]) cell.appendChild(el('i', 'st'));
+      if (game.star && game.star[k]) cell.appendChild(el('span', 'cstar', '☆'));
       var n = sheetsOnDay(k);
       if (n) cell.appendChild(el('span', 'dots', new Array(Math.min(4, n) + 1).join('●')));
       plansOn(k).forEach(function (p) { cell.appendChild(el('span', 'pm', planIcon(p))); });
@@ -4612,7 +4811,10 @@
         + '<li>（しき）（こたえ）（ひっさん）の ところに 書きます。ここは まるつけには つかいません。じゆうに つかって いいです。</li>'
         + '<li>下の 白い ますに <b>数字で こたえを 入れます</b>。ここを 見て まるつけを します。</li>'
         + '<li><b>時計や ものさしの 絵</b>が 出る もんだいも あります。時計は「なん時」「なん分」の 2つの ますに、ものさしは「なんcm」「なんmm」の 2つの ますに 入れます。0の ときは からっぽの ままで OK。</li>'
-        + '<li>ぜんぶ 書けたら、いちばん下の <span class="k">まるつけ</span> を おします。</li>'
+        + '<li>ぜんぶ 書けたら、いちばん下の <span class="k">まるつけ</span> を おします。ボタンには <b>のこりの かず</b>が 出ます（「まるつけ（あと 2もん）」）。</li>'
+        + '<li>まるつけを おすと、①から じゅんに <b>朱色の ○</b>が 1つずつ 書かれます。○が つづくと 音が すこしずつ 高く なって、2もん めからは「2もん つづけて ○」と 出ます。ぜんぶ ○の ときは「ぜんぶ ○！」と 紙ふぶき。</li>'
+        + '<li>まっている のが いやな ときは、画面を どこでも タップすると ぜんぶ すぐ 出ます。</li>'
+        + '<li><b>なおしを ぜんぶ なおせた とき</b>が いちばん 大きな お祝いです。まちがえても へる ものは 1つも ありません。</li>'
         + '<li>まちがえた ときは、その もんだいの 下に <b>こたえと しき</b>が 出ます。「せんせいの ワンポイント」も よめます。</li></ul>'],
       ['✖️', 'くく（九九）', '<ul>'
         + '<li>ホームの <b>くく（九九）</b>で、だんを タップして えらびます（いくつでも）。「じゅんばん」か「バラバラ」を えらんで <span class="k">スタート</span>。</li>'
@@ -4637,6 +4839,10 @@
         + '<li>つぎに 同じ もんだいが できたら、その カードに <b>⭐</b>が つきます。⭐は「もう おぼえた」の しるし。</li>'
         + '<li>カードは 九九・文しょうだい・けいさん・かんじ の 4つに 分かれて います。まだ 出て いない カードは ひみつ。</li>'
         + '<li>いちばん 上の「おぼえかたの きほん」は いつでも 読めます（声に出す／つぎの日に もう一度／人に せつめいする など）。</li></ul>'],
+      ['⭐', 'きょうだけの もんだいと きょうの あいぼう', '<ul>'
+        + '<li><b>☆ きょうだけ</b>：「きょうの 5問」に 1日 1問だけ、ふちが 金色の もんだいが まざります。きのうと ちがう 1問が かならず 入ります。ちょうせんするだけで +5、あって いたら さらに +10。まちがえても へりません。</li>'
+        + '<li><b>きょうの あいぼう</b>：まるつけの あと、きょうの なかまが となりに 出て ひとこと 言います。あいぼうは 毎日 かわります。「いっしょに ○かいめ」は やるほど ふえて、へりません。</li>'
+        + '<li>きょう だれが あいぼうかは、ホームの へやの カードにも 出ます。</li></ul>'],
       ['👧', 'しゅじんこうと なかま・きせかえ', '<ul>'
         + '<li>しゅじんこうは 女の子（はじめの なまえは <b>すず</b>）。なまえは マイルームの「きせかえ」の <span class="k">なまえ</span> に 書いて <span class="k">きめる</span> で いつでも かえられます。ドリまるは <b>さいしょの なかま</b>です。</li>'
         + '<li>べんきょうや クエストを つづけると、<b>なかまが へやに あつまって きます</b>。どうぶつの なかまと、ひなちゃん・そうたくん・ここちゃん・みらいさん などの ともだち。だれが どうすると くるかは マイルームの「なかま」に 出ています。</li>'
@@ -4663,6 +4869,13 @@
         + '<li>日を タップすると、その日 やった ことが 見られます。</li></ul>']
     ],
     oya: [
+      ['✨', '毎日 つづける ための しかけ（v36）', '<p>「毎日 とくのが 楽しくなるように」の ご依頼で、5つ 入れました。ポイントや メダルを 増やすのでは なく、<b>まいにち かならず 起きる 場面</b>を よくする方向にしています。</p><ul>'
+        + '<li><b>まるつけの 演出</b>：○を 1問ずつ 朱色で 書き、連続で 音が 上がります。いちばん 大きな お祝いは「ぜんぶ なおせた とき」。×には 音も 点滅も つけていません（責めない）。演出中は まるつけボタンが 止まりますが、画面タップで すぐ 飛ばせます。</li>'
+        + '<li><b>いますぐ はじめる</b>：ホームの いちばん上に「けいさん ○回目を はじめる」の 大きな ボタン。えらぶ画面を 通らずに 始められます。下の 小さい リンクは「きょうの 5問」。タイルは 1つも 減らしていません。</li>'
+        + '<li><b>☆ きょうだけの もんだい</b>：1日1問だけ 金色の もんだい。ちょうせん +5／正解 さらに +10。まちがえても マイナスは ありません。</li>'
+        + '<li><b>きょうの あいぼう</b>：まるつけの あとに なかまが ひとこと。毎日 かわります。「いっしょに といた かい数」は 減りません。</li>'
+        + '<li><b>つぎの ごほうび の はばを ひろげました</b>：レベルの 解放が 無い 帯（Lv.31〜34 など）でも「あと 2日で メダル」「あと 3まいで メダル」が 出ます。本だなは 105まいで 止まらず、床に「あるいた 道」が のびていきます。</li>'
+        + '<li>あわせて、<b>かさ（型が 2つしか ない 単元）で 4問しか 出ていなかった</b> のと、<b>日を またいでも 画面が 前の日の ままだった</b> のを 直しました。</li></ul>'],
       ['🏫', '学校の 宿題プリントから ふやした もんだい（v35）', '<p>いただいた 宿題プリント（9/14 時計・9/16・9/17 長さ・9/18 九九と ひっさん・作図）を 見て、アプリに なかった 7つの 型を 足しました。</p><ul>'
         + '<li><b>時こくと 時間</b>：時計の 絵を よむ／時計を 見て ○分前／○時間はん後／おくれて いる・すすんで いる 時計／あと なん分で ○時。時計は アプリの 中で えがくので、まいかい ちがう 時こくが 出ます。</li>'
         + '<li><b>長さ</b>：cmと mmの かんけい（2cm＝20mm、29mm＝2cm9mm、6cm8mm＝68mm）／ものさしの 絵を よむ。</li>'
@@ -4879,9 +5092,21 @@
     c.appendChild(x);
     return c;
   }
+  function nowCard() {   // ホームの いちばん上：えらばずに すぐ はじめられる ボタン
+    var c = el('div', 'nowcard'), ks = keisan(), at = Math.min(KAI_MAX, ks.at || 1);
+    var g = goals(), td = sheetsOnDay(todayKey());
+    c.appendChild(el('div', 'nowlead', td >= g.day ? 'きょうの もくひょう おわったね！ まだ やる？' : 'いますぐ はじめる'));
+    c.appendChild(btn('btn nowgo', '▶ けいさん ' + at + '回目を はじめる（10問）', function () { welcomeGone = true; startKeisan(at); }));
+    var u = unitById(dst.unit || game.unitNow);
+    c.appendChild(btn('linkbtn shu nowsub', 'きょうの 5問（' + u.name + '）→', function () { welcomeGone = true; startDaily(u.id); }));
+    return c;
+  }
+  var lastRenderKey = null;
   function renderCharCard() {
     var box = $('charCard'); if (!box) return; box.innerHTML = '';
     if (!game) initGame();
+    lastRenderKey = todayKey();
+    box.appendChild(nowCard());
     if (!welcomeGone) { if (!welEl) welEl = welcomeCard(); box.appendChild(welEl); }   // 立ち上げのときだけ 出す
     var lv = levelOf(), card = btn('ccard room', null, function () { renderGrow(); show('grow'); });
     card.innerHTML = roomSVG();
@@ -4894,6 +5119,8 @@
     var tx = el('div', 'xptxt'); tx.appendChild(el('span', null, 'あと ' + (lv.need - lv.into) + ' ポイントで Lv.' + (lv.level + 1)));
     tx.appendChild(html('span', null, game.stamps[dayKey(new Date().toISOString())] ? '<b>スタンプ ✓</b>' : 'れんぞく ' + streak() + '日'));
     info.appendChild(tx);
+    var bud = buddyOf(todayKey());
+    if (bud) info.appendChild(el('div', 'goal', 'きょうは ' + bud.name + 'が いっしょ'));
     var nr = nextRewardLine(); if (nr) info.appendChild(html('div', 'nextrw', nr));
     info.appendChild(el('div', 'goal', goalLine()));
     card.appendChild(info);
@@ -5066,7 +5293,8 @@
     MATES.forEach(function (mt) {
       var got = game.mates[mt.id], d = el('div', 'medal' + (got ? '' : ' lock'));
       d.appendChild(html('div', 'mate', '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + mateInner(mt, !got) + '</svg>'));
-      d.appendChild(el('b', null, got ? mt.name : '？？？')); d.appendChild(el('small', null, got ? fmtDay(dayKey(got)) + 'に なかまに' : mt.need + ' で なかまに'));
+      d.appendChild(el('b', null, got ? mt.name : '？？？'));
+      d.appendChild(el('small', null, got ? (buddyCount(mt.id) ? 'いっしょに といた ' + buddyCount(mt.id) + 'かい' : fmtDay(dayKey(got)) + 'に なかまに') : mt.need + ' で なかまに'));
       if (got) d.appendChild(btn('linkbtn shu', '👗 きせかえ', function () { dressWho = mt.id; renderGrow(); backToDress(); }));
       mg.appendChild(d);
     });
