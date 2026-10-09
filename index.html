@@ -13,6 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="すずドリル">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="preload" as="image" href="./img/splash.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Klee+One:wght@400;600&display=swap">
@@ -205,8 +206,17 @@
   .mark.x path{animation:drawX .3s ease-out}
   @keyframes drawX{from{opacity:0; transform:scale(.6); transform-origin:center} to{opacity:1; transform:scale(1)}}
   .combo{margin:10px 0 0 39px; font-family:var(--f-round); font-size:13.5px; color:var(--shu-ink); font-weight:700}
+  /* 起動画面（ひらいた すぐ あと の 白い 画面を なくす） */
+  #splash{position:fixed; inset:0; z-index:200; display:grid; place-items:center; background:var(--ground); transition:opacity .45s ease}
+  #splash img{width:min(66vw,360px); height:auto; animation:spPop .55s cubic-bezier(.2,1.4,.5,1)}
+  #splash.out{opacity:0; pointer-events:none}
+  @keyframes spPop{from{transform:scale(.86); opacity:0} to{transform:none; opacity:1}}
+  @media (prefers-reduced-motion: reduce){ #splash img{animation:none} }
   .cheer{position:fixed; inset:0; z-index:60; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; overflow:hidden; transition:opacity .4s}
   .cheer.out{opacity:0}
+  .cheer .cframe{position:absolute; inset:0; display:grid; place-items:center}
+  .cheer .cframe img{width:min(94vw,560px); max-height:72vh; animation:cheerPop .5s cubic-bezier(.2,1.4,.5,1)}
+  .cheer b, .cheer span{position:relative; z-index:1}
   .cheer b{font-family:var(--f-round); font-size:44px; color:var(--shu); background:var(--paper); border:4px solid var(--shu); border-radius:22px; padding:14px 30px; box-shadow:0 10px 34px rgba(0,0,0,.22); animation:cheerPop .5s cubic-bezier(.2,1.4,.5,1)}
   .cheer span{margin-top:12px; font-family:var(--f-round); font-size:17px; color:var(--ink); background:var(--paper); border-radius:999px; padding:6px 16px; box-shadow:0 4px 14px rgba(0,0,0,.14)}
   @keyframes cheerPop{from{transform:scale(.5) rotate(-6deg); opacity:0} to{transform:scale(1) rotate(0); opacity:1}}
@@ -519,6 +529,8 @@
   .ohayo{min-height:48px; padding:6px 20px; border-radius:999px; background:var(--shu); color:#fff; border:0; font-family:var(--f-round); font-size:17px; font-weight:700; flex:none; box-shadow:0 3px 0 var(--shu-ink)}
   .ohayo:active{transform:translateY(2px); box-shadow:none}
   .omikuji{display:flex; gap:6px 14px; align-items:center; flex-wrap:wrap; margin:10px 0 2px; padding:8px 12px; border-radius:12px; background:var(--shu-wash); font-family:var(--f-round); font-size:14px}
+  .omikuji .opic{flex:0 0 auto; margin-right:2px}
+  .omikuji .opic img{display:block; width:52px; height:52px}
   .omikuji b.luck{font-size:24px; color:var(--shu-ink); margin-left:4px}
   .omikuji .dot{display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-2px; margin-right:4px; border:1px solid rgba(0,0,0,.15)}
   .omikuji .fl{width:100%; color:var(--ink-soft); font-size:13px}
@@ -768,6 +780,8 @@
 </style>
 </head>
 <body>
+
+<div id="splash"><img src="./img/splash.webp" alt="" width="760" height="742"></div>
 
 <div class="top"><div class="wrap">
   <button type="button" class="back" id="back" hidden>‹ ホーム</button>
@@ -1847,6 +1861,7 @@
   }
   function cheerOverlay(main, sub) {   // ぜんぶ○・ぜんぶ なおせた の お祝い
     var w = el('div', 'cheer');
+    w.appendChild(html('i', 'cframe', '<img src="./img/cheer-frame.webp" alt="">'));
     w.appendChild(el('b', null, main));
     if (sub) w.appendChild(el('span', null, sub));
     for (var i = 0; i < 20; i++) {
@@ -4252,16 +4267,22 @@
 
 
   // マイルーム の 絵。まど（じかんで 昼夜）・カレンダー・本だな（5まいで 1さつ）・つくえ・ドリまる・なかま・かざり
+  var roomN = 0;
   function roomSVG() {
     var lv = levelOf().level, st = stageOf(lv), h = new Date().getHours(), night = h < 6 || h >= 18, evening = h >= 16 && h < 18;
     var sky = night ? '#2b3a67' : evening ? '#f9b872' : '#bfe3f7', d = game.decor, s = '';
     s += '<rect width="640" height="250" fill="#f6ecd2"/><rect y="250" width="640" height="110" fill="#d9b98c"/>';
     for (var x = 0; x < 640; x += 80) s += '<path d="M' + x + ' 250 v110" stroke="#c9a36f" stroke-width="1.5"/>';
     s += '<rect y="245" width="640" height="7" fill="#c9a36f"/>';
+    s += '<image href="./img/room-bg.webp" x="0" y="0" width="640" height="360" preserveAspectRatio="xMidYMid slice"/>';   // かべ と ゆか（上の ベタ塗りは 絵が 出ない ときの ひかえ）
     if (d.rug) s += '<ellipse cx="200" cy="318" rx="125" ry="30" fill="#e2857a"/><ellipse cx="200" cy="318" rx="95" ry="20" fill="none" stroke="#f4b9ae" stroke-width="5"/>';
-    s += '<rect x="60" y="40" width="170" height="130" rx="6" fill="' + sky + '" stroke="#fff" stroke-width="8"/>';
+    s += '<rect x="60" y="40" width="170" height="130" rx="6" fill="' + sky + '"/>';
     if (night) { s += '<circle cx="180" cy="75" r="16" fill="#fff6c9"/><circle cx="172" cy="70" r="14" fill="' + sky + '"/>'; [[90, 60], [120, 95], [150, 130], [105, 140], [200, 120]].forEach(function (p) { s += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="2" fill="#fff"/>'; }); }
     else { s += '<circle cx="180" cy="80" r="17" fill="' + (evening ? '#ff8c5a' : '#ffd166') + '"/><ellipse cx="110" cy="120" rx="26" ry="10" fill="#fff" opacity=".9"/><ellipse cx="128" cy="112" rx="18" ry="9" fill="#fff" opacity=".9"/>'; }
+    var wpic = night ? 'night' : evening ? 'evening' : (h >= 6 && h < 10) ? 'morning' : 'day', wcid = 'winclip' + (++roomN);
+    s += '<clipPath id="' + wcid + '"><rect x="60" y="40" width="170" height="130" rx="6"/></clipPath>';
+    s += '<image clip-path="url(#' + wcid + ')" href="./img/win-' + wpic + '.webp" x="60" y="40" width="170" height="130" preserveAspectRatio="xMidYMid slice"/>';
+    s += '<rect x="60" y="40" width="170" height="130" rx="6" fill="none" stroke="#fff" stroke-width="8"/>';
     s += '<path d="M145 40 v130 M60 105 h170" stroke="#fff" stroke-width="5"/>';
     s += '<path d="M40 30 h30 q-6 70 10 140 h-40z" fill="#f4a0a0"/><path d="M250 30 h-30 q6 70 -10 140 h40z" fill="#f4a0a0"/>';
     if (d.garland) { for (var g = 0; g < 8; g++) s += '<path d="M' + (20 + g * 80) + ' 14 l22 30 22 -30z" fill="' + COLORS[g % 6] + '"/>'; s += '<path d="M10 14 h620" stroke="#8f6a3e" stroke-width="2"/>'; }
@@ -4394,6 +4415,7 @@
   var QUEST_DEFAULT = ['s_hand', 's_greet', 'h_ready', 'h_help'];   // さいしょから 出ている クエスト
   var QCAT = { learn: 'ドリル' }; QGRPS.forEach(function (g) { QCAT[g.id] = g.short; });
   var LUCKS = [['大吉', 3], ['中吉', 3], ['小吉', 2], ['吉', 2]];   // うんせい と 出やすさ（わるいのは 出ない）
+  var OMI_PICS = ['clover', 'star', 'rainbow', 'hanamaru', 'music', 'cake'];   // おみくじの 絵（その日 かわらない）
   var LUCKY_COLORS = [['あか', '#e2574c'], ['あお', '#4d8fd6'], ['きいろ', '#f2c94c'], ['みどり', '#6cbf6c'], ['ピンク', '#f49ac1'], ['むらさき', '#c9a3ff'], ['オレンジ', '#ffb27a'], ['みずいろ', '#7ec8e3']];
   var LUCKY_ITEMS = ['えんぴつ', 'けしゴム', 'ハンカチ', 'くつした', 'ぼうし', 'ノート', 'コップ', 'ものさし', 'おりがみ', 'ふでばこ', 'すいとう', 'ティッシュ'];
   var FORTUNE_LINES = ['きょうは 手を あげると いいことが あるよ', 'ともだちに やさしくすると ラッキー', 'あさごはんを しっかり たべると げんきに なれる日', '字を ていねいに 書くと ○が ふえるよ', 'にがてな もんだいに ちょうせんすると ぐんと のびる日', 'にこにこ していると いいことが おきるよ', 'せなかを ピンと のばすと かっこいい日', 'あいさつが ラッキーを つれてくるよ', 'おてつだいを すると おうちの人が よろこぶ日', 'そらを 見上げると いいことが 見つかるかも'];
@@ -4404,7 +4426,7 @@
     var h = hashStr(k + '|' + (game.name || '')), pick = function (arr, seed) { return arr[seed % arr.length]; };
     var tw = 0; LUCKS.forEach(function (l) { tw += l[1]; });
     var r = h % tw, luck = LUCKS[0][0]; for (var i = 0; i < LUCKS.length; i++) { if (r < LUCKS[i][1]) { luck = LUCKS[i][0]; break; } r -= LUCKS[i][1]; }
-    return { luck: luck, color: pick(LUCKY_COLORS, h >>> 4), item: pick(LUCKY_ITEMS, h >>> 9), line: pick(FORTUNE_LINES, h >>> 14) };
+    return { luck: luck, color: pick(LUCKY_COLORS, h >>> 4), item: pick(LUCKY_ITEMS, h >>> 9), line: pick(FORTUNE_LINES, h >>> 14), pic: pick(OMI_PICS, h >>> 19) };
   }
   function greet() { var h = new Date().getHours(); return h < 11 ? 'おはよう！' : h < 17 ? 'こんにちは！' : 'こんばんは！'; }
   function qday(map, k) { return map[k] || (map[k] = {}); }
@@ -4657,6 +4679,7 @@
     card.appendChild(hd);
     if (checked) {
       var om = el('div', 'omikuji');
+      om.appendChild(html('span', 'opic', '<img src="./img/omi-' + f.pic + '.webp" alt="">'));
       om.appendChild(html('span', null, 'きょうの うんせい<b class="luck">' + f.luck + '</b>'));
       om.appendChild(html('span', null, '<i class="dot" style="background:' + f.color[1] + '"></i>ラッキーカラー ' + f.color[0]));
       om.appendChild(el('span', null, '🍀 ラッキーアイテム ' + f.item));
@@ -5482,6 +5505,11 @@
   // ---------- boot ----------
   if (QS.gen) { renderPrint(); show('print'); document.body.classList.add('print-mode'); }
   else { renderHome(); show('home'); }
+  (function () {   // 起動画面：画面が できたら そっと 消す
+    var sp = document.getElementById('splash'); if (!sp) return;
+    var out = function () { sp.classList.add('out'); setTimeout(function () { if (sp.parentNode) sp.remove(); }, 600); };
+    if (QS.gen) out(); else setTimeout(out, 560);
+  })();
 })();
 </script>
 

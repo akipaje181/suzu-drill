@@ -1,6 +1,11 @@
 /* すずドリル service worker — offline cache */
-const VERSION = 'suzu-drill-v38';
-const CORE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
+const VERSION = 'suzu-drill-v39';
+const CORE = ['./', './index.html', './manifest.webmanifest',
+  './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png',
+  './img/splash.webp', './img/room-bg.webp', './img/cheer-frame.webp',
+  './img/win-morning.webp', './img/win-day.webp', './img/win-evening.webp', './img/win-night.webp',
+  './img/omi-clover.webp', './img/omi-star.webp', './img/omi-rainbow.webp',
+  './img/omi-hanamaru.webp', './img/omi-music.webp', './img/omi-cake.webp'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
