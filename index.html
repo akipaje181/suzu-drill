@@ -140,11 +140,17 @@
   }
   .q-t{font-family:var(--f-round); font-size:16.5px; line-height:1.85; line-break:strict; flex:1; margin:0}
   .clockp{display:block; width:154px; height:154px; margin:10px 0 2px}
+  .kasachart{display:block; width:100%; max-width:320px; height:auto; margin:6px 0}
   .rulerp{display:block; width:100%; max-width:420px; height:auto; margin:10px 0 2px}
   .q-t .qq{display:block}
   .psheet .clockp{width:30mm; height:30mm; margin:1.5mm 0}
   .psheet .rulerp{width:78mm; margin:1.5mm 0}
   .q.star{border-color:#c9a227; border-width:2px}
+  .bxs{display:flex; flex-wrap:wrap; gap:8px 12px; align-items:center}
+  .bx{display:inline-flex; align-items:center; gap:4px}
+  .bx i{font-style:normal; font-family:var(--f-round); font-size:15px; color:var(--shu-ink); font-weight:700}
+  .bx .num{width:74px}
+  @media (max-width:560px){ .bx .num{width:62px} }
   .startag{position:absolute; top:-10px; right:58px; font-family:var(--f-round); font-size:11.5px; font-weight:700; color:#a8851f; background:var(--paper); border-radius:6px; padding:0 7px}
   .q-type{position:absolute; top:-9px; left:14px; font-size:11px; color:var(--ink-soft); background:var(--paper); padding:0 6px; border-radius:6px}
   .row{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:13px 0 0 39px}
@@ -907,6 +913,9 @@
     ['tokei_zure', 'おくれて いる 時計', 'toki'],
     ['jikan_ade', 'あと なん分で ○時', 'toki'],
     ['cm_mm', 'cmと mmの かんけい', 'nagasa'],
+    ['l_dl', 'Lと dLの かんけい', 'kasa'],
+    ['dl_ml', 'dLと mLの かんけい', 'kasa'],
+    ['kasa_box', 'dLに そろえて 計算', 'kasa'],
     ['monosashi', 'ものさしを よむ', 'nagasa']
   ];
   ADD_TYPES.forEach(function (t) {
@@ -919,6 +928,9 @@
   LESSONS.tokei_ato = { title: '時計を 見て「○時間はん後」', why: '「1時間はん」は <b>1時間30分</b>の こと。時間を 先に たして、そのあと 分を たします。分が 60を こえたら 1時間 くり上げます。', ex: ['時計が 10時30分、2時間はん後', '時間 → <em>10+2=12時</em>', '分 → <em>30+30=60分</em> = 1時間 くり上げ', 'こたえ <em>1時</em>'], ng: '「はん」を 50分だと しない。はんは 30分。', try: { gen: true } };
   LESSONS.tokei_zure = { title: 'おくれて いる・すすんで いる 時計', why: '<b>おくれて いる</b> 時計は、本当の 時こくより 前を さして います。だから 正しい 時こくは <b>時計＋おくれた 分</b>。<b>すすんで いる</b> 時計は 先を さして いるので <b>時計−すすんだ 分</b>です。', ex: ['時計が 2時23分で 11分 おくれて いる', '<em>2時23分 + 11分 = 2時34分</em>', 'すすんで いる ときは <em>2時23分 − 11分 = 2時12分</em>'], ng: 'おくれて いるのに ひいて しまわない。「おくれ＝まだ 足りない → たす」と おぼえる。', try: { gen: true } };
   LESSONS.jikan_ade = { title: '「あと なん分で ○時」', why: '1時間は 60分。いまの 分を 60から ひくと、つぎの ちょうどの 時までの 時間が 出ます。', ex: ['いま 5時10分', '<em>60-10=50</em>', 'こたえ <em>50分</em>'], ng: '「あと なん分」と きかれて 時こくを こたえない。こたえは 分の 長さ。', try: { gen: true } };
+  LESSONS.l_dl = { title: 'Lと dLの かんけい', why: '<b>1L ＝ 10dL</b>。Lを dLに するときは ×10、dLを Lに するときは 10の まとまりが いくつ あるかを 見ます。3L5dL なら 30dLと 5dL で 35dL。', ex: [kasaChartSVG(), '<em>4L = 40dL</em>', '<em>60dL = 6L</em>', '<em>3L5dL = 35dL</em>', '<em>47dL = 4L7dL</em>'], ng: '3L5dL を <b>8dL</b>（3+5）と しない。Lは 10ばいして から たす。', try: { gen: true } };
+  LESSONS.dl_ml = { title: 'dLと mLの かんけい', why: '<b>1dL ＝ 100mL</b>、<b>1L ＝ 1000mL</b>。dLを mLに するときは ×100。mLを dLに するときは 100の まとまりが いくつ あるかを 見ます。350mL なら 300mLで 3dL、のこり 50mL。', ex: [kasaChartSVG(), '<em>7dL = 700mL</em>', '<em>1L = 1000mL</em>', '<em>500mL = 5dL</em>', '<em>350mL = 3dL50mL</em>'], ng: '1L を <b>100mL</b>と しない。1Lは 10dL なので 1000mL。', try: { gen: true } };
+  LESSONS.kasa_box = { title: 'dLに そろえて 計算する', why: 'たんいが まざって いる ときは、<b>ぜんぶ dLに そろえて</b>から 計算すると かんたんです。① まず それぞれを dLに なおす ② dLどうしで 計算する ③ こたえを LとdL に もどす。この じゅんに □を うめます。', ex: [kasaChartSVG(), '4L4dL ＋ 6dL → <em>44dL ＋ 6dL</em>', '<em>44+6=50dL</em>', '<em>50dL = 5L</em>', '6L7dL − 700mL → <em>67dL − 7dL = 60dL = 6L</em>'], ng: 'Lと dLを そのまま たさない。700mL を <b>700dL</b>と しない（100mLで 1dL なので 7dL）。', try: { gen: true } };
   LESSONS.cm_mm = { title: 'cmと mmの かんけい', why: '<b>1cm = 10mm</b>。cmを mmに するときは ×10、mmを cmに するときは 10の まとまりが いくつ あるかを 見ます。2cm8mm なら 20mm と 8mm で 28mm。', ex: ['<em>5cm = 50mm</em>', '<em>29mm = 2cm9mm</em>', '<em>6cm8mm = 68mm</em>'], ng: '6cm8mm を <b>14mm</b>（6+8）と しない。cmは 10ばいして から たす。', try: { gen: true } };
   LESSONS.monosashi = { title: 'ものさしを よむ', why: '大きい めもり（数字）が cm、その あいだの 小さい めもりが mm で、1cmの 中に 10こ あります。線の はしが どの めもりに あるかを 見て、cmを よんでから のこりの 小さい めもりを 数えます。', ex: ['数字の 7を すぎて 小さい めもり 5つめ', '→ <em>7cm5mm</em>'], ng: '0から はかりはじめて いるかを たしかめる。めもりの まん中の 長い 線（5mm）を 1cmと まちがえない。', try: { gen: true } };
   UNITS.push({ id: 'chosen', name: 'ちょうせん（はってん）', keys: CHOSEN_TYPES.map(function (c) { return c[0]; }) });
@@ -962,6 +974,7 @@
   var TAPES = [['赤い', '青い', 'テープ'], ['白い', '黄色い', 'リボン'], ['長い', 'みじかい', 'ひも'], ['青い', '赤い', 'テープ']];
   function num(v, u) { return { k: 'n', v: v, u: u }; }
   function pair(a, b, u1, u2) { return { k: 'pair', a: a, b: b, u1: u1, u2: u2 }; }
+  function boxes(arr) { return { k: 'boxes', b: arr }; }   // ①②③…と じゅんに うめる
   function pk(opts, pick, v, u, tail) { return { k: 'pick', opts: opts, pick: pick, v: v, u: u, tail: tail || '多い' }; }
   function P(t, s, ans) { return { t: t, s: s, ans: ans }; }
   function tm(h, m) { return h + '時' + (m ? m + '分' : ''); }
@@ -1003,6 +1016,61 @@
   var GD = 0;
   function gd(a, b, c) { return GD >= 2 && c !== undefined ? c : GD >= 1 && b !== undefined ? b : a; }
   var GEN = {};
+
+  // --- かさ の たんい（学校の 計算小テスト 2-④ より）1L=10dL / 1dL=100mL / 1L=1000mL ---
+  function kasaChartSVG() {
+    var s = '<svg viewBox="0 0 300 150" class="kasachart" role="img" aria-label="1Lと 1dLと 1mLの ひょう">';
+    s += '<text x="4" y="16" font-size="13" font-family="sans-serif" fill="#2b2620">1L を 10こに わけると 1dL</text>';
+    s += '<rect x="4" y="24" width="280" height="34" fill="#dff1fb" stroke="#2b2620" stroke-width="2"/>';
+    for (var i = 1; i < 10; i++) s += '<path d="M' + (4 + i * 28) + ' 24 v34" stroke="#2b2620" stroke-width="1.4"/>';
+    s += '<text x="18" y="46" font-size="10" text-anchor="middle" font-family="sans-serif" fill="#2b2620">1dL</text>';
+    s += '<text x="150" y="74" font-size="12" text-anchor="middle" font-family="sans-serif" fill="#6f695d">1L ＝ 10dL</text>';
+    s += '<text x="4" y="98" font-size="13" font-family="sans-serif" fill="#2b2620">1dL を 100こに わけると 1mL</text>';
+    s += '<rect x="4" y="106" width="28" height="30" fill="#dff1fb" stroke="#2b2620" stroke-width="2"/>';
+    s += '<text x="40" y="126" font-size="13" font-family="sans-serif" fill="#2b2620">1dL ＝ 100mL　　1L ＝ 1000mL</text>';
+    return s + '</svg>';
+  }
+  GEN.l_dl = function (r) {
+    var kind = ri(r, 0, 3);
+    if (kind === 0) { var a = gd(ch(r, [1, 2, 3, 5]), ri(r, 2, 9), ri(r, 2, 40)); return P(a + 'L は なんdL ですか。', ['1L = 10dL', a + 'L = ' + (a * 10) + 'dL'], num(a * 10, 'dL')); }
+    if (kind === 1) { var b = gd(ch(r, [20, 30, 50]), ri(r, 2, 9) * 10, ri(r, 2, 40) * 10); return P(b + 'dL は なんL ですか。', ['10dLで 1L', b + 'dL = ' + (b / 10) + 'L'], num(b / 10, 'L')); }
+    if (kind === 2) { var c = ri(r, 1, gd(5, 12, 40)), d = ri(r, 1, 9); return P(c + 'L' + d + 'dL は なんdL ですか。', [c + 'L = ' + (c * 10) + 'dL', (c * 10) + '+' + d + '=' + (c * 10 + d)], num(c * 10 + d, 'dL')); }
+    var e = ri(r, 1, gd(5, 12, 40)), f = ri(r, 1, 9), v = e * 10 + f;
+    return P(v + 'dL は なんLなんdL ですか。', ['10dLで 1L', v + 'dL = ' + e + 'L' + f + 'dL'], pair(e, f, 'L', 'dL'));
+  };
+  GEN.dl_ml = function (r) {
+    var kind = ri(r, 0, 3);
+    if (kind === 0) { var a = gd(ch(r, [1, 2, 3, 5]), ri(r, 2, 9), ri(r, 2, 9)); return P(a + 'dL は なんmL ですか。', ['1dL = 100mL', a + 'dL = ' + (a * 100) + 'mL'], num(a * 100, 'mL')); }
+    if (kind === 1) { var b = gd(1, ri(r, 1, 3), ri(r, 1, 6)); return P(b + 'L は なんmL ですか。', ['1L = 10dL = 1000mL', b + 'L = ' + (b * 1000) + 'mL'], num(b * 1000, 'mL')); }
+    if (kind === 2) { var c = ri(r, 2, 9) * 100; return P(c + 'mL は なんdL ですか。', ['100mLで 1dL', c + 'mL = ' + (c / 100) + 'dL'], num(c / 100, 'dL')); }
+    var d2 = ri(r, 1, 9), e2 = gd(50, ch(r, [20, 50, 70]), ri(r, 1, 9) * 10), v2 = d2 * 100 + e2;
+    return P(v2 + 'mL は なんdLなんmL ですか。', ['100mLで 1dL', v2 + 'mL = ' + d2 + 'dL' + e2 + 'mL'], pair(d2, e2, 'dL', 'mL'));
+  };
+  function kasaTail(S, n1, n2) {   // わりきれる ときは 「◯L」だけ にする（学校の プリントと 同じ）
+    if (S % 10 === 0) return { t: ' ＝ ' + n1 + 'L', b: [{ v: S / 10, u: 'L', lab: n1 }], s: S + 'dL=' + (S / 10) + 'L' };
+    return { t: ' ＝ ' + n1 + 'L' + n2 + 'dL', b: [{ v: Math.floor(S / 10), u: 'L', lab: n1 }, { v: S % 10, u: 'dL', lab: n2 }], s: S + 'dL=' + Math.floor(S / 10) + 'L' + (S % 10) + 'dL' };
+  }
+  GEN.kasa_box = function (r) {
+    var kind = ri(r, 0, 2), top = gd(5, 9, 20);
+    if (kind === 0) {   // 4L4dL ＋ 6dL ＝ ①dL ＋ ②dL ＝ ③dL ＝ ④L⑤dL
+      var a = ri(r, 1, top), b = ri(r, 1, 9), c = ri(r, 1, 9), A = a * 10 + b, S = A + c, tl = kasaTail(S, '④', '⑤');
+      return { t: a + 'L' + b + 'dL ＋ ' + c + 'dL ＝ ①dL ＋ ②dL ＝ ③dL' + tl.t,
+        s: [a + 'L' + b + 'dL=' + A + 'dL', A + '+' + c + '=' + S, tl.s],
+        ans: boxes([{ v: A, u: 'dL', lab: '①' }, { v: c, u: 'dL', lab: '②' }, { v: S, u: 'dL', lab: '③' }].concat(tl.b)) };
+    }
+    if (kind === 1) {   // 8L6dL − 4L3dL ＝ ①dL − ②dL ＝ ③dL ＝ ④L⑤dL
+      var a2 = ri(r, 2, top), b2 = ri(r, 1, 9), c2 = ri(r, 1, a2 - 1), d2 = ri(r, 0, 9);
+      var A2 = a2 * 10 + b2, B2 = c2 * 10 + d2, S2 = A2 - B2, tl2 = kasaTail(S2, '④', '⑤');
+      return { t: a2 + 'L' + b2 + 'dL − ' + c2 + 'L' + (d2 ? d2 + 'dL' : '') + ' ＝ ①dL − ②dL ＝ ③dL' + tl2.t,
+        s: [a2 + 'L' + b2 + 'dL=' + A2 + 'dL　' + c2 + 'L' + (d2 ? d2 + 'dL' : '') + '=' + B2 + 'dL', A2 + '-' + B2 + '=' + S2, tl2.s],
+        ans: boxes([{ v: A2, u: 'dL', lab: '①' }, { v: B2, u: 'dL', lab: '②' }, { v: S2, u: 'dL', lab: '③' }].concat(tl2.b)) };
+    }
+    var a3 = ri(r, 2, top), b3 = ri(r, 1, 9), ml = ri(r, 1, Math.min(9, b3 + 5)) * 100;   // 6L7dL − 700mL
+    var A3 = a3 * 10 + b3, B3 = ml / 100, S3 = A3 - B3, tl3 = kasaTail(S3, '④', '⑤');
+    return { t: a3 + 'L' + b3 + 'dL − ' + ml + 'mL ＝ ①dL − ②dL ＝ ③dL' + tl3.t,
+      s: [a3 + 'L' + b3 + 'dL=' + A3 + 'dL　' + ml + 'mL=' + B3 + 'dL', A3 + '-' + B3 + '=' + S3, tl3.s],
+      ans: boxes([{ v: A3, u: 'dL', lab: '①' }, { v: B3, u: 'dL', lab: '②' }, { v: S3, u: 'dL', lab: '③' }].concat(tl3.b)) };
+  };
 
   // --- 時計（学校の 宿題プリント 9/14・時計プリント より） ---
   GEN.tokei_yomi = function (r) {
@@ -1417,6 +1485,16 @@
       f1.dataset.f = 'a'; f2.dataset.f = 'b';
       row.appendChild(f1); row.appendChild(el('span', 'unit', a.u1));
       row.appendChild(f2); row.appendChild(el('span', 'unit', a.u2));
+    } else if (a.k === 'boxes') {
+      var bx = el('div', 'bxs');
+      a.b.forEach(function (f, i) {
+        var w = el('span', 'bx');
+        w.appendChild(el('i', null, f.lab));
+        var nf = numField(''); nf.dataset.f = 'b' + i;
+        w.appendChild(nf); w.appendChild(el('span', 'unit', f.u));
+        bx.appendChild(w);
+      });
+      row.appendChild(bx);
     } else if (a.k === 'pick') {
       var box = el('div', 'opts');
       a.opts.forEach(function (o) {
@@ -1479,6 +1557,11 @@
     var a = item.q.ans, card = item.card;
     if (a.k === 'choice') return item.pick ? item.pick === a.pick : null;
     if (a.k === 'self') return item.pick === 'ok' ? true : item.pick === 'ng' ? false : null;
+    if (a.k === 'boxes') {
+      var got = a.b.map(function (f, i) { return val(card, 'b' + i); });
+      if (got.every(function (v) { return v === null; })) return null;
+      return got.every(function (v, i) { return v === a.b[i].v; });
+    }
     if (a.k === 'pair') {
       var x = val(card, 'a'), y = val(card, 'b');
       if (x === null) return null;
@@ -1496,6 +1579,7 @@
   function answerText(a) {
     if (a.k === 'choice') return a.pick;
     if (a.k === 'self') return a.answer;
+    if (a.k === 'boxes') return a.b.map(function (f) { return f.lab + ' ' + f.v + f.u; }).join('　');
     if (a.k === 'pair') return a.a + a.u1 + (a.b ? a.b + a.u2 : '');
     if (a.k === 'pick') return a.pick + 'が ' + a.v + a.u + ' ' + (a.tail || '多い');
     return a.v + a.u;
@@ -1978,6 +2062,7 @@
     c_box_hiki: ['へった 分を もどす', '□−6＝14 なら、14に 6を もどして 20。ひき算の □は たし算で 出ます。'],
     c_box_kake: ['九九の 段を さがす', '□×4＝28 なら、4の だんで 28に なる ところを さがす。7×4＝28 だから 7。'],
     c_len: ['cm は cm、mm は mm', '10mm で 1cm。たてに たんいを そろえて 書くと まざりません。'],
+    c_ldl: ['1L＝10dL、1dL＝100mL', 'Lを dLに するときは ×10、dLを mLに するときは ×100。1L＝1000mL も セットで。'],
     c_cmmm: ['1cm＝10mm', 'cm→mm は ×10、mm→cm は 10の かたまりが いくつ。6cm8mm は 60＋8 で 68mm。'],
     c_kasa: ['L は L、dL は dL', '10dL で 1L。dLが 10に なったら くり上げ、ひけない ときは 1L を くずします。']
   };
@@ -2043,6 +2128,9 @@
   KOTSU_T.tokei_ato = ['「はん」は 30分', '1時間はん＝1時間30分。時間どうし・分どうしを たして、分が 60に なったら 1時間 くり上げる。'];
   KOTSU_T.tokei_zure = ['おくれ＝たす、すすみ＝ひく', 'おくれて いる 時計は まだ 足りないから <b>たす</b>。すすんで いる 時計は 行きすぎだから <b>ひく</b>。合言葉「おくれは たす」。'];
   KOTSU_T.jikan_ade = ['60から いまの 分を ひく', '「あと なん分で つぎの 時か」は 60−（いまの 分）。こたえは 時こくでは なく 分の 長さ。'];
+  KOTSU_T.l_dl = ['1L＝10dL', 'Lを dLに するときは ×10、dLを Lに するときは 10で まとめる。3L5dL＝30dL＋5dL＝35dL。'];
+  KOTSU_T.dl_ml = ['1dL＝100mL、1L＝1000mL', 'dLを mLに するときは ×100。1Lは 10dL だから 1000mL。350mL は 300（3dL）と 50 に わける。'];
+  KOTSU_T.kasa_box = ['まず ぜんぶ dLに そろえる', 'たんいが まざったら dLに そろえて から 計算。さいごに 10で わって Lに もどす。合言葉「そろえて、計算して、もどす」。'];
   KOTSU_T.cm_mm = ['1cm＝10mm', 'cm→mm は ×10。mm→cm は 10の かたまりが いくつ。6cm8mm＝60mm＋8mm＝68mm。'];
   KOTSU_T.monosashi = ['小さい めもりは 1mm', '1cmの 中に 小さい めもりが 10こ。5つめの 少し 長い 線が 5mm。0から はかれて いるかも かくにん。'];
   var KZ_CAT = [['kk', '九九'], ['ty', '文しょうだい'], ['ke', 'けいさん'], ['kj', 'かんじ']];
@@ -2454,7 +2542,7 @@
     if (game) { game.lessonsRead[key] = true; }
     d.appendChild(el('span', 'eyebrow', 'せんせいの ワンポイント'));
     d.appendChild(el('h2', null, L.title));
-    d.appendChild(el('p', 'why', L.why));
+    d.appendChild(html('p', 'why', L.why));   // <b> などの かざりも つかえる
     var ex = el('div', 'ex'); ex.appendChild(el('div', 'h', 'れい'));
     L.ex.forEach(function (line) { ex.appendChild(html('div', null, line)); });
     d.appendChild(ex);
@@ -3170,6 +3258,13 @@
       if (k === 1) return CP((cm * 10 + mm) + 'mm ＝', [(cm * 10 + mm) + 'mm=' + cm + 'cm' + mm + 'mm'], pair(cm, mm, 'cm', 'mm'));
       return CP(cm + 'cm' + mm + 'mm ＝', [cm + 'cm=' + (cm * 10) + 'mm', (cm * 10) + '+' + mm + '=' + (cm * 10 + mm)], num(cm * 10 + mm, 'mm'));
     },
+    c_ldl: function (r) {
+      var k = ri(r, 0, 3);
+      if (k === 0) { var a = ri(r, 2, 9); return CP(a + 'L ＝', ['1L=10dL'], num(a * 10, 'dL')); }
+      if (k === 1) { var b = ri(r, 2, 9); return CP(b + 'dL ＝', ['1dL=100mL'], num(b * 100, 'mL')); }
+      if (k === 2) { var c = ri(r, 1, 9), d = ri(r, 1, 9); return CP(c + 'L' + d + 'dL ＝', [(c * 10) + '+' + d], num(c * 10 + d, 'dL')); }
+      var e = ri(r, 1, 9), f = ri(r, 1, 9); return CP((e * 10 + f) + 'dL ＝', ['10dLで 1L'], pair(e, f, 'L', 'dL'));
+    },
     c_kasa: function (r) {
       var l1 = ri(r, 1, 6), d1 = ri(r, 1, 9), l2 = ri(r, 1, 4), d2 = ri(r, 1, 9);
       if (r() < 0.5) { var dd = d1 + d2, L = l1 + l2 + (dd >= 10 ? 1 : 0), D = dd % 10; return CP(l1 + 'L' + d1 + 'dL ＋ ' + l2 + 'L' + d2 + 'dL ＝', ['dL ' + d1 + '+' + d2 + '=' + dd, 'L ' + l1 + '+' + l2 + '=' + (l1 + l2)], pair(L, D, 'L', 'dL')); }
@@ -3187,7 +3282,7 @@
     [38, ['c_kuku_mix', 'c_bai'], '九九 ぜんぶ・○ばい'],
     [44, ['c_hissan3'], '3けたの ひっさん'],
     [50, ['c_box_tashi', 'c_box_hiki', 'c_box_kake'], '□を もとめる（先どり）'],
-    [56, ['c_len', 'c_cmmm', 'c_kasa'], '長さ・かさの 計算・たんい'],
+    [56, ['c_len', 'c_cmmm', 'c_kasa', 'c_ldl'], '長さ・かさの 計算・たんい'],
     [60, ['c_tashi2', 'c_hiki2', 'c_kuku_mix', 'c_box_kake', 'c_tashi3'], 'まとめ']
   ];
   var KAI_MAX = 60;
@@ -4810,6 +4905,7 @@
         + '<li><b>ペンで 書きます</b>。指は 画面を うごかす ため。指で 書きたい ときは、わくの 上の <span class="k">指で かく</span> を おします。</li>'
         + '<li>（しき）（こたえ）（ひっさん）の ところに 書きます。ここは まるつけには つかいません。じゆうに つかって いいです。</li>'
         + '<li>下の 白い ますに <b>数字で こたえを 入れます</b>。ここを 見て まるつけを します。</li>'
+        + '<li><b>①②③の ますを じゅんに うめる</b> もんだいも あります（「4L4dL ＋ 6dL ＝ ①dL ＋ ②dL ＝ ③dL ＝ ④L」）。ぜんぶ 合って いたら ○です。</li>'
         + '<li><b>時計や ものさしの 絵</b>が 出る もんだいも あります。時計は「なん時」「なん分」の 2つの ますに、ものさしは「なんcm」「なんmm」の 2つの ますに 入れます。0の ときは からっぽの ままで OK。</li>'
         + '<li>ぜんぶ 書けたら、いちばん下の <span class="k">まるつけ</span> を おします。ボタンには <b>のこりの かず</b>が 出ます（「まるつけ（あと 2もん）」）。</li>'
         + '<li>まるつけを おすと、①から じゅんに <b>朱色の ○</b>が 1つずつ 書かれます。○が つづくと 音が すこしずつ 高く なって、2もん めからは「2もん つづけて ○」と 出ます。ぜんぶ ○の ときは「ぜんぶ ○！」と 紙ふぶき。</li>'
@@ -4869,6 +4965,11 @@
         + '<li>日を タップすると、その日 やった ことが 見られます。</li></ul>']
     ],
     oya: [
+      ['🥛', 'L・dL・mL の たんい（v37）', '<p>計算小テスト 2-④ の つまずき（1L＝10dL／1dL＝100mL／1L＝1000mL と、たんいを そろえてからの 計算）に あわせて、学校の プリントと 同じ「□を じゅんに うめる」形で 3つ 足しました。</p><ul>'
+        + '<li><b>Lと dLの かんけい</b>：4L＝□dL／60dL＝□L／3L5dL＝□dL／47dL＝□L□dL</li>'
+        + '<li><b>dLと mLの かんけい</b>：7dL＝□mL／1L＝□mL／500mL＝□dL／350mL＝□dL□mL</li>'
+        + '<li><b>dLに そろえて 計算する</b>：4L4dL＋6dL＝①dL＋②dL＝③dL＝④L のように、①から じゅんに ますを うめます。ぜんぶ 合って はじめて ○（とちゅうだけ 合って いても ✗）。ひき算、◯◯mL との ひき算も 出ます。</li>'
+        + '<li>出てくる ところ：ホーム →「きょうの 5問」→ <b>かさ</b>。「せんせいの ワンポイント」に 1L＝10dL＝1000mL の ひょうの 絵つきで 3つ 入れました。「いんさつ」→「型から 作る」→ かさ で 紙の プリントにも できます。「けいさん 1まい」の 56回目あたりにも たんいの へんかんを 足しました。</li></ul>'],
       ['✨', '毎日 つづける ための しかけ（v36）', '<p>「毎日 とくのが 楽しくなるように」の ご依頼で、5つ 入れました。ポイントや メダルを 増やすのでは なく、<b>まいにち かならず 起きる 場面</b>を よくする方向にしています。</p><ul>'
         + '<li><b>まるつけの 演出</b>：○を 1問ずつ 朱色で 書き、連続で 音が 上がります。いちばん 大きな お祝いは「ぜんぶ なおせた とき」。×には 音も 点滅も つけていません（責めない）。演出中は まるつけボタンが 止まりますが、画面タップで すぐ 飛ばせます。</li>'
         + '<li><b>いますぐ はじめる</b>：ホームの いちばん上に「けいさん ○回目を はじめる」の 大きな ボタン。えらぶ画面を 通らずに 始められます。下の 小さい リンクは「きょうの 5問」。タイルは 1つも 減らしていません。</li>'
