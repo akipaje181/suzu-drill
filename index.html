@@ -206,6 +206,15 @@
   .mark.x path{animation:drawX .3s ease-out}
   @keyframes drawX{from{opacity:0; transform:scale(.6); transform-origin:center} to{opacity:1; transform:scale(1)}}
   .combo{margin:10px 0 0 39px; font-family:var(--f-round); font-size:13.5px; color:var(--shu-ink); font-weight:700}
+  /* 絵の すず（9ポーズ）。きせかえは うつらない ので、一瞬 出る ところと ホームの 上だけに つかう */
+  .spose{display:block; margin:0 auto; width:auto; height:118px}
+  .nowcard .spose{height:116px; margin-bottom:-2px}
+  .fixhd .spose{height:78px; margin:0 auto 2px}
+  .gres .spose{height:100px; margin:8px auto 0}
+  .cheer .spose{height:min(30vh,230px); animation:cheerPop .55s cubic-bezier(.2,1.4,.5,1)}
+  .top .sface{height:30px; width:auto; margin-right:-4px; flex:0 0 auto}
+  @media (max-width:560px){ .spose{height:98px} .nowcard .spose{height:100px} }
+  @media (prefers-reduced-motion: reduce){ .cheer .spose{animation:none} }
   /* 起動画面（ひらいた すぐ あと の 白い 画面を なくす） */
   #splash{position:fixed; inset:0; z-index:200; display:grid; place-items:center; background:var(--ground); transition:opacity .45s ease}
   #splash img{width:min(66vw,360px); height:auto; animation:spPop .55s cubic-bezier(.2,1.4,.5,1)}
@@ -214,8 +223,12 @@
   @media (prefers-reduced-motion: reduce){ #splash img{animation:none} }
   .cheer{position:fixed; inset:0; z-index:60; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; overflow:hidden; transition:opacity .4s}
   .cheer.out{opacity:0}
-  .cheer .cframe{position:absolute; inset:0; display:grid; place-items:center}
-  .cheer .cframe img{width:min(94vw,560px); max-height:72vh; animation:cheerPop .5s cubic-bezier(.2,1.4,.5,1)}
+  .cheer::before{content:''; position:absolute; inset:0; background:var(--ground); opacity:.84}   /* すずと 飾りが 読めるように、うしろを そっと かくす */
+  .cheer .cmsg{position:relative; display:grid; place-items:center; width:min(94vw,520px); aspect-ratio:1/1; max-height:56vh}
+  .cheer .cframe{position:absolute; inset:0}
+  .cheer .cframe img{width:100%; height:100%; object-fit:contain; animation:cheerPop .5s cubic-bezier(.2,1.4,.5,1)}
+  .cheer .cmsgin{position:relative; z-index:1; display:flex; flex-direction:column; align-items:center}
+  .cheer .cwho{margin-top:-3vh; position:relative; z-index:2}
   .cheer b, .cheer span{position:relative; z-index:1}
   .cheer b{font-family:var(--f-round); font-size:44px; color:var(--shu); background:var(--paper); border:4px solid var(--shu); border-radius:22px; padding:14px 30px; box-shadow:0 10px 34px rgba(0,0,0,.22); animation:cheerPop .5s cubic-bezier(.2,1.4,.5,1)}
   .cheer span{margin-top:12px; font-family:var(--f-round); font-size:17px; color:var(--ink); background:var(--paper); border-radius:999px; padding:6px 16px; box-shadow:0 4px 14px rgba(0,0,0,.14)}
@@ -785,6 +798,7 @@
 
 <div class="top"><div class="wrap">
   <button type="button" class="back" id="back" hidden>‹ ホーム</button>
+  <img class="sface" src="./img/suzu-face.webp" alt="" width="437" height="420">
   <h1 id="ttl">すずドリル</h1>
   <button type="button" class="helpb" id="helpBtn" aria-label="つかいかた">？</button>
   <div class="tabs" id="tabs" hidden></div>
@@ -1859,11 +1873,13 @@
     for (var i = 0; i < n; i++) (function (k) { markT.push(setTimeout(function () { paint(k); }, k * step)); })(i);
     markT.push(setTimeout(finish, n * step + 80));
   }
-  function cheerOverlay(main, sub) {   // ぜんぶ○・ぜんぶ なおせた の お祝い
-    var w = el('div', 'cheer');
-    w.appendChild(html('i', 'cframe', '<img src="./img/cheer-frame.webp" alt="">'));
-    w.appendChild(el('b', null, main));
-    if (sub) w.appendChild(el('span', null, sub));
+  function cheerOverlay(main, sub, pose) {   // ぜんぶ○・ぜんぶ なおせた の お祝い
+    var w = el('div', 'cheer'), msg = el('div', 'cmsg'), inn = el('div', 'cmsgin');
+    msg.appendChild(html('i', 'cframe', '<img src="./img/cheer-frame.webp" alt="">'));
+    inn.appendChild(el('b', null, main));
+    if (sub) inn.appendChild(el('span', null, sub));
+    msg.appendChild(inn); w.appendChild(msg);
+    w.appendChild(html('div', 'cwho', suzuImg(pose || 'cheer')));
     for (var i = 0; i < 20; i++) {
       var c = el('i', 'confetti');
       c.style.left = (3 + Math.random() * 94) + '%'; c.style.background = COLORS[i % COLORS.length];
@@ -1918,6 +1934,7 @@
       nextLabel: o.nextLabel, next: o.next, again: o.again
     });
     var hd = el('div', 'fixhd');
+    hd.appendChild(html('div', null, suzuImg('think')));
     hd.appendChild(el('b', null, 'なおし　' + items.length + '問'));
     hd.appendChild(el('span', null, round === 1 ? 'まちがえた ところだけ もう一度。ぜんぶ なおせたら つぎに すすめるよ。' : round + '回目の なおし。ゆっくりで だいじょうぶ。'));
     o.box.insertBefore(hd, o.box.firstChild);
@@ -3912,6 +3929,7 @@
     ev.decor.forEach(function (d) { tags.appendChild(html('span', 'badge', '🛋 へやに「' + d.name + '」が ふえた')); });
     if (ev.star) tags.appendChild(html('span', 'badge', '⭐ ★が ' + ev.star + 'こに なった！'));
     if (tags.children.length) p.appendChild(tags);
+    if (ev.badges.length) p.appendChild(html('div', null, suzuImg('medal')));   // メダルを もらった ときだけ 出す
     if (sc) {   // きょうの あいぼうが ひとこと（まるつけの あとだけ）
       var b = buddyOf(todayKey());
       if (b) {
@@ -4250,6 +4268,15 @@
   }
   function doriInner(stage, mood) { var lk = mateLook(DORI_MATE); return charInner({ stage: stage, color: game.color, wear: lk.wear, accColor: lk.accColor, mood: mood }); }
   function mainInner(o) { return heroOn() ? heroInner(heroOpts(o)) : charInner(o); }
+  // 絵の すず。pose は 9まい（stand/cheer/write/think/rest/morning/medal/sleep/face）
+  function suzuImg(pose, cls) { return '<img class="' + (cls || 'spose') + '" src="./img/suzu-' + pose + '.webp" alt="" loading="lazy">'; }
+  function suzuPose() {   // いまの ようすで ポーズを えらぶ（奨也の道の pose と 同じ 考え方）
+    var h = new Date().getHours(), k = todayKey(), td = sheetsOnDay(k);
+    if (h >= 21 || h < 6) return 'sleep';
+    if (td >= goals().day) return 'rest';
+    if (h < 10 && !game.morning[k]) return 'morning';
+    return td > 0 ? 'write' : 'stand';
+  }
   function mainSVG(o) { return '<svg class="char" viewBox="0 0 200 200" aria-hidden="true">' + mainInner(o) + '</svg>'; }
   function mateInner(m, gray) {   // なかまの 絵（どうぶつ／ひと）
     if (m.human) {
@@ -5247,6 +5274,7 @@
   function nowCard() {   // ホームの いちばん上：えらばずに すぐ はじめられる ボタン
     var c = el('div', 'nowcard'), ks = keisan(), at = Math.min(KAI_MAX, ks.at || 1);
     var g = goals(), td = sheetsOnDay(todayKey());
+    c.appendChild(html('div', null, suzuImg(suzuPose())));
     c.appendChild(el('div', 'nowlead', td >= g.day ? 'きょうの もくひょう おわったね！ まだ やる？' : 'いますぐ はじめる'));
     c.appendChild(btn('btn nowgo', '▶ けいさん ' + at + '回目を はじめる（10問）', function () { welcomeGone = true; startKeisan(at); }));
     var u = unitById(dst.unit || game.unitNow);
