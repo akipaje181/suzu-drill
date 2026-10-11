@@ -1,5 +1,5 @@
 /* すずドリル service worker — offline cache */
-const VERSION = 'suzu-drill-v43';
+const VERSION = 'suzu-drill-v44';
 const CORE = [
   './', './index.html', './manifest.webmanifest', './icon-192.png',
   './icon-512.png', './icon-180.png', './icon-maskable-512.png', './img/splash.webp',
