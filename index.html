@@ -213,6 +213,12 @@
   .gres .spose{height:100px; margin:8px auto 0}
   .cheer .spose{height:min(30vh,230px); animation:cheerPop .55s cubic-bezier(.2,1.4,.5,1)}
   .top .sface{height:30px; width:auto; margin-right:-4px; flex:0 0 auto}
+  .rankb{height:34px; width:auto; vertical-align:-9px; margin-right:6px}
+  .gbig .rankb{height:46px; vertical-align:-12px}
+  .fxwrap{position:relative; display:grid; place-items:center; width:100%; margin-top:6px}
+  .fxwrap::before{content:''; position:absolute; inset:0; background:url(./img/fx-medal.webp) center/contain no-repeat; opacity:.95}
+  .fxwrap .spose{position:relative; z-index:1; height:118px}
+  .gres .fxband{display:block; width:100%; height:54px; background:url(./img/fx-levelup.webp) center/cover no-repeat; border-radius:8px; order:-1}
   @media (max-width:560px){ .spose{height:98px} .nowcard .spose{height:100px} }
   @media (prefers-reduced-motion: reduce){ .cheer .spose{animation:none} }
   /* 起動画面（ひらいた すぐ あと の 白い 画面を なくす） */
@@ -3909,6 +3915,7 @@
   }
   function gameResultPanel(ev, sc) {
     var p = el('div', 'gres' + (ev.up ? ' up' : ''));
+    if (ev.up) p.appendChild(el('i', 'fxband'));   // レベルアップの かざり帯
     var mood = ev.up ? 'excited' : 'happy';
     p.appendChild(html('div', null, mainSVG({ stage: stageOf(ev.level), color: game.color, wear: game.wear, mood: mood })));
     var gx = el('div', 'gx');
@@ -3932,7 +3939,7 @@
     ev.decor.forEach(function (d) { tags.appendChild(html('span', 'badge', '🛋 へやに「' + d.name + '」が ふえた')); });
     if (ev.star) tags.appendChild(html('span', 'badge', '⭐ ★が ' + ev.star + 'こに なった！'));
     if (tags.children.length) p.appendChild(tags);
-    if (ev.badges.length) p.appendChild(html('div', null, suzuImg('medal')));   // メダルを もらった ときだけ 出す
+    if (ev.badges.length) p.appendChild(html('div', 'fxwrap fxmedal', suzuImg('medal')));   // メダルを もらった ときだけ 出す
     if (sc) {   // きょうの あいぼうが ひとこと（まるつけの あとだけ）
       var b = buddyOf(todayKey());
       if (b) {
@@ -4445,7 +4452,14 @@
   var QUEST_DEFAULT = ['s_hand', 's_greet', 'h_ready', 'h_help'];   // さいしょから 出ている クエスト
   var QCAT = { learn: 'ドリル' }; QGRPS.forEach(function (g) { QCAT[g.id] = g.short; });
   // 絵の メダル（画像が ある id だけ。ない ものは 絵文字の まま）
-  var MEDAL_PIC = { first: 1, perfect1: 1, streak3: 1, streak7: 1, streak30: 1, card1: 1, card2: 1, card3: 1, s10: 1, s50: 1, s100: 1, goal7: 1, week1: 1 };
+  var MEDAL_PIC = {
+    first: 1, perfect1: 1, perfect10: 1, streak3: 1, streak7: 1, streak30: 1,
+    card1: 1, card2: 1, card3: 1, s10: 1, s50: 1, s100: 1,
+    goal7: 1, week1: 1, master1: 1, master5: 1, master10: 1, weakwin: 1,
+    weak10: 1, scan1: 1, lessons5: 1, mates3: 1, quest1: 1, allclear1: 1,
+    allclear7: 1, morning7: 1, big1: 1, oks10: 1, diary7: 1, routine7: 1
+  };   // 30個 ぜんぶ 絵が ある
+  function rankImg(st, cls) { return '<img class="' + (cls || 'rankb') + '" src="./img/rank-' + (st + 1) + '.webp" alt="">'; }   // だんかい 0〜6 → rank-1〜7
   function medalPic(b, cls) { return MEDAL_PIC[b.id] ? '<img class="' + (cls || 'mic') + '" src="./img/medal-' + b.id + '.webp" alt="">' : b.ic; }
   var LUCKS = [['大吉', 3], ['中吉', 3], ['小吉', 2], ['吉', 2]];   // うんせい と 出やすさ（わるいのは 出ない）
   var OMI_PICS = ['clover', 'star', 'rainbow', 'hanamaru', 'music', 'cake'];   // おみくじの 絵（その日 かわらない）
@@ -5299,7 +5313,9 @@
     var lab = el('div', 'clabel'); lab.appendChild(el('b', null, '🏠 マイルーム')); lab.appendChild(el('span', null, 'ひらく →'));
     card.insertBefore(lab, card.firstChild);
     var info = el('div', 'cinfo');
-    var nm = el('div', 'cname', mainName()); nm.appendChild(el('small', null, 'Lv.' + lv.level + '　' + stageLabel(stageOf(lv.level)) + '　なかま ' + mateCount()));
+    var nm = el('div', 'cname'); nm.appendChild(html('span', null, rankImg(stageOf(lv.level))));
+    nm.appendChild(html('span', null, mainName()));
+    nm.appendChild(el('small', null, 'Lv.' + lv.level + '　' + stageLabel(stageOf(lv.level)) + '　なかま ' + mateCount()));
     info.appendChild(nm);
     var bar = el('div', 'xpbar'), fill = el('i'); fill.style.width = Math.round(lv.into / lv.need * 100) + '%'; bar.appendChild(fill); info.appendChild(bar);
     var tx = el('div', 'xptxt'); tx.appendChild(el('span', null, 'あと ' + (lv.need - lv.into) + ' ポイントで Lv.' + (lv.level + 1)));
