@@ -464,6 +464,9 @@
   .medal b{font-family:var(--f-round); font-size:14px; display:block}
   .medal small{font-size:11px; color:var(--ink-soft); display:block; line-height:1.5}
   .medal.lock .ic{background:var(--rule-soft); border-color:var(--rule); filter:grayscale(1); opacity:.6}
+  .medal .ic.pic{background:none; border:0; width:62px; height:62px}      /* 絵の メダルは それ自体に ふちが ある */
+  .medal .ic.pic img{width:100%; height:100%; display:block}
+  .badge .mic{width:20px; height:20px; vertical-align:-5px; margin-right:2px}
   .medal.lock{opacity:.75}
   .streak{font-family:var(--f-round); font-size:15px; margin:4px 0 0}
   .streak b{color:var(--shu-ink); font-size:20px}
@@ -3925,7 +3928,7 @@
     if (heroOn() && ev.up) {
       DRESS_PARTS.forEach(function (pt) { pt[1].forEach(function (x) { if (x[2] > ev.from && x[2] <= ev.level) tags.appendChild(html('span', 'badge', '👗 きせかえ ' + pt[2] + '「' + x[1] + '」')); }); });
     }
-    ev.badges.forEach(function (b) { tags.appendChild(html('span', 'badge', b.ic + ' メダル「' + b.name + '」')); });
+    ev.badges.forEach(function (b) { tags.appendChild(html('span', 'badge', medalPic(b) + ' メダル「' + b.name + '」')); });
     ev.decor.forEach(function (d) { tags.appendChild(html('span', 'badge', '🛋 へやに「' + d.name + '」が ふえた')); });
     if (ev.star) tags.appendChild(html('span', 'badge', '⭐ ★が ' + ev.star + 'こに なった！'));
     if (tags.children.length) p.appendChild(tags);
@@ -4441,6 +4444,9 @@
   ];
   var QUEST_DEFAULT = ['s_hand', 's_greet', 'h_ready', 'h_help'];   // さいしょから 出ている クエスト
   var QCAT = { learn: 'ドリル' }; QGRPS.forEach(function (g) { QCAT[g.id] = g.short; });
+  // 絵の メダル（画像が ある id だけ。ない ものは 絵文字の まま）
+  var MEDAL_PIC = { first: 1, perfect1: 1, streak3: 1, streak7: 1, streak30: 1, card1: 1, card2: 1, card3: 1, s10: 1, s50: 1, s100: 1, goal7: 1, week1: 1 };
+  function medalPic(b, cls) { return MEDAL_PIC[b.id] ? '<img class="' + (cls || 'mic') + '" src="./img/medal-' + b.id + '.webp" alt="">' : b.ic; }
   var LUCKS = [['大吉', 3], ['中吉', 3], ['小吉', 2], ['吉', 2]];   // うんせい と 出やすさ（わるいのは 出ない）
   var OMI_PICS = ['clover', 'star', 'rainbow', 'hanamaru', 'music', 'cake'];   // おみくじの 絵（その日 かわらない）
   var LUCKY_COLORS = [['あか', '#e2574c'], ['あお', '#4d8fd6'], ['きいろ', '#f2c94c'], ['みどり', '#6cbf6c'], ['ピンク', '#f49ac1'], ['むらさき', '#c9a3ff'], ['オレンジ', '#ffb27a'], ['みずいろ', '#7ec8e3']];
@@ -5517,7 +5523,8 @@
     var bg = el('div', 'medals');
     BADGES.forEach(function (b) {
       var got = game.badges[b.id], d = el('div', 'medal' + (got ? '' : ' lock'));
-      d.appendChild(el('div', 'ic', got ? b.ic : '？')); d.appendChild(el('b', null, b.name));
+      d.appendChild(got && MEDAL_PIC[b.id] ? html('div', 'ic pic', medalPic(b, 'mfull')) : el('div', 'ic', got ? b.ic : '？'));
+      d.appendChild(el('b', null, b.name));
       d.appendChild(el('small', null, got ? fmtDay(dayKey(got)) + ' ゲット' : b.desc));
       bg.appendChild(d);
     });

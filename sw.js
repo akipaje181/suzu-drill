@@ -1,5 +1,5 @@
 /* すずドリル service worker — offline cache */
-const VERSION = 'suzu-drill-v40';
+const VERSION = 'suzu-drill-v41';
 const CORE = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-180.png', './icon-maskable-512.png',
   './img/splash.webp', './img/room-bg.webp', './img/cheer-frame.webp',
@@ -8,7 +8,11 @@ const CORE = ['./', './index.html', './manifest.webmanifest',
   './img/omi-hanamaru.webp', './img/omi-music.webp', './img/omi-cake.webp',
   './img/suzu-stand.webp', './img/suzu-cheer.webp', './img/suzu-write.webp',
   './img/suzu-think.webp', './img/suzu-rest.webp', './img/suzu-morning.webp',
-  './img/suzu-medal.webp', './img/suzu-sleep.webp', './img/suzu-face.webp'];
+  './img/suzu-medal.webp', './img/suzu-sleep.webp', './img/suzu-face.webp',
+  './img/medal-first.webp', './img/medal-perfect1.webp', './img/medal-streak3.webp', './img/medal-streak7.webp',
+  './img/medal-streak30.webp', './img/medal-card1.webp', './img/medal-card2.webp', './img/medal-card3.webp',
+  './img/medal-s10.webp', './img/medal-s50.webp', './img/medal-s100.webp', './img/medal-goal7.webp',
+  './img/medal-week1.webp'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
